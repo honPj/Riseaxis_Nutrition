@@ -27,6 +27,7 @@
   <meta name="twitter:image" content="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- ============ JSON-LD STRUCTURED DATA ============ -->
   <script type="application/ld+json">
@@ -49,7 +50,7 @@
 
   <style>
     /* ============================================================
-       RISE AXIS SOLUTIONS — BRAND PALETTE (matches About page)
+       RISE AXIS SOLUTIONS — BRAND PALETTE (matches index page)
        ============================================================ */
     :root {
       --navy: #1e53b4;
@@ -77,122 +78,622 @@
       line-height: 1.6;
       overflow-x: hidden;
     }
+    body.search-open { overflow: hidden; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
     img { display: block; max-width: 100%; }
     button { font-family: inherit; }
     .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
-    /* ---------- TOP BAR (matches About) ---------- */
+    /* ============================================================
+       TOP BAR
+       ============================================================ */
     .top-bar {
-      background: var(--navy);
-      color: #fff;
-      padding: 10px 0;
-      font-size: 0.88rem;
+      background: var(--navy); color: #fff;
+      padding: 10px 0; font-size: 0.88rem;
     }
     .top-bar .container {
       display: flex; flex-wrap: wrap;
-      justify-content: space-between; align-items: center;
-      gap: 12px;
+      justify-content: space-between; align-items: center; gap: 12px;
     }
     .top-item { display: flex; align-items: center; gap: 8px; }
     .top-item i { color: var(--orange); font-size: 0.95rem; }
     .top-item strong { color: #fff; font-weight: 600; }
 
-    /* ---------- NAVIGATION (matches About) ---------- */
+    /* ============================================================
+       NAVIGATION
+       ============================================================ */
     .main-nav {
-      background: var(--bg-white);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       position: sticky; top: 0; z-index: 1000;
-      box-shadow: 0 2px 12px rgba(31, 58, 110, 0.08);
-      border-bottom: 3px solid var(--red);
+      box-shadow: 0 1px 0 rgba(31, 58, 110, 0.06);
       transition: box-shadow 0.3s;
     }
+    .main-nav.scrolled { box-shadow: 0 8px 30px rgba(31, 58, 110, 0.1); }
     .main-nav .container {
       display: flex; align-items: center;
-      justify-content: space-between; min-height: 78px;
+      justify-content: space-between; min-height: 82px;
+      gap: 24px;
     }
+
     .logo {
       display: flex; align-items: center; gap: 10px;
-      font-weight: 800; font-size: 1.4rem;
-      color: var(--navy); letter-spacing: 0.5px;
+      font-weight: 900; font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      position: relative;
+      flex-shrink: 0;
     }
     .logo-mark {
       display: flex; align-items: center; gap: 2px;
-      font-size: 1.6rem; font-weight: 900;
+      font-size: 1.55rem; font-weight: 900;
     }
     .logo-mark .rise { color: var(--navy); }
     .logo-mark .axis { color: var(--red); }
     .logo-sub {
-      display: block; font-size: 0.55rem;
+      display: block; font-size: 0.52rem;
       letter-spacing: 3px; color: var(--bronze);
-      font-weight: 700; margin-top: -4px;
+      font-weight: 700; margin-top: -3px;
+    }
+    .logo::after {
+      content: '';
+      position: absolute;
+      right: -8px; top: 4px; bottom: 4px;
+      width: 3px;
+      background: linear-gradient(180deg, var(--red), var(--orange), var(--green));
+      border-radius: 3px;
+      opacity: 0.7;
     }
 
+    /* ---------- NAV LINKS ---------- */
     .nav-links {
-      display: flex; align-items: center; gap: 28px;
-      color: var(--navy); font-weight: 600; font-size: 0.95rem;
+      display: flex; align-items: center; gap: 4px;
+      font-weight: 600; font-size: 0.9rem;
+      flex: 1;
+      justify-content: center;
     }
-    .nav-links a { transition: color 0.2s; padding: 8px 0; position: relative; }
-    .nav-links a::after {
-      content: ''; position: absolute; bottom: 0; left: 0;
-      width: 0; height: 2px; background: var(--red);
-      transition: width 0.25s;
+    .nav-links > li > a {
+      padding: 9px 14px;
+      border-radius: 8px;
+      color: var(--navy);
+      transition: all 0.25s;
+      position: relative;
+      display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap;
     }
-    .nav-links a:hover { color: var(--red); }
-    .nav-links a:hover::after { width: 100%; }
-    .nav-links a.active { color: var(--red); }
-    .nav-links a.active::after { width: 100%; }
+    .nav-links > li > a:hover,
+    .nav-links > li > a.active {
+      background: rgba(30, 83, 180, 0.06);
+      color: var(--red);
+    }
 
     .dropdown { position: relative; }
-    .dropdown > a i { font-size: 0.65rem; margin-left: 4px; }
+    .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
+    .dropdown:hover > a i { transform: rotate(180deg); }
     .dropdown-menu {
-      position: absolute; top: 100%; left: 0;
-      background: var(--bg-white); min-width: 210px;
-      border-radius: 8px; padding: 8px 0;
-      box-shadow: 0 10px 30px rgba(31, 58, 110, 0.15);
-      border-top: 3px solid var(--red);
+      position: absolute; top: calc(100% + 8px); left: 0;
+      background: var(--bg-white); min-width: 230px;
+      border-radius: 14px; padding: 10px;
+      box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15);
+      border: 1px solid var(--border);
       opacity: 0; visibility: hidden;
       transform: translateY(10px);
-      transition: all 0.2s;
+      transition: all 0.25s;
     }
     .dropdown:hover .dropdown-menu {
       opacity: 1; visibility: visible; transform: translateY(0);
     }
     .dropdown-menu a {
-      display: block; padding: 10px 20px;
-      color: var(--navy); font-weight: 500; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      color: var(--navy); font-weight: 500; font-size: 0.88rem;
+      border-radius: 10px;
+      transition: all 0.2s;
     }
-    .dropdown-menu a:hover { background: var(--bg-light); color: var(--red); }
-
-    .nav-actions { display: flex; align-items: center; gap: 12px; }
-    .search-icon {
-      color: var(--navy); font-size: 1.05rem;
-      width: 40px; height: 40px;
+    .dropdown-menu a i {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--bg-light);
       display: flex; align-items: center; justify-content: center;
-      border: 2px solid var(--border); border-radius: 50%;
-      cursor: pointer; transition: all 0.2s;
+      font-size: 0.85rem; color: var(--red);
+      transition: all 0.2s;
     }
-    .search-icon:hover { border-color: var(--red); color: var(--red); }
+    .dropdown-menu a:hover {
+      background: var(--bg-light); color: var(--red);
+      transform: translateX(4px);
+    }
+    .dropdown-menu a:hover i { background: var(--red); color: #fff; }
 
-    .btn-catalogue {
+    /* ---------- NAV ACTIONS ---------- */
+    .nav-actions {
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .search-icon {
+      color: var(--navy); font-size: 0.95rem;
+      width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--border); border-radius: 50%;
+      cursor: pointer; transition: all 0.25s;
+      background: var(--bg-white);
+      padding: 0;
+    }
+    .search-icon:hover {
+      border-color: var(--navy);
+      background: var(--navy); color: #fff;
+      transform: rotate(90deg);
+    }
+
+    .cart-icon-btn {
+      position: relative;
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), #0a5f2e);
+      color: #fff;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+      box-shadow: 0 4px 14px rgba(14,122,60,0.25);
+    }
+    .cart-icon-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(14,122,60,0.4);
+    }
+    .cart-badge-nav {
+      position: absolute;
+      top: -4px; right: -4px;
+      min-width: 20px; height: 20px;
+      padding: 0 6px;
+      border-radius: 20px;
       background: var(--red); color: #fff;
-      padding: 12px 22px; border-radius: 120px;;
-      font-weight: 700; border: none; cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-      font-size: 0.9rem;
+      font-size: 0.68rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff;
+      line-height: 1;
     }
-    .btn-catalogue:hover { background: var(--red-dark); transform: translateY(-1px); }
 
-    .btn-shop {
-      background: var(--green); color: #fff;
-      padding: 12px 22px; border-radius: 120px;
-      font-weight: 700; border: none; cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-      font-size: 0.9rem;
+    /* Sign In dropdown */
+    .auth-actions { display: inline-flex; align-items: center; }
+    .signin-dropdown { position: relative; display: inline-block; }
+    .btn-signin {
       display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px; border-radius: 120px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff; border: none;
+      font-weight: 700; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 4px 14px rgba(30,83,180,0.25);
     }
-    .btn-shop:hover { background: #0a5f2e; transform: translateY(-1px); }
-    .btn-shop i { font-size: 0.9rem; }
+    .btn-signin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(30,83,180,0.4);
+    }
+    .signin-menu {
+      position: absolute; top: calc(100% + 10px); right: 0;
+      min-width: 260px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 50px rgba(31,58,110,0.15);
+      padding: 8px;
+      opacity: 0; visibility: hidden;
+      transform: translateY(8px);
+      transition: all 0.22s;
+      z-index: 200;
+    }
+    .signin-dropdown:hover .signin-menu,
+    .signin-dropdown:focus-within .signin-menu {
+      opacity: 1; visibility: visible; transform: translateY(0);
+    }
+    .signin-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 10px;
+      color: var(--navy); transition: all 0.2s;
+    }
+    .signin-menu a:hover { background: #f5f9ff; color: var(--red); }
+    .signin-menu a i {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: #f0f4fa; color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .signin-menu a:hover i { background: var(--red); color: #fff; }
+    .signin-menu a div { display: flex; flex-direction: column; }
+    .signin-menu a strong { font-size: 0.9rem; font-weight: 700; line-height: 1.2; }
+    .signin-menu a small {
+      font-size: 0.72rem; color: var(--text-muted);
+      font-weight: 500; margin-top: 2px;
+    }
+
+    /* ============================================================
+       SEARCH OVERLAY
+       ============================================================ */
+    .search-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(15, 23, 41, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1500;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s;
+      padding: 90px 24px 40px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    .search-overlay.open { opacity: 1; visibility: visible; }
+    .search-panel {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      overflow: hidden;
+      transform: translateY(-20px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .search-overlay.open .search-panel { transform: translateY(0) scale(1); }
+    .search-panel-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+      background: #fafbff;
+    }
+    .search-panel-header > i { color: var(--navy); font-size: 1.1rem; }
+    .search-input-wrap { flex: 1; position: relative; }
+    .search-input-wrap input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fff;
+      outline: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .search-input-wrap input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(30,83,180,0.1);
+    }
+    .search-close {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+      flex-shrink: 0;
+    }
+    .search-close:hover {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+      transform: rotate(90deg);
+    }
+    .search-panel-body {
+      padding: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .search-hint {
+      padding: 30px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .search-hint i {
+      font-size: 2rem; color: var(--border);
+      display: block; margin-bottom: 10px;
+    }
+    .search-hint strong {
+      display: block; color: var(--navy);
+      font-size: 1rem; margin-bottom: 4px;
+    }
+    .search-group-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 14px 16px 8px;
+    }
+    .search-result {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .search-result:hover { background: #f5f9ff; }
+    .search-result-img {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--bg-light);
+      flex-shrink: 0;
+    }
+    .search-result-icon {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      background: #f0f4fa;
+      color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .search-result-info { flex: 1; min-width: 0; }
+    .search-result-info strong {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--navy);
+      font-weight: 700;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .search-result-info small {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .search-result-arrow {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+    .search-no-results {
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .search-no-results i {
+      font-size: 2rem; color: var(--border);
+      margin-bottom: 12px; display: block;
+    }
+    .search-no-results strong {
+      display: block; color: var(--navy);
+      font-size: 1rem; margin-bottom: 4px;
+    }
+
+    /* ============================================================
+       MOBILE NAV — hamburger + slide menu
+       ============================================================ */
+    .mobile-nav-actions {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+    .hamburger {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.25s;
+      padding: 0;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2.5px;
+      background: var(--navy);
+      border-radius: 3px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hamburger:hover { border-color: var(--navy); background: var(--bg-light); }
+    .hamburger.active { background: var(--navy); border-color: var(--navy); }
+    .hamburger.active span { background: #fff; }
+    .hamburger.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scale(0); }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-menu-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 41, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 1500;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s;
+    }
+    .mobile-menu-overlay.open { opacity: 1; visibility: visible; }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0; right: 0;
+      width: 340px; max-width: 88vw;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -20px 0 60px rgba(0,0,0,0.2);
+      z-index: 1600;
+      transform: translateX(105%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .mobile-menu.open { transform: translateX(0); }
+
+    .mobile-menu-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbff;
+      flex-shrink: 0;
+    }
+    .mobile-menu-close {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+    }
+    .mobile-menu-close:hover {
+      background: var(--red); border-color: var(--red);
+      color: #fff; transform: rotate(90deg);
+    }
+
+    .mobile-user {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f7fafd, #eef4fb);
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-user-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff; font-weight: 800; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .mobile-user-info { flex: 1; min-width: 0; }
+    .mobile-user-info strong {
+      display: block; color: var(--navy);
+      font-size: 0.95rem; font-weight: 800;
+    }
+    .mobile-user-info small {
+      display: block; color: var(--text-muted);
+      font-size: 0.78rem; font-weight: 500;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .mobile-menu-links {
+      padding: 12px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .mobile-menu-links > li { margin-bottom: 2px; }
+    .mobile-menu-links > li > a,
+    .mobile-dropdown-toggle {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      color: var(--navy);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .mobile-menu-links > li > a:hover,
+    .mobile-menu-links > li > a.active,
+    .mobile-dropdown-toggle:hover {
+      background: #f5f9ff; color: var(--red);
+    }
+    .mobile-menu-links > li > a i,
+    .mobile-dropdown-toggle i:first-child {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: #f0f4fa; color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.88rem;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .mobile-menu-links > li > a:hover i,
+    .mobile-menu-links > li > a.active i,
+    .mobile-dropdown-toggle:hover i:first-child {
+      background: var(--red); color: #fff;
+    }
+    .mobile-dropdown-toggle { justify-content: space-between; }
+    .mobile-dropdown-toggle > span { display: flex; align-items: center; gap: 14px; }
+    .mobile-dropdown-toggle > i:last-child {
+      font-size: 0.7rem; color: var(--text-muted);
+      transition: transform 0.3s;
+    }
+    .mobile-dropdown-toggle.open > i:last-child { transform: rotate(180deg); }
+    .mobile-submenu {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s ease;
+      padding-left: 16px; margin-top: 2px;
+    }
+    .mobile-submenu.open { max-height: 400px; padding: 6px 0 6px 16px; }
+    .mobile-submenu a {
+      display: block; padding: 11px 14px;
+      color: var(--text-muted); font-size: 0.9rem;
+      font-weight: 600; border-radius: 10px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .mobile-submenu a:hover {
+      background: #f5f9ff; color: var(--navy);
+      border-left-color: var(--red);
+    }
+
+    .mobile-menu-auth {
+      padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-auth-btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 13px 18px;
+      border-radius: 12px;
+      font-weight: 700; font-size: 0.9rem;
+      transition: all 0.25s;
+      cursor: pointer; border: none;
+      font-family: inherit;
+    }
+    .mobile-auth-outline {
+      background: #fff; color: var(--navy);
+      border: 1.5px solid var(--border);
+    }
+    .mobile-auth-outline:hover { border-color: var(--navy); background: var(--bg-light); }
+    .mobile-auth-primary {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(30,83,180,0.25);
+    }
+    .mobile-auth-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(30,83,180,0.4);
+    }
+    .mobile-auth-danger {
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(200,16,46,0.25);
+    }
+    .mobile-auth-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(200,16,46,0.4);
+    }
+
+    .mobile-menu-footer {
+      padding: 16px 22px 24px;
+      background: #fafbff;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mobile-menu-contact {
+      display: flex; flex-direction: column; gap: 8px;
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .mobile-menu-contact span { display: flex; align-items: center; gap: 8px; }
+    .mobile-menu-contact i { color: var(--orange); width: 16px; }
 
     /* ============================================================
        BLOG HERO
@@ -251,14 +752,6 @@
       gap: 50px;
       align-items: center;
     }
-    .blog-hero-left .breadcrumb {
-      font-size: 0.82rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.75);
-      margin-bottom: 18px;
-    }
-    .blog-hero-left .breadcrumb a { color: var(--orange); }
     .blog-hero-left .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -301,9 +794,7 @@
       background-clip: text;
       animation: shine 3s linear infinite;
     }
-    @keyframes shine {
-      to { background-position: 200% center; }
-    }
+    @keyframes shine { to { background-position: 200% center; } }
     .blog-hero-left p {
       font-size: 1.05rem;
       color: rgba(255,255,255,0.9);
@@ -322,38 +813,22 @@
       backdrop-filter: blur(14px);
       max-width: 560px;
     }
-    .blog-search i {
-      color: rgba(255,255,255,0.7);
-      margin-right: 12px;
-      font-size: 1rem;
-    }
+    .blog-search i { color: rgba(255,255,255,0.7); margin-right: 12px; font-size: 1rem; }
     .blog-search input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 0.95rem;
+      flex: 1; background: transparent; border: none;
+      outline: none; color: #fff; font-size: 0.95rem;
       padding: 12px 0;
     }
     .blog-search input::placeholder { color: rgba(255,255,255,0.6); }
     .blog-search button {
-      background: var(--orange);
-      color: #fff;
-      border: none;
-      padding: 12px 22px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.25s;
-      font-size: 0.88rem;
+      background: var(--orange); color: #fff; border: none;
+      padding: 12px 22px; border-radius: 10px;
+      font-weight: 700; cursor: pointer;
+      transition: all 0.25s; font-size: 0.88rem;
     }
-    .blog-search button:hover {
-      background: #d44a15;
-      transform: translateY(-1px);
-    }
+    .blog-search button:hover { background: #d44a15; transform: translateY(-1px); }
 
-    /* Hero right — featured post card */
+    /* Featured post */
     .featured-post-card {
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.15);
@@ -381,53 +856,33 @@
       object-fit: cover;
       transition: transform 0.7s;
     }
-    .featured-post-card:hover .featured-post-img img {
-      transform: scale(1.08);
-    }
+    .featured-post-card:hover .featured-post-img img { transform: scale(1.08); }
     .featured-badge {
       position: absolute;
       top: 14px; left: 14px;
-      background: var(--orange);
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      background: var(--orange); color: #fff;
+      padding: 6px 14px; border-radius: 30px;
+      font-size: 0.65rem; font-weight: 800;
+      letter-spacing: 1.5px; text-transform: uppercase;
       box-shadow: 0 6px 16px rgba(232,93,38,0.4);
       z-index: 2;
     }
-    .featured-post-body {
-      padding: 22px 24px 26px;
-      color: #fff;
-    }
+    .featured-post-body { padding: 22px 24px 26px; color: #fff; }
     .featured-post-cat {
-      display: inline-block;
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: var(--orange);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      display: inline-block; font-size: 0.68rem;
+      font-weight: 800; color: var(--orange);
+      letter-spacing: 1.5px; text-transform: uppercase;
       margin-bottom: 10px;
     }
     .featured-post-body h3 {
-      font-size: 1.15rem;
-      font-weight: 800;
-      line-height: 1.35;
-      margin-bottom: 10px;
+      font-size: 1.15rem; font-weight: 800;
+      line-height: 1.35; margin-bottom: 10px;
     }
     .featured-post-meta {
-      display: flex;
-      gap: 14px;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.75);
+      display: flex; gap: 14px;
+      font-size: 0.75rem; color: rgba(255,255,255,0.75);
     }
-    .featured-post-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
+    .featured-post-meta span { display: inline-flex; align-items: center; gap: 5px; }
     .featured-post-meta i { color: var(--orange); }
 
     /* ============================================================
@@ -438,43 +893,33 @@
       border-bottom: 1px solid var(--border);
       padding: 20px 0;
       position: sticky;
-      top: 78px;
+      top: 82px;
       z-index: 900;
       box-shadow: 0 4px 20px rgba(31, 58, 110, 0.05);
     }
     .category-bar .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 20px;
       flex-wrap: wrap;
     }
     .cat-chips { display: flex; gap: 10px; flex-wrap: wrap; }
     .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      border-radius: 30px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 30px;
       background: var(--bg-light);
       border: 1.5px solid var(--border);
-      color: var(--navy);
-      font-weight: 600;
-      font-size: 0.84rem;
-      cursor: pointer;
-      transition: all 0.25s;
-      user-select: none;
+      color: var(--navy); font-weight: 600;
+      font-size: 0.84rem; cursor: pointer;
+      transition: all 0.25s; user-select: none;
     }
     .chip:hover { border-color: var(--navy); transform: translateY(-2px); }
     .chip.active {
       background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      border-color: var(--navy);
-      color: #fff;
+      border-color: var(--navy); color: #fff;
       box-shadow: 0 8px 20px rgba(30, 83, 180, 0.3);
     }
     .post-count {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 0.85rem; color: var(--text-muted);
       font-weight: 600;
     }
     .post-count strong { color: var(--navy); }
@@ -482,24 +927,16 @@
     /* ============================================================
        BLOG LAYOUT — MAIN GRID + SIDEBAR
        ============================================================ */
-    .blog-layout {
-      padding: 60px 0 100px;
-      background: var(--bg-light);
-    }
+    .blog-layout { padding: 60px 0 100px; background: var(--bg-light); }
     .blog-layout-grid {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 50px;
-      align-items: start;
+      display: grid; grid-template-columns: 1fr 340px;
+      gap: 50px; align-items: start;
     }
-
-    /* Blog cards */
     .blog-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 28px;
     }
-
     .blog-card {
       background: var(--bg-white);
       border-radius: 20px;
@@ -507,13 +944,10 @@
       border: 1px solid var(--border);
       box-shadow: 0 6px 20px rgba(31, 58, 110, 0.05);
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      opacity: 0;
-      transform: translateY(30px);
+      display: flex; flex-direction: column;
+      opacity: 0; transform: translateY(30px);
       animation: cardIn 0.6s ease forwards;
-      cursor: pointer;
-      position: relative;
+      cursor: pointer; position: relative;
     }
     @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
     .blog-card:hover {
@@ -522,160 +956,94 @@
       border-color: transparent;
     }
     .blog-card-img {
-      position: relative;
-      height: 220px;
-      overflow: hidden;
+      position: relative; height: 220px; overflow: hidden;
     }
     .blog-card-img img {
-      width: 100%; height: 100%;
-      object-fit: cover;
+      width: 100%; height: 100%; object-fit: cover;
       transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .blog-card:hover .blog-card-img img {
-      transform: scale(1.1);
-    }
+    .blog-card:hover .blog-card-img img { transform: scale(1.1); }
     .blog-card-img::after {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(180deg, transparent 55%, rgba(18,50,110,0.35));
       pointer-events: none;
     }
     .blog-card-cat {
-      position: absolute;
-      top: 14px; left: 14px;
+      position: absolute; top: 14px; left: 14px;
       background: rgba(255,255,255,0.95);
-      color: var(--navy);
-      padding: 5px 13px;
-      border-radius: 30px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      z-index: 3;
+      color: var(--navy); padding: 5px 13px;
+      border-radius: 30px; font-size: 0.65rem;
+      font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; z-index: 3;
       backdrop-filter: blur(8px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .blog-card-read {
-      position: absolute;
-      bottom: 14px; right: 14px;
-      background: rgba(0,0,0,0.55);
-      color: #fff;
-      padding: 5px 12px;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      z-index: 3;
+      position: absolute; bottom: 14px; right: 14px;
+      background: rgba(0,0,0,0.55); color: #fff;
+      padding: 5px 12px; border-radius: 30px;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.5px; z-index: 3;
       backdrop-filter: blur(8px);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+      display: inline-flex; align-items: center; gap: 5px;
     }
     .blog-card-body {
-      padding: 24px 24px 26px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      padding: 24px 24px 26px; flex: 1;
+      display: flex; flex-direction: column;
     }
     .blog-card-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      font-size: 0.74rem;
-      color: var(--text-muted);
+      display: flex; flex-wrap: wrap; gap: 14px;
+      font-size: 0.74rem; color: var(--text-muted);
       margin-bottom: 12px;
     }
-    .blog-card-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
+    .blog-card-meta span { display: inline-flex; align-items: center; gap: 5px; }
     .blog-card-meta i { color: var(--orange); }
     .blog-card-title {
-      font-size: 1.15rem;
-      color: var(--navy);
-      font-weight: 800;
-      line-height: 1.35;
-      margin-bottom: 10px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 1.15rem; color: var(--navy);
+      font-weight: 800; line-height: 1.35; margin-bottom: 10px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
       transition: color 0.25s;
     }
     .blog-card:hover .blog-card-title { color: var(--red); }
     .blog-card-excerpt {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      line-height: 1.7;
-      flex: 1;
-      margin-bottom: 18px;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      color: var(--text-muted); font-size: 0.9rem;
+      line-height: 1.7; flex: 1; margin-bottom: 18px;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
     }
     .blog-card-footer {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       justify-content: space-between;
-      padding-top: 16px;
-      border-top: 1px dashed var(--border);
+      padding-top: 16px; border-top: 1px dashed var(--border);
     }
-    .blog-card-author {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .blog-card-author { display: flex; align-items: center; gap: 10px; }
     .author-avatar {
-      width: 34px; height: 34px;
-      border-radius: 50%;
+      width: 34px; height: 34px; border-radius: 50%;
       background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.8rem;
-      flex-shrink: 0;
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
     }
-    .author-name {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--navy);
-    }
+    .author-name { font-size: 0.8rem; font-weight: 700; color: var(--navy); }
     .read-link {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--red);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--red); display: inline-flex;
+      align-items: center; gap: 6px;
       transition: gap 0.25s;
     }
     .blog-card:hover .read-link { gap: 12px; }
 
     /* Load more */
-    .load-more-wrap {
-      text-align: center;
-      margin-top: 50px;
-    }
+    .load-more-wrap { text-align: center; margin-top: 50px; }
     .btn-load-more {
       background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff;
-      padding: 16px 40px;
-      border-radius: 14px;
-      font-weight: 800;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+      color: #fff; padding: 16px 40px;
+      border-radius: 14px; font-weight: 800;
+      border: none; cursor: pointer; font-size: 0.9rem;
+      letter-spacing: 1px; text-transform: uppercase;
       transition: all 0.3s;
       box-shadow: 0 12px 30px rgba(30,83,180,0.3);
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
+      display: inline-flex; align-items: center; gap: 12px;
     }
     .btn-load-more:hover {
       transform: translateY(-3px);
@@ -686,22 +1054,12 @@
     .btn-load-more:hover i { transform: translateY(3px); }
 
     /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      display: none;
-    }
+    .empty-state { text-align: center; padding: 80px 20px; display: none; }
     .empty-state.visible { display: block; }
-    .empty-state i {
-      font-size: 4rem;
-      color: var(--border);
-      margin-bottom: 20px;
-    }
+    .empty-state i { font-size: 4rem; color: var(--border); margin-bottom: 20px; }
     .empty-state h3 {
-      font-size: 1.4rem;
-      color: var(--navy);
-      font-weight: 800;
-      margin-bottom: 10px;
+      font-size: 1.4rem; color: var(--navy);
+      font-weight: 800; margin-bottom: 10px;
     }
     .empty-state p { color: var(--text-muted); }
 
@@ -709,354 +1067,253 @@
        SIDEBAR
        ============================================================ */
     .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      position: sticky;
-      top: 110px;
+      display: flex; flex-direction: column;
+      gap: 30px; position: sticky; top: 110px;
     }
     .widget {
-      background: var(--bg-white);
-      border-radius: 18px;
-      padding: 28px 24px;
-      border: 1px solid var(--border);
+      background: var(--bg-white); border-radius: 18px;
+      padding: 28px 24px; border: 1px solid var(--border);
       box-shadow: 0 6px 20px rgba(31, 58, 110, 0.04);
     }
     .widget-title {
-      font-size: 1.02rem;
-      color: var(--navy);
-      font-weight: 800;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      position: relative;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-size: 1.02rem; color: var(--navy);
+      font-weight: 800; margin-bottom: 20px;
+      padding-bottom: 12px; position: relative;
+      letter-spacing: 0.5px; text-transform: uppercase;
     }
     .widget-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 42px; height: 3px;
+      content: ''; position: absolute;
+      bottom: 0; left: 0; width: 42px; height: 3px;
       background: linear-gradient(90deg, var(--orange), var(--red));
       border-radius: 2px;
     }
-
-    /* Popular posts */
     .popular-list { display: flex; flex-direction: column; gap: 16px; }
     .popular-item {
-      display: flex;
-      gap: 14px;
-      padding-bottom: 16px;
+      display: flex; gap: 14px; padding-bottom: 16px;
       border-bottom: 1px dashed var(--border);
-      cursor: pointer;
-      transition: transform 0.25s;
+      cursor: pointer; transition: transform 0.25s;
     }
-    .popular-item:last-child {
-      padding-bottom: 0;
-      border-bottom: none;
-    }
+    .popular-item:last-child { padding-bottom: 0; border-bottom: none; }
     .popular-item:hover { transform: translateX(4px); }
     .popular-thumb {
-      width: 66px; height: 66px;
-      border-radius: 12px;
-      object-fit: cover;
-      flex-shrink: 0;
+      width: 66px; height: 66px; border-radius: 12px;
+      object-fit: cover; flex-shrink: 0;
       transition: transform 0.4s;
     }
     .popular-item:hover .popular-thumb { transform: scale(1.06) rotate(-2deg); }
     .popular-info { flex: 1; min-width: 0; }
     .popular-info h4 {
-      font-size: 0.86rem;
-      color: var(--navy);
-      font-weight: 700;
-      line-height: 1.35;
-      margin-bottom: 4px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 0.86rem; color: var(--navy);
+      font-weight: 700; line-height: 1.35; margin-bottom: 4px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
     }
     .popular-item:hover .popular-info h4 { color: var(--red); }
     .popular-info small {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+      font-size: 0.7rem; color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 5px;
     }
     .popular-info small i { color: var(--orange); }
 
-    /* Categories list */
     .cat-list { display: flex; flex-direction: column; gap: 4px; }
     .cat-link {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--navy);
-      cursor: pointer;
-      transition: all 0.25s;
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 10px 14px;
+      border-radius: 10px; font-size: 0.88rem;
+      font-weight: 600; color: var(--navy);
+      cursor: pointer; transition: all 0.25s;
       border: 1px solid transparent;
     }
     .cat-link:hover {
-      background: var(--bg-light);
-      border-color: var(--border);
-      color: var(--red);
-      transform: translateX(4px);
+      background: var(--bg-light); border-color: var(--border);
+      color: var(--red); transform: translateX(4px);
     }
     .cat-count {
-      background: var(--bg-light);
-      color: var(--navy);
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 30px;
+      background: var(--bg-light); color: var(--navy);
+      font-size: 0.72rem; font-weight: 800;
+      padding: 3px 10px; border-radius: 30px;
       border: 1px solid var(--border);
     }
     .cat-link:hover .cat-count {
-      background: var(--red);
-      color: #fff;
-      border-color: var(--red);
+      background: var(--red); color: #fff; border-color: var(--red);
     }
 
-    /* Tag cloud */
-    .tag-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
     .tag {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 30px;
-      background: var(--bg-light);
-      border: 1px solid var(--border);
-      color: var(--navy);
-      font-size: 0.76rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s;
+      display: inline-block; padding: 6px 14px;
+      border-radius: 30px; background: var(--bg-light);
+      border: 1px solid var(--border); color: var(--navy);
+      font-size: 0.76rem; font-weight: 600;
+      cursor: pointer; transition: all 0.25s;
     }
     .tag:hover {
-      background: var(--navy);
-      color: #fff;
-      border-color: var(--navy);
-      transform: translateY(-2px);
+      background: var(--navy); color: #fff;
+      border-color: var(--navy); transform: translateY(-2px);
     }
 
-    /* Newsletter widget */
     .newsletter-widget {
       background: linear-gradient(135deg, var(--navy-deep), var(--navy) 60%, var(--red) 160%);
-      color: #fff;
-      border-radius: 18px;
-      padding: 32px 26px;
-      position: relative;
-      overflow: hidden;
-      border: none;
-      box-shadow: 0 20px 40px rgba(30,83,180,0.25);
+      color: #fff; border-radius: 18px;
+      padding: 32px 26px; position: relative; overflow: hidden;
+      border: none; box-shadow: 0 20px 40px rgba(30,83,180,0.25);
     }
     .newsletter-widget::before {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background-image:
         radial-gradient(circle at 20% 20%, rgba(232,93,38,0.4), transparent 45%),
         radial-gradient(circle at 80% 80%, rgba(200,16,46,0.4), transparent 45%);
     }
-    .newsletter-widget::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 26px 26px;
-      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
-    }
     .newsletter-widget > * { position: relative; z-index: 2; }
     .newsletter-icon {
-      width: 54px; height: 54px;
-      border-radius: 14px;
+      width: 54px; height: 54px; border-radius: 14px;
       background: rgba(255,255,255,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      color: var(--orange);
-      margin-bottom: 18px;
-      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: var(--orange);
+      margin-bottom: 18px; backdrop-filter: blur(10px);
     }
     .newsletter-widget h3 {
-      font-size: 1.2rem;
-      font-weight: 800;
-      margin-bottom: 10px;
-      line-height: 1.3;
+      font-size: 1.2rem; font-weight: 800;
+      margin-bottom: 10px; line-height: 1.3;
     }
     .newsletter-widget p {
-      font-size: 0.86rem;
-      color: rgba(255,255,255,0.85);
-      margin-bottom: 20px;
-      line-height: 1.6;
+      font-size: 0.86rem; color: rgba(255,255,255,0.85);
+      margin-bottom: 20px; line-height: 1.6;
     }
-    .newsletter-widget form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .newsletter-widget form { display: flex; flex-direction: column; gap: 10px; }
     .newsletter-widget input {
-      padding: 13px 16px;
-      border-radius: 10px;
+      padding: 13px 16px; border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.2);
       background: rgba(255,255,255,0.1);
-      color: #fff;
-      font-size: 0.88rem;
-      outline: none;
-      backdrop-filter: blur(10px);
+      color: #fff; font-size: 0.88rem;
+      outline: none; backdrop-filter: blur(10px);
     }
     .newsletter-widget input::placeholder { color: rgba(255,255,255,0.6); }
     .newsletter-widget input:focus { border-color: var(--orange); }
     .newsletter-widget button {
-      background: var(--orange);
-      color: #fff;
-      border: none;
-      padding: 13px;
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.25s;
-      font-size: 0.85rem;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      background: var(--orange); color: #fff;
+      border: none; padding: 13px; border-radius: 10px;
+      font-weight: 800; cursor: pointer;
+      transition: all 0.25s; font-size: 0.85rem;
+      letter-spacing: 0.5px; text-transform: uppercase;
     }
     .newsletter-widget button:hover {
-      background: #d44a15;
-      transform: translateY(-2px);
+      background: #d44a15; transform: translateY(-2px);
       box-shadow: 0 12px 25px rgba(232,93,38,0.5);
     }
 
-    /* ---------- FOOTER (matches About) ---------- */
+    /* ============================================================
+       FOOTER
+       ============================================================ */
     .footer {
-      background: var(--navy-dark);
-      color: #c8d2e6;
-      padding: 65px 0 0;
-      font-size: 0.9rem;
-      border-top: 4px solid var(--red);
+      background: var(--navy-deep); color: #c8d2e6;
+      padding: 80px 0 0; font-size: 0.9rem;
+      position: relative; overflow: hidden;
+    }
+    .footer::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--navy), var(--red), var(--orange), var(--green));
+    }
+    .footer::after {
+      content: ''; position: absolute;
+      top: 0; right: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(232,93,38,0.08), transparent 70%);
+      border-radius: 50%;
     }
     .footer-grid {
       display: grid;
-      grid-template-columns: 1.5fr 1fr 1.2fr 1.3fr;
-      gap: 40px;
-      padding-bottom: 45px;
+      grid-template-columns: 1.6fr 1fr 1.2fr 1.3fr;
+      gap: 50px; padding-bottom: 50px;
       border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: relative; z-index: 2;
     }
     .footer-brand .logo {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      display: inline-flex;
-      color: #fff;
+      font-size: 1.5rem; margin-bottom: 18px;
+      display: inline-flex; color: #fff;
     }
     .footer-brand .logo-mark .rise { color: #fff; }
     .footer-brand .logo-mark .axis { color: var(--orange); }
     .footer-brand .logo-sub { color: var(--orange); }
-    .footer-brand p { margin-bottom: 20px; color: #a8b4cc; line-height: 1.65; }
-    .footer-social { display: flex; gap: 12px; }
+    .footer-brand p { margin-bottom: 24px; color: #a8b4cc; line-height: 1.7; }
+    .footer-social { display: flex; gap: 10px; }
     .footer-social a {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      transition: background 0.2s, transform 0.2s;
+      width: 42px; height: 42px;
+      border-radius: 12px; background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; transition: all 0.3s;
+      border: 1px solid rgba(255,255,255,0.08);
     }
     .footer-social a:hover {
-      background: var(--red);
-      transform: translateY(-2px);
+      background: var(--red); transform: translateY(-4px) rotate(-6deg);
+      box-shadow: 0 12px 25px rgba(200,16,46,0.4);
     }
     .footer h4 {
-      color: #fff;
-      font-size: 1rem;
-      margin-bottom: 20px;
-      position: relative;
-      padding-bottom: 10px;
+      color: #fff; font-size: 1rem;
+      margin-bottom: 24px; position: relative;
+      padding-bottom: 12px; letter-spacing: 0.5px;
     }
     .footer h4::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 40px; height: 3px;
-      background: var(--orange);
+      content: ''; position: absolute;
+      bottom: 0; left: 0; width: 40px; height: 3px;
+      background: linear-gradient(90deg, var(--orange), var(--red));
       border-radius: 2px;
     }
-    .footer ul li { margin-bottom: 10px; }
-    .footer ul a { color: #a8b4cc; transition: color 0.2s; }
-    .footer ul a:hover { color: var(--orange); }
-    .footer-contact li {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 14px;
-      color: #a8b4cc;
+    .footer ul li { margin-bottom: 12px; }
+    .footer ul a {
+      color: #a8b4cc; transition: all 0.25s;
+      display: inline-flex; align-items: center; gap: 8px;
     }
-    .footer-contact i { color: var(--orange); margin-top: 3px; }
+    .footer ul a:hover { color: var(--orange); transform: translateX(4px); }
+    .footer-contact li {
+      display: flex; gap: 12px; margin-bottom: 16px;
+      color: #a8b4cc; line-height: 1.55;
+    }
+    .footer-contact i {
+      color: var(--orange); margin-top: 4px;
+      width: 18px; flex-shrink: 0;
+    }
     .newsletter-form {
-      display: flex;
-      margin-top: 15px;
+      display: flex; margin-top: 15px;
       background: rgba(255,255,255,0.06);
-      border-radius: 8px;
-      overflow: hidden;
+      border-radius: 8px; overflow: hidden;
       border: 1px solid rgba(255,255,255,0.1);
     }
     .newsletter-form input {
-      flex: 1;
-      padding: 12px 15px;
-      background: transparent;
-      border: none;
-      color: #fff;
-      outline: none;
-      font-size: 0.9rem;
+      flex: 1; padding: 12px 15px;
+      background: transparent; border: none;
+      color: #fff; outline: none; font-size: 0.9rem;
     }
     .newsletter-form input::placeholder { color: #7a88a8; }
     .newsletter-form button {
-      background: var(--red);
-      color: #fff;
-      border: none;
-      padding: 0 20px;
-      cursor: pointer;
-      font-weight: 700;
+      background: var(--red); color: #fff;
+      border: none; padding: 0 20px;
+      cursor: pointer; font-weight: 700;
     }
     .newsletter-form button:hover { background: var(--red-dark); }
     .footer-bottom {
-      padding: 22px 0;
-      text-align: center;
-      color: #7a88a8;
-      font-size: 0.85rem;
+      padding: 26px 0; text-align: center;
+      color: #7a88a8; font-size: 0.82rem;
+      position: relative; z-index: 2;
     }
     .footer-bottom strong { color: var(--orange); }
 
-    /* ---------- WHATSAPP ---------- */
+    /* ============================================================
+       WHATSAPP FLOAT + SCROLL PROGRESS
+       ============================================================ */
     .whatsapp-float {
-      position: fixed;
-      bottom: 25px; right: 25px;
-      background: var(--green);
-      color: #fff;
-      width: 58px; height: 58px;
+      position: fixed; bottom: 25px; right: 25px;
+      background: linear-gradient(135deg, var(--green), #0a5f2e);
+      color: #fff; width: 62px; height: 62px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      box-shadow: 0 6px 20px rgba(14, 122, 60, 0.45);
-      z-index: 999;
-      transition: transform 0.3s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.9rem;
+      box-shadow: 0 10px 30px rgba(14, 122, 60, 0.5);
+      z-index: 999; transition: all 0.3s;
     }
     .whatsapp-float::before {
-      content: '';
-      position: absolute;
-      inset: -6px;
-      border-radius: 50%;
+      content: ''; position: absolute;
+      inset: -6px; border-radius: 50%;
       border: 2px solid rgba(14, 122, 60, 0.4);
       animation: ripple 2s infinite;
     }
@@ -1066,7 +1323,6 @@
     }
     .whatsapp-float:hover { transform: scale(1.1) rotate(-8deg); }
 
-    /* ---------- SCROLL PROGRESS ---------- */
     .scroll-progress {
       position: fixed;
       top: 0; left: 0;
@@ -1077,7 +1333,28 @@
       transition: width 0.1s;
     }
 
-    /* ---------- RESPONSIVE ---------- */
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1200px) {
+      .nav-links { gap: 2px; font-size: 0.86rem; }
+      .nav-links > li > a { padding: 8px 10px; }
+      .btn-signin { padding: 10px 16px; font-size: 0.82rem; }
+    }
+
+    @media (max-width: 1024px) {
+      .nav-links,
+      .nav-actions {
+        display: none !important;
+      }
+      .mobile-nav-actions {
+        display: flex;
+      }
+      .main-nav .container {
+        min-height: 72px;
+      }
+    }
+
     @media (max-width: 1100px) {
       .blog-hero .container { grid-template-columns: 1fr; gap: 40px; }
       .featured-post-card { max-width: 520px; }
@@ -1087,14 +1364,6 @@
     }
     @media (max-width: 992px) {
       .top-bar .container { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .main-nav .container { flex-wrap: wrap; padding: 10px 20px; gap: 12px; }
-      .nav-links {
-        order: 3; width: 100%; justify-content: center;
-        flex-wrap: wrap; gap: 15px; font-size: 0.88rem;
-        padding-top: 12px;
-        border-top: 1px solid var(--border);
-      }
-      .nav-actions { margin-left: auto; }
       .category-bar { top: auto; position: relative; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
     }
@@ -1106,21 +1375,27 @@
       .blog-search i { display: none; }
       .blog-search input { padding: 8px 0; text-align: center; }
       .blog-search button { width: 100%; }
-      .btn-catalogue, .btn-shop { padding: 10px 14px; font-size: 0.8rem; }
-      .btn-shop i { display: none; }
       .cat-chips {
-        width: 100%;
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        padding-bottom: 6px;
+        width: 100%; overflow-x: auto;
+        flex-wrap: nowrap; padding-bottom: 6px;
       }
       .chip { flex-shrink: 0; }
       .blog-grid { grid-template-columns: 1fr; gap: 22px; }
       .footer-grid { grid-template-columns: 1fr; }
+
+      .search-overlay { padding: 20px 12px 30px; }
+      .search-panel-header { padding: 14px 16px; }
+      .search-input-wrap input { font-size: 0.92rem; padding: 11px 14px; }
+      .search-close { width: 36px; height: 36px; }
+      .search-result-img,
+      .search-result-icon { width: 42px; height: 42px; }
+      .search-result-info strong { font-size: 0.86rem; }
     }
     @media (max-width: 480px) {
       .blog-hero-left h1 { font-size: 1.7rem; }
       .top-item { font-size: 0.8rem; }
+      .mobile-menu { width: 100%; max-width: 100%; }
+      .cart-icon-btn, .hamburger { width: 40px; height: 40px; }
     }
   </style>
 </head>
@@ -1148,8 +1423,9 @@
   </div>
 
   <!-- ========== NAVIGATION ========== -->
-  <nav class="main-nav">
+  <nav class="main-nav" id="mainNav">
     <div class="container">
+
       <a href="../index.html" class="logo">
         <div>
           <span class="logo-mark">
@@ -1166,25 +1442,197 @@
         <li class="dropdown">
           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
           <ul class="dropdown-menu">
-            <li><a href="product.html">Feed Additives</a></li>
-            <li><a href="product.html">Veterinary Products</a></li>
-            <li><a href="product.html">Injectables</a></li>
-            <li><a href="product.html">Premixes</a></li>
+            <li><a href="product.html"><i class="fas fa-flask"></i> Feed Additives</a></li>
+            <li><a href="product.html"><i class="fas fa-syringe"></i> Veterinary Products</a></li>
+            <li><a href="product.html"><i class="fas fa-prescription-bottle"></i> Injectables</a></li>
+            <li><a href="product.html"><i class="fas fa-capsules"></i> Premixes</a></li>
           </ul>
         </li>
         <li><a href="blog.html" class="active">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
+        <li><a href="shop.html">Shop</a></li>
       </ul>
 
       <div class="nav-actions">
-        <div class="search-icon"><i class="fas fa-search"></i></div>
-        <button class="btn-catalogue">Get Catalogue</button>
-        <button class="btn-shop" onclick="window.location.href='product.html'">
-          <i class="fas fa-shopping-cart"></i> Shop
+        <button class="search-icon" aria-label="Search" onclick="openSearch()">
+          <i class="fas fa-search"></i>
+        </button>
+
+        <a href="cart.html" class="cart-icon-btn" aria-label="View cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge-nav" id="navCartBadge">0</span>
+        </a>
+
+        <span id="authLinks" class="auth-actions">
+          <div class="signin-dropdown">
+            <button class="btn-signin" type="button">
+              <i class="fas fa-user-circle"></i>
+              <span>Sign In</span>
+              <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
+            </button>
+            <div class="signin-menu">
+              <a href="login.html">
+                <i class="fas fa-sign-in-alt"></i>
+                <div>
+                  <strong>Login</strong>
+                  <small>I already have an account</small>
+                </div>
+              </a>
+              <a href="register.html">
+                <i class="fas fa-user-plus"></i>
+                <div>
+                  <strong>Create Account</strong>
+                  <small>New to Rise Axis</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </span>
+
+        <span id="userLinks" class="auth-actions" style="display:none;">
+          <div class="signin-dropdown">
+            <button class="btn-signin" type="button">
+              <i class="fas fa-user-circle"></i>
+              <span id="userMenuName">My Account</span>
+              <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
+            </button>
+            <div class="signin-menu">
+              <a href="account.html">
+                <i class="fas fa-user"></i>
+                <div>
+                  <strong>My Account</strong>
+                  <small>Orders & profile</small>
+                </div>
+              </a>
+              <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <div>
+                  <strong>Logout</strong>
+                  <small>Sign out</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </span>
+      </div>
+
+      <div class="mobile-nav-actions">
+        <a href="cart.html" class="cart-icon-btn" aria-label="View cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge-nav" id="navCartBadgeMob">0</span>
+        </a>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
+
     </div>
   </nav>
+
+  <!-- ========== SEARCH OVERLAY ========== -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <div class="search-panel-header">
+        <i class="fas fa-search"></i>
+        <div class="search-input-wrap">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search articles, products, pages..."
+            autocomplete="off"
+          >
+        </div>
+        <button class="search-close" onclick="closeSearch()" aria-label="Close search">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="search-panel-body" id="searchResults">
+        <div class="search-hint">
+          <i class="fas fa-search"></i>
+          <strong>Start typing to search</strong>
+          Try "soil", "premixes", "contact", or a product name.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MOBILE SLIDE MENU ========== -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+  <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-header">
+      <a href="../index.html" class="logo">
+        <div>
+          <span class="logo-mark">
+            <span class="rise">RISE</span>
+            <span class="axis">AXIS</span>
+          </span>
+          <span class="logo-sub">SOLUTIONS LTD</span>
+        </div>
+      </a>
+      <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="mobile-user" id="mobileUserBox" style="display:none;">
+      <div class="mobile-user-avatar" id="mobileUserInitials">··</div>
+      <div class="mobile-user-info">
+        <strong id="mobileUserName">Welcome</strong>
+        <small id="mobileUserEmail">—</small>
+      </div>
+    </div>
+
+    <ul class="mobile-menu-links">
+      <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="aboutUs.html"><i class="fas fa-users"></i> About Us</a></li>
+
+      <li class="mobile-dropdown">
+        <button class="mobile-dropdown-toggle" id="mobileProductsToggle" aria-expanded="false">
+          <span><i class="fas fa-box"></i> Products</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <ul class="mobile-submenu" id="mobileProductsSubmenu">
+          <li><a href="product.html">Feed Additives</a></li>
+          <li><a href="product.html">Veterinary Products</a></li>
+          <li><a href="product.html">Injectables</a></li>
+          <li><a href="product.html">Premixes</a></li>
+        </ul>
+      </li>
+
+      <li><a href="blog.html" class="active"><i class="fas fa-newspaper"></i> Blog</a></li>
+      <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+      <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+      <li><a href="#" onclick="event.preventDefault(); closeMobileMenu(); openSearch();"><i class="fas fa-search"></i> Search</a></li>
+    </ul>
+
+    <div class="mobile-menu-auth" id="mobileAuthSection">
+      <a href="login.html" class="mobile-auth-btn mobile-auth-outline">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+      <a href="register.html" class="mobile-auth-btn mobile-auth-primary">
+        <i class="fas fa-user-plus"></i> Create Account
+      </a>
+    </div>
+
+    <div class="mobile-menu-auth" id="mobileUserSection" style="display:none;">
+      <a href="account.html" class="mobile-auth-btn mobile-auth-primary">
+        <i class="fas fa-user-circle"></i> My Account
+      </a>
+      <a href="#" id="mobileLogoutBtn" class="mobile-auth-btn mobile-auth-danger">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+
+    <div class="mobile-menu-footer">
+      <div class="mobile-menu-contact">
+        <span><i class="fas fa-phone-alt"></i> +254 725 538 297</span>
+        <span><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</span>
+      </div>
+    </div>
+  </aside>
 
   <!-- ============================================================
        BLOG HERO
@@ -1195,9 +1643,6 @@
 
     <div class="container">
       <div class="blog-hero-left">
-        <!-- <div class="breadcrumb">
-          <a href="../index.html">Home</a> &nbsp;/&nbsp; Blog
-        </div> -->
         <div class="eyebrow">
           <span class="dot"><i class="fas fa-newspaper"></i></span>
           Our Blog
@@ -1207,18 +1652,18 @@
 
         <form class="blog-search" onsubmit="event.preventDefault()">
           <i class="fas fa-search"></i>
-          <input type="text" id="searchInput" placeholder="Search articles by title, tag, or keyword...">
-          <button onclick="document.getElementById('searchInput').focus()">Search</button>
+          <input type="text" id="blogSearchInput" placeholder="Search articles by title, tag, or keyword...">
+          <button type="button" onclick="document.getElementById('blogSearchInput').focus()">Search</button>
         </form>
       </div>
 
-      <article class="featured-post-card" onclick="window.location.href='blog-post.html'">
+      <article class="featured-post-card" onclick="window.location.href='blog-post.html?id=1'">
         <div class="featured-post-img">
           <span class="featured-badge">Featured</span>
-          <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80" alt="Featured article on sustainable farming practices in Kenya">
+          <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80" alt="Featured article on sustainable farming practices in Kenya" loading="lazy">
         </div>
         <div class="featured-post-body">
-          <span class="featured-post-cat">Agronomy</span>
+          <span class="featured-post-cat">Sustainability</span>
           <h3>5 Sustainable Farming Practices Every Kenyan Farmer Should Know</h3>
           <div class="featured-post-meta">
             <span><i class="fas fa-calendar-alt"></i> Mar 14, 2026</span>
@@ -1236,11 +1681,11 @@
     <div class="container">
       <div class="cat-chips" id="catChips">
         <div class="chip active" data-cat="all"><i class="fas fa-th-large"></i> All Posts</div>
-        <div class="chip" data-cat="agronomy"> Agronomy</div>
-        <div class="chip" data-cat="veterinary"> Veterinary</div>
-        <div class="chip" data-cat="products"> Product Guides</div>
-        <div class="chip" data-cat="industry"> Industry News</div>
-        <div class="chip" data-cat="sustainability"> Sustainability</div>
+        <div class="chip" data-cat="agronomy"><i class="fas fa-seedling"></i> Agronomy</div>
+        <div class="chip" data-cat="veterinary"><i class="fas fa-paw"></i> Veterinary</div>
+        <div class="chip" data-cat="products"><i class="fas fa-box"></i> Product Guides</div>
+        <div class="chip" data-cat="industry"><i class="fas fa-chart-line"></i> Industry News</div>
+        <div class="chip" data-cat="sustainability"><i class="fas fa-leaf"></i> Sustainability</div>
       </div>
       <span class="post-count"><strong id="postCount">9</strong> articles</span>
     </div>
@@ -1253,7 +1698,6 @@
     <div class="container">
       <div class="blog-layout-grid">
 
-        <!-- MAIN COLUMN -->
         <div>
           <div class="blog-grid" id="blogGrid"></div>
 
@@ -1270,36 +1714,34 @@
           </div>
         </div>
 
-        <!-- SIDEBAR -->
         <aside class="sidebar">
 
-          <!-- Popular posts -->
           <div class="widget">
             <h3 class="widget-title">Popular Posts</h3>
             <div class="popular-list">
-              <div class="popular-item" onclick="window.location.href='blog-post.html'">
-                <img class="popular-thumb" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=80" alt="Popular article on crop protection">
+              <div class="popular-item" onclick="window.location.href='blog-post.html?id=1'">
+                <img class="popular-thumb" src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=80" alt="Popular article on crop protection" loading="lazy">
                 <div class="popular-info">
                   <h4>How to Choose the Right Crop Protection Products</h4>
                   <small><i class="fas fa-eye"></i> 1,240 views</small>
                 </div>
               </div>
-              <div class="popular-item" onclick="window.location.href='blog-post.html'">
-                <img class="popular-thumb" src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=200&q=80" alt="Popular article on floriculture">
+              <div class="popular-item" onclick="window.location.href='blog-post.html?id=4'">
+                <img class="popular-thumb" src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=200&q=80" alt="Popular article on floriculture" loading="lazy">
                 <div class="popular-info">
                   <h4>Floriculture in Kenya: Trends, Opportunities, and Challenges</h4>
                   <small><i class="fas fa-eye"></i> 980 views</small>
                 </div>
               </div>
-              <div class="popular-item" onclick="window.location.href='blog-post.html'">
-                <img class="popular-thumb" src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&q=80" alt="Popular article on livestock nutrition">
+              <div class="popular-item" onclick="window.location.href='blog-post.html?id=3'">
+                <img class="popular-thumb" src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&q=80" alt="Popular article on livestock nutrition" loading="lazy">
                 <div class="popular-info">
                   <h4>Livestock Nutrition: The Role of Premixes and Additives</h4>
                   <small><i class="fas fa-eye"></i> 872 views</small>
                 </div>
               </div>
-              <div class="popular-item" onclick="window.location.href='blog-post.html'">
-                <img class="popular-thumb" src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=200&q=80" alt="Popular article on soil health">
+              <div class="popular-item" onclick="window.location.href='blog-post.html?id=5'">
+                <img class="popular-thumb" src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=200&q=80" alt="Popular article on soil health" loading="lazy">
                 <div class="popular-info">
                   <h4>Building Healthy Soil: A Foundation for Higher Yields</h4>
                   <small><i class="fas fa-eye"></i> 756 views</small>
@@ -1308,7 +1750,6 @@
             </div>
           </div>
 
-          <!-- Categories -->
           <div class="widget">
             <h3 class="widget-title">Categories</h3>
             <div class="cat-list">
@@ -1322,7 +1763,7 @@
                 Product Guides <span class="cat-count">2</span>
               </div>
               <div class="cat-link" onclick="filterCategory('industry')">
-                Industry News <span class="cat-count">1</span>
+                Industry News <span class="cat-count">2</span>
               </div>
               <div class="cat-link" onclick="filterCategory('sustainability')">
                 Sustainability <span class="cat-count">1</span>
@@ -1330,7 +1771,6 @@
             </div>
           </div>
 
-          <!-- Tags -->
           <div class="widget">
             <h3 class="widget-title">Popular Tags</h3>
             <div class="tag-cloud">
@@ -1345,7 +1785,6 @@
             </div>
           </div>
 
-          <!-- Newsletter -->
           <div class="widget newsletter-widget">
             <div class="newsletter-icon"><i class="fas fa-envelope-open-text"></i></div>
             <h3>Never Miss a Post</h3>
@@ -1419,160 +1858,56 @@
     </div>
   </footer>
 
-  <!-- ========== WHATSAPP ========== -->
   <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
   <!-- ========== JAVASCRIPT ========== -->
   <script>
-    // ============================================================
-    // BLOG DATA
-    // ============================================================
+    /* ============================================================
+       SUPABASE CLIENT
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       SCROLL PROGRESS + STICKY NAV
+       ============================================================ */
+    const progress = document.getElementById('scrollProgress');
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      progress.style.width = (window.scrollY / total) * 100 + '%';
+      if (window.scrollY > 30) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    });
+
+    /* ============================================================
+       BLOG DATA
+       ============================================================ */
     const POSTS = [
-      {
-        id: 1,
-        title: '5 Sustainable Farming Practices Every Kenyan Farmer Should Know',
-        excerpt: 'From crop rotation to integrated pest management — discover the practical, proven practices that improve yields while protecting the land for future generations.',
-        cat: 'sustainability',
-        catLabel: 'Sustainability',
-        author: 'James Mwangi',
-        authorInitials: 'JM',
-        date: 'Mar 14, 2026',
-        readTime: '6 min',
-        img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80',
-        tags: ['soil', 'crop', 'sustainability']
-      },
-      {
-        id: 2,
-        title: 'How to Choose the Right Crop Protection Products for Your Farm',
-        excerpt: 'A practical guide to understanding pesticide formulations, active ingredients, and safe application methods for healthier crops and higher yields.',
-        cat: 'agronomy',
-        catLabel: 'Agronomy',
-        author: 'Grace Wanjiku',
-        authorInitials: 'GW',
-        date: 'Mar 10, 2026',
-        readTime: '8 min',
-        img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
-        tags: ['crop', 'fertilizers']
-      },
-      {
-        id: 3,
-        title: 'Livestock Nutrition: The Role of Premixes and Feed Additives',
-        excerpt: 'Understanding what goes into your animals\' feed and how the right premix can transform herd health, milk yield, and overall profitability.',
-        cat: 'veterinary',
-        catLabel: 'Veterinary',
-        author: 'Dr. Peter Ochieng',
-        authorInitials: 'PO',
-        date: 'Mar 06, 2026',
-        readTime: '7 min',
-        img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80',
-        tags: ['dairy', 'poultry', 'vet']
-      },
-      {
-        id: 4,
-        title: 'Floriculture in Kenya: Trends, Opportunities, and Challenges',
-        excerpt: 'Kenya\'s floriculture sector is one of the largest in the world. We look at what\'s driving growth and what farmers need to stay competitive.',
-        cat: 'industry',
-        catLabel: 'Industry News',
-        author: 'Sarah Njeri',
-        authorInitials: 'SN',
-        date: 'Mar 02, 2026',
-        readTime: '5 min',
-        img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80',
-        tags: ['crop', 'seeds']
-      },
-      {
-        id: 5,
-        title: 'Building Healthy Soil: A Foundation for Higher Yields',
-        excerpt: 'Soil health is the cornerstone of productive farming. Learn how to test, improve, and maintain soil fertility for long-term success.',
-        cat: 'agronomy',
-        catLabel: 'Agronomy',
-        author: 'James Mwangi',
-        authorInitials: 'JM',
-        date: 'Feb 26, 2026',
-        readTime: '9 min',
-        img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80',
-        tags: ['soil', 'fertilizers']
-      },
-      {
-        id: 6,
-        title: 'A Practical Guide to Modern Irrigation Systems',
-        excerpt: 'From drip irrigation to sprinklers — comparing the most common irrigation systems and helping you choose the right one for your farm.',
-        cat: 'products',
-        catLabel: 'Product Guides',
-        author: 'David Kamau',
-        authorInitials: 'DK',
-        date: 'Feb 20, 2026',
-        readTime: '6 min',
-        img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
-        tags: ['irrigation', 'crop']
-      },
-      {
-        id: 7,
-        title: 'Understanding Veterinary Injectables: A Farmer\'s Handbook',
-        excerpt: 'A clear, practical guide to the most common veterinary injectables — what they treat, how to administer them, and safety precautions.',
-        cat: 'veterinary',
-        catLabel: 'Veterinary',
-        author: 'Dr. Peter Ochieng',
-        authorInitials: 'PO',
-        date: 'Feb 15, 2026',
-        readTime: '7 min',
-        img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80',
-        tags: ['vet', 'dairy']
-      },
-      {
-        id: 8,
-        title: 'Seed Selection: Matching Varieties to Your Climate and Soil',
-        excerpt: 'Choosing the right seed variety is one of the highest-impact decisions a farmer can make. Here\'s how to get it right.',
-        cat: 'agronomy',
-        catLabel: 'Agronomy',
-        author: 'Grace Wanjiku',
-        authorInitials: 'GW',
-        date: 'Feb 10, 2026',
-        readTime: '5 min',
-        img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80',
-        tags: ['seeds', 'crop']
-      },
-      {
-        id: 9,
-        title: 'The Rise of Precision Agriculture in East Africa',
-        excerpt: 'Drones, sensors, and data are transforming how farmers manage their fields. Here\'s what precision agriculture means for small and large farms alike.',
-        cat: 'industry',
-        catLabel: 'Industry News',
-        author: 'Sarah Njeri',
-        authorInitials: 'SN',
-        date: 'Feb 04, 2026',
-        readTime: '8 min',
-        img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80',
-        tags: ['crop', 'sustainability']
-      }
+      { id: 1, title: '5 Sustainable Farming Practices Every Kenyan Farmer Should Know', excerpt: 'From crop rotation to integrated pest management — discover the practical, proven practices that improve yields while protecting the land for future generations.', cat: 'sustainability', catLabel: 'Sustainability', author: 'James Mwangi', authorInitials: 'JM', date: 'Mar 14, 2026', readTime: '6 min', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80', tags: ['soil', 'crop', 'sustainability'] },
+      { id: 2, title: 'How to Choose the Right Crop Protection Products for Your Farm', excerpt: 'A practical guide to understanding pesticide formulations, active ingredients, and safe application methods for healthier crops and higher yields.', cat: 'agronomy', catLabel: 'Agronomy', author: 'Grace Wanjiku', authorInitials: 'GW', date: 'Mar 10, 2026', readTime: '8 min', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80', tags: ['crop', 'fertilizers'] },
+      { id: 3, title: 'Livestock Nutrition: The Role of Premixes and Feed Additives', excerpt: 'Understanding what goes into your animals\' feed and how the right premix can transform herd health, milk yield, and overall profitability.', cat: 'veterinary', catLabel: 'Veterinary', author: 'Dr. Peter Ochieng', authorInitials: 'PO', date: 'Mar 06, 2026', readTime: '7 min', img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80', tags: ['dairy', 'poultry', 'vet'] },
+      { id: 4, title: 'Floriculture in Kenya: Trends, Opportunities, and Challenges', excerpt: 'Kenya\'s floriculture sector is one of the largest in the world. We look at what\'s driving growth and what farmers need to stay competitive.', cat: 'industry', catLabel: 'Industry News', author: 'Sarah Njeri', authorInitials: 'SN', date: 'Mar 02, 2026', readTime: '5 min', img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80', tags: ['crop', 'seeds'] },
+      { id: 5, title: 'Building Healthy Soil: A Foundation for Higher Yields', excerpt: 'Soil health is the cornerstone of productive farming. Learn how to test, improve, and maintain soil fertility for long-term success.', cat: 'agronomy', catLabel: 'Agronomy', author: 'James Mwangi', authorInitials: 'JM', date: 'Feb 26, 2026', readTime: '9 min', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80', tags: ['soil', 'fertilizers'] },
+      { id: 6, title: 'A Practical Guide to Modern Irrigation Systems', excerpt: 'From drip irrigation to sprinklers — comparing the most common irrigation systems and helping you choose the right one for your farm.', cat: 'products', catLabel: 'Product Guides', author: 'David Kamau', authorInitials: 'DK', date: 'Feb 20, 2026', readTime: '6 min', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80', tags: ['irrigation', 'crop'] },
+      { id: 7, title: 'Understanding Veterinary Injectables: A Farmer\'s Handbook', excerpt: 'A clear, practical guide to the most common veterinary injectables — what they treat, how to administer them, and safety precautions.', cat: 'veterinary', catLabel: 'Veterinary', author: 'Dr. Peter Ochieng', authorInitials: 'PO', date: 'Feb 15, 2026', readTime: '7 min', img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80', tags: ['vet', 'dairy'] },
+      { id: 8, title: 'Seed Selection: Matching Varieties to Your Climate and Soil', excerpt: 'Choosing the right seed variety is one of the highest-impact decisions a farmer can make. Here\'s how to get it right.', cat: 'agronomy', catLabel: 'Agronomy', author: 'Grace Wanjiku', authorInitials: 'GW', date: 'Feb 10, 2026', readTime: '5 min', img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80', tags: ['seeds', 'crop'] },
+      { id: 9, title: 'The Rise of Precision Agriculture in East Africa', excerpt: 'Drones, sensors, and data are transforming how farmers manage their fields. Here\'s what precision agriculture means for small and large farms alike.', cat: 'industry', catLabel: 'Industry News', author: 'Sarah Njeri', authorInitials: 'SN', date: 'Feb 04, 2026', readTime: '8 min', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80', tags: ['crop', 'sustainability'] }
     ];
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    let state = {
-      category: 'all',
-      search: '',
-      visible: 6
-    };
+    let state = { category: 'all', search: '', visible: 6 };
 
     const grid = document.getElementById('blogGrid');
     const emptyState = document.getElementById('emptyState');
     const postCount = document.getElementById('postCount');
     const loadMoreWrap = document.getElementById('loadMoreWrap');
 
-    // ============================================================
-    // RENDER
-    // ============================================================
     function getFiltered() {
       let list = [...POSTS];
-
-      if (state.category !== 'all') {
-        list = list.filter(p => p.cat === state.category);
-      }
-
+      if (state.category !== 'all') list = list.filter(p => p.cat === state.category);
       if (state.search.trim()) {
         const q = state.search.toLowerCase();
         list = list.filter(p =>
@@ -1582,7 +1917,6 @@
           p.tags.some(t => t.toLowerCase().includes(q))
         );
       }
-
       return list;
     }
 
@@ -1625,23 +1959,14 @@
         </article>
       `).join('');
 
-      // Show/hide load more
-      if (filtered.length > state.visible) {
-        loadMoreWrap.style.display = 'block';
-      } else {
-        loadMoreWrap.style.display = 'none';
-      }
+      loadMoreWrap.style.display = filtered.length > state.visible ? 'block' : 'none';
     }
 
-    // ============================================================
-    // LOAD MORE
-    // ============================================================
     function loadMore() {
       const btn = document.querySelector('.btn-load-more');
       const original = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
       btn.disabled = true;
-
       setTimeout(() => {
         state.visible += 6;
         renderPosts();
@@ -1650,9 +1975,6 @@
       }, 600);
     }
 
-    // ============================================================
-    // FILTER HANDLERS
-    // ============================================================
     document.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -1668,7 +1990,7 @@
       state.category = cat;
       state.search = '';
       state.visible = 6;
-      document.getElementById('searchInput').value = '';
+      document.getElementById('blogSearchInput').value = '';
       document.querySelectorAll('.chip').forEach(c => {
         c.classList.toggle('active', c.dataset.cat === cat);
       });
@@ -1680,7 +2002,7 @@
       state.category = 'all';
       state.search = tag;
       state.visible = 6;
-      document.getElementById('searchInput').value = tag;
+      document.getElementById('blogSearchInput').value = tag;
       document.querySelectorAll('.chip').forEach(c => {
         c.classList.toggle('active', c.dataset.cat === 'all');
       });
@@ -1688,35 +2010,296 @@
       document.querySelector('.category-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    document.getElementById('searchInput').addEventListener('input', e => {
+    document.getElementById('blogSearchInput').addEventListener('input', e => {
       state.search = e.target.value;
       state.visible = 6;
       renderPosts();
     });
 
-    // ============================================================
-    // INIT
-    // ============================================================
     renderPosts();
 
-    // ============================================================
-    // SCROLL PROGRESS + STICKY NAV
-    // ============================================================
-    const progress = document.getElementById('scrollProgress');
-    const nav = document.querySelector('.main-nav');
-    window.addEventListener('scroll', () => {
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      progress.style.width = (window.scrollY / total) * 100 + '%';
-      nav.style.boxShadow = window.scrollY > 50
-        ? '0 4px 20px rgba(31,58,110,0.18)'
-        : '0 2px 12px rgba(31,58,110,0.08)';
+    /* ============================================================
+       SEARCH OVERLAY
+       ============================================================ */
+    const SEARCH_INDEX = [
+      ...POSTS.map(p => ({ type: 'blog', name: p.title, cat: p.catLabel, url: `blog-post.html?id=${p.id}`, img: p.img, desc: p.excerpt })),
+      { type: 'page', name: 'Home', url: '../index.html', icon: 'fa-home', desc: 'Rise Axis Solutions homepage' },
+      { type: 'page', name: 'About Us', url: 'aboutUs.html', icon: 'fa-users', desc: 'Our story, mission, and values' },
+      { type: 'page', name: 'Products', url: 'product.html', icon: 'fa-box', desc: 'Browse our full product range' },
+      { type: 'page', name: 'Blog', url: 'blog.html', icon: 'fa-newspaper', desc: 'Agri-input insights and farming tips' },
+      { type: 'page', name: 'Contact', url: 'contact.html', icon: 'fa-envelope', desc: 'Get in touch with our team' },
+      { type: 'page', name: 'Shop', url: 'shop.html', icon: 'fa-store', desc: 'Order agri-inputs online' },
+      { type: 'page', name: 'Cart', url: 'cart.html', icon: 'fa-shopping-bag', desc: 'View your shopping cart' },
+      { type: 'page', name: 'Login', url: 'login.html', icon: 'fa-sign-in-alt', desc: 'Sign in to your account' },
+      { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' },
+      { type: 'category', name: 'Feed Additives', url: 'shop.html', icon: 'fa-flask', desc: 'Nutritional supplements and feed enhancers' },
+      { type: 'category', name: 'Veterinary Products', url: 'shop.html', icon: 'fa-syringe', desc: 'Animal health and wellness products' },
+      { type: 'category', name: 'Injectables', url: 'shop.html', icon: 'fa-prescription-bottle', desc: 'Fast-acting injectable treatments' },
+      { type: 'category', name: 'Premixes', url: 'shop.html', icon: 'fa-capsules', desc: 'Complete nutrition blends for livestock' }
+    ];
+
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    function openSearch() {
+      searchOverlay.classList.add('open');
+      document.body.classList.add('search-open');
+      setTimeout(() => searchInput.focus(), 150);
+    }
+    function closeSearch() {
+      searchOverlay.classList.remove('open');
+      document.body.classList.remove('search-open');
+      searchInput.value = '';
+      searchResults.innerHTML = `
+        <div class="search-hint">
+          <i class="fas fa-search"></i>
+          <strong>Start typing to search</strong>
+          Try "soil", "premixes", "contact", or a product name.
+        </div>`;
+    }
+    function escapeHtml(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function runSearch(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        searchResults.innerHTML = `
+          <div class="search-hint">
+            <i class="fas fa-search"></i>
+            <strong>Start typing to search</strong>
+            Try "soil", "premixes", "contact", or a product name.
+          </div>`;
+        return;
+      }
+      const matches = SEARCH_INDEX.filter(item =>
+        item.name.toLowerCase().includes(q) ||
+        (item.desc && item.desc.toLowerCase().includes(q)) ||
+        (item.cat && item.cat.toLowerCase().includes(q))
+      );
+      if (matches.length === 0) {
+        searchResults.innerHTML = `
+          <div class="search-no-results">
+            <i class="fas fa-search-minus"></i>
+            <strong>No results for "${escapeHtml(query)}"</strong>
+            <p>Try a different keyword, or browse the Blog.</p>
+          </div>`;
+        return;
+      }
+
+      const blogs = matches.filter(m => m.type === 'blog');
+      const pages = matches.filter(m => m.type === 'page');
+      const cats = matches.filter(m => m.type === 'category');
+      let html = '';
+
+      if (blogs.length) {
+        html += `<div class="search-group-title">Articles · ${blogs.length}</div>`;
+        html += blogs.slice(0, 6).map(b => `
+          <a class="search-result" href="${escapeHtml(b.url)}">
+            <img class="search-result-img" src="${escapeHtml(b.img)}" alt="${escapeHtml(b.name)}" loading="lazy">
+            <div class="search-result-info">
+              <strong>${escapeHtml(b.name)}</strong>
+              <small>${escapeHtml(b.cat)}</small>
+            </div>
+            <i class="fas fa-chevron-right search-result-arrow"></i>
+          </a>
+        `).join('');
+      }
+      if (cats.length) {
+        html += `<div class="search-group-title">Categories · ${cats.length}</div>`;
+        html += cats.map(c => `
+          <a class="search-result" href="${escapeHtml(c.url)}">
+            <div class="search-result-icon"><i class="fas ${escapeHtml(c.icon)}"></i></div>
+            <div class="search-result-info">
+              <strong>${escapeHtml(c.name)}</strong>
+              <small>${escapeHtml(c.desc)}</small>
+            </div>
+            <i class="fas fa-chevron-right search-result-arrow"></i>
+          </a>
+        `).join('');
+      }
+      if (pages.length) {
+        html += `<div class="search-group-title">Pages · ${pages.length}</div>`;
+        html += pages.map(pg => `
+          <a class="search-result" href="${escapeHtml(pg.url)}">
+            <div class="search-result-icon"><i class="fas ${escapeHtml(pg.icon)}"></i></div>
+            <div class="search-result-info">
+              <strong>${escapeHtml(pg.name)}</strong>
+              <small>${escapeHtml(pg.desc)}</small>
+            </div>
+            <i class="fas fa-chevron-right search-result-arrow"></i>
+          </a>
+        `).join('');
+      }
+      searchResults.innerHTML = html;
+    }
+
+    searchInput?.addEventListener('input', e => runSearch(e.target.value));
+    searchInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = searchInput.value.trim();
+        if (!q) return;
+        window.location.href = `shop.html?search=${encodeURIComponent(q)}`;
+      }
+      if (e.key === 'Escape') closeSearch();
+    });
+    searchOverlay?.addEventListener('click', e => {
+      if (e.target === searchOverlay) closeSearch();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && searchOverlay.classList.contains('open')) closeSearch();
     });
 
-    // ============================================================
-    // CONSOLE BRAND
-    // ============================================================
+    /* ============================================================
+       AUTH UI
+       ============================================================ */
+    function applyAuthUI(user, profile) {
+      const authLinks = document.getElementById('authLinks');
+      const userLinks = document.getElementById('userLinks');
+      const mobileAuth = document.getElementById('mobileAuthSection');
+      const mobileUser = document.getElementById('mobileUserSection');
+      const mobileUserBox = document.getElementById('mobileUserBox');
+
+      if (user) {
+        if (authLinks) authLinks.style.display = 'none';
+        if (userLinks) userLinks.style.display = 'inline-flex';
+        if (mobileAuth) mobileAuth.style.display = 'none';
+        if (mobileUser) mobileUser.style.display = 'flex';
+
+        const initials = (
+          (profile?.first_name || user.email || 'U')[0] +
+          (profile?.last_name || '')[0] || ''
+        ).toUpperCase();
+        const name = profile?.first_name
+          ? `${profile.first_name}${profile.last_name ? ' ' + profile.last_name : ''}`
+          : (user.email || 'User').split('@')[0];
+
+        const initialsEl = document.getElementById('mobileUserInitials');
+        const nameEl = document.getElementById('mobileUserName');
+        const emailEl = document.getElementById('mobileUserEmail');
+        const menuNameEl = document.getElementById('userMenuName');
+
+        if (initialsEl) initialsEl.textContent = initials || '··';
+        if (nameEl) nameEl.textContent = name;
+        if (emailEl) emailEl.textContent = user.email;
+        if (menuNameEl) menuNameEl.textContent = name.length > 12 ? 'Account' : name;
+        if (mobileUserBox) mobileUserBox.style.display = 'flex';
+      } else {
+        if (authLinks) authLinks.style.display = 'inline-flex';
+        if (userLinks) userLinks.style.display = 'none';
+        if (mobileAuth) mobileAuth.style.display = 'flex';
+        if (mobileUser) mobileUser.style.display = 'none';
+        if (mobileUserBox) mobileUserBox.style.display = 'none';
+      }
+    }
+
+    async function fetchAndApplyAuth() {
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) { applyAuthUI(null); return; }
+
+        let profile = null;
+        try {
+          const { data } = await supabaseClient
+            .from('profiles')
+            .select('first_name, last_name, role')
+            .eq('id', user.id)
+            .single();
+          profile = data;
+        } catch (_) {}
+
+        applyAuthUI(user, profile);
+      } catch (_) {
+        applyAuthUI(null);
+      }
+    }
+
+    fetchAndApplyAuth();
+    supabaseClient.auth.onAuthStateChange(() => { fetchAndApplyAuth(); });
+
+    async function doLogout(e) {
+      if (e) e.preventDefault();
+      if (!confirm('Sign out of your account?')) return;
+      await supabaseClient.auth.signOut();
+      window.location.reload();
+    }
+    document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
+    document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
+
+    /* ============================================================
+       HAMBURGER / MOBILE MENU
+       ============================================================ */
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+    function openMobileMenu() {
+      mobileMenu.classList.add('open');
+      mobileMenuOverlay.classList.add('open');
+      hamburgerBtn.classList.add('active');
+      hamburgerBtn.setAttribute('aria-expanded', 'true');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+      mobileMenuOverlay.classList.remove('open');
+      hamburgerBtn.classList.remove('active');
+      hamburgerBtn.setAttribute('aria-expanded', 'false');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    hamburgerBtn?.addEventListener('click', () => {
+      if (mobileMenu.classList.contains('open')) closeMobileMenu();
+      else openMobileMenu();
+    });
+    mobileMenuClose?.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMobileMenu();
+    });
+
+    const mobileProductsToggle = document.getElementById('mobileProductsToggle');
+    const mobileProductsSubmenu = document.getElementById('mobileProductsSubmenu');
+    mobileProductsToggle?.addEventListener('click', () => {
+      const isOpen = mobileProductsSubmenu.classList.toggle('open');
+      mobileProductsToggle.classList.toggle('open', isOpen);
+      mobileProductsToggle.setAttribute('aria-expanded', isOpen);
+    });
+
+    mobileMenu?.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (link.id === 'mobileLogoutBtn') return;
+        closeMobileMenu();
+      });
+    });
+
+    /* ============================================================
+       CART BADGE
+       ============================================================ */
+    function updateNavCartBadge() {
+      try {
+        const raw = localStorage.getItem('riseAxisCart');
+        const cart = raw ? JSON.parse(raw) : [];
+        const count = cart.reduce((s, i) => s + (i.quantity || 0), 0);
+        const badge = document.getElementById('navCartBadge');
+        const badgeMob = document.getElementById('navCartBadgeMob');
+        if (badge) badge.textContent = count;
+        if (badgeMob) badgeMob.textContent = count;
+      } catch (_) {}
+    }
+    updateNavCartBadge();
+    window.addEventListener('storage', e => {
+      if (e.key === 'riseAxisCart') updateNavCartBadge();
+    });
+
     console.log('%c RISE AXIS — Blog ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
-    console.log('%c Clarity · Direction · Results ', 'background: #E85D26; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
   </script>
 
 </body>

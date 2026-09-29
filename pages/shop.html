@@ -606,16 +606,6 @@
         radial-gradient(circle at 15% 20%, rgba(232,93,38,0.35), transparent 45%),
         radial-gradient(circle at 85% 80%, rgba(200,16,46,0.35), transparent 45%);
     }
-    .shop-hero::after {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 50px 50px;
-      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-    }
     .shop-hero-orb {
       position: absolute; border-radius: 50%;
       filter: blur(80px); opacity: 0.5;
@@ -627,7 +617,6 @@
       0%, 100% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(30px, -20px) scale(1.08); }
     }
-
     .shop-hero .container {
       position: relative; z-index: 3;
       display: grid;
@@ -635,7 +624,6 @@
       gap: 50px;
       align-items: center;
     }
-
     .shop-hero-left .eyebrow {
       display: inline-flex; align-items: center; gap: 10px;
       background: rgba(255,255,255,0.1);
@@ -658,7 +646,6 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(232,93,38,0.7); }
       50% { box-shadow: 0 0 0 10px rgba(232,93,38,0); }
     }
-
     .shop-hero-left h1 {
       font-size: 3.2rem;
       font-weight: 900;
@@ -683,7 +670,6 @@
       font-weight: 300;
       margin-bottom: 28px;
     }
-
     .hero-search {
       display: flex;
       align-items: center;
@@ -751,6 +737,17 @@
       transform: translateX(6px);
       border-color: rgba(232,93,38,0.4);
     }
+    .hero-cat-item .cat-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--orange), #d44a15);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .hero-cat-item:nth-child(2) .cat-icon { background: linear-gradient(135deg, var(--green), #0a5f2e); }
+    .hero-cat-item:nth-child(3) .cat-icon { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
+    .hero-cat-item:nth-child(4) .cat-icon { background: linear-gradient(135deg, var(--navy), var(--navy-deep)); }
     .hero-cat-item .cat-text { flex: 1; color: #fff; font-weight: 600; font-size: 0.92rem; }
     .hero-cat-item .cat-text small {
       display: block; font-size: 0.72rem;
@@ -889,10 +886,7 @@
     .read-more-btn:hover {
       background: var(--orange); color: #fff;
       transform: translateY(-2px) scale(1.04);
-      box-shadow: 0 15px 35px rgba(232,93,38,0.5);
     }
-    .read-more-btn i { transition: transform 0.3s; }
-    .read-more-btn:hover i { transform: translateX(4px); }
 
     .product-badges {
       position: absolute; top: 14px; left: 14px;
@@ -911,29 +905,6 @@
     .badge-hot { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
     .badge-sale { background: linear-gradient(135deg, var(--orange), #d44a15); }
     .badge i { font-size: 0.6rem; }
-
-    .quick-actions {
-      position: absolute; top: 14px; right: 14px;
-      display: flex; flex-direction: column; gap: 8px;
-      z-index: 3; opacity: 0;
-      transform: translateX(12px);
-      transition: all 0.35s;
-    }
-    .product-card:hover .quick-actions { opacity: 1; transform: translateX(0); }
-    .quick-action {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.95);
-      color: var(--navy);
-      border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
-      box-shadow: 0 6px 16px rgba(31,58,110,0.15);
-      transition: all 0.25s;
-      backdrop-filter: blur(10px);
-    }
-    .quick-action:hover { background: var(--navy); color: #fff; transform: scale(1.12); }
-    .quick-action.active { background: var(--red); color: #fff; }
 
     .product-body {
       padding: 22px 20px 24px;
@@ -993,10 +964,6 @@
     }
     .btn-add:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 25px rgba(200,16,46,0.45); }
     .btn-add:active { transform: scale(0.95); }
-    .btn-add.added {
-      background: linear-gradient(135deg, var(--green), #0a5f2e);
-      box-shadow: 0 6px 16px rgba(14,122,60,0.3);
-    }
 
     .empty-state { text-align: center; padding: 80px 20px; display: none; }
     .empty-state.visible { display: block; }
@@ -1012,395 +979,156 @@
     .empty-state button:hover { background: var(--red); transform: translateY(-2px); }
 
     /* ============================================================
-       PRODUCT DETAIL MODAL
+       ADD-TO-CART MODAL
        ============================================================ */
-    .modal-overlay {
+    .atc-modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(15, 23, 41, 0.65);
+      background: rgba(15,23,41,0.55);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 1500;
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
       opacity: 0; visibility: hidden;
-      transition: all 0.4s;
-      display: flex; align-items: center; justify-content: center;
-      padding: 30px;
+      transition: all 0.35s;
     }
-    .modal-overlay.open { opacity: 1; visibility: visible; }
-
-    .modal-content {
-      background: var(--bg-white);
-      border-radius: 28px;
-      width: 100%; max-width: 1160px;
+    .atc-modal-overlay.open { opacity: 1; visibility: visible; }
+    .atc-modal {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%; max-width: 560px;
       max-height: 92vh; overflow-y: auto;
+      padding: 32px 34px 30px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
       position: relative;
-      transform: translateY(30px) scale(0.97);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+      transform: translateY(20px) scale(0.98);
+      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
     }
-    .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
-
-    .modal-close {
-      position: absolute; top: 20px; right: 20px;
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: var(--bg-light);
-      color: var(--navy);
-      border: 1px solid var(--border);
-      cursor: pointer;
+    .atc-modal-overlay.open .atc-modal { transform: translateY(0) scale(1); }
+    .atc-close {
+      position: absolute; top: 18px; right: 20px;
+      background: none; border: none;
+      width: 34px; height: 34px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
-      transition: all 0.3s;
-      z-index: 10;
+      color: #94a3b8; font-size: 1.2rem; cursor: pointer;
+      transition: all 0.2s;
     }
-    .modal-close:hover { background: var(--red); color: #fff; transform: rotate(90deg); }
+    .atc-close:hover { background: #f1f5f9; color: var(--red); transform: rotate(90deg); }
+    .atc-title {
+      font-size: 1.9rem; font-weight: 900;
+      color: #0f1729; letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .atc-product-name {
+      font-size: 1rem; color: #64748b; font-weight: 500;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+    .atc-section-label {
+      font-size: 0.95rem; font-weight: 700;
+      color: #0f1729; margin-bottom: 12px; display: block;
+    }
+    .pack-options {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .pack-btn {
+      flex: 1 1 auto; min-width: 110px;
+      padding: 12px 16px; border-radius: 30px;
+      border: 1.5px solid #d7dee8; background: #fff;
+      color: #1e3a5f; font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; transition: all 0.2s;
+      text-align: center; font-family: inherit;
+    }
+    .pack-btn:hover { border-color: var(--navy); background: #f7fafd; }
+    .pack-btn.active {
+      background: var(--navy); border-color: var(--navy);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(30,83,180,0.3);
+    }
+    .pack-btn .pack-price-hint {
+      display: block; font-size: 0.72rem;
+      font-weight: 600; opacity: 0.75; margin-top: 2px;
+    }
+    .pack-btn.active .pack-price-hint { color: rgba(255,255,255,0.9); }
 
-    .modal-body {
-      padding: 50px;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 55px;
-      align-items: start;
+    .qty-input-wrap { position: relative; margin-bottom: 24px; }
+    .qty-input {
+      width: 100%; padding: 14px 18px;
+      border: 1.5px solid #d7dee8; border-radius: 12px;
+      font-size: 1rem; font-weight: 600;
+      color: #0f1729; background: #fff;
+      outline: none; font-family: inherit;
+      transition: border-color 0.2s;
     }
+    .qty-input:focus { border-color: var(--navy); }
 
-    .modal-image-side { position: sticky; top: 30px; }
-    .modal-image-wrap {
-      background: linear-gradient(135deg, #f5f8fc, #eaf0f8);
-      border-radius: 22px;
-      padding: 40px;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 460px;
-      border: 1px solid var(--border);
-      position: relative; overflow: hidden;
+    .price-summary {
+      background: #f7f9fc; border-radius: 16px;
+      padding: 22px 24px; margin-bottom: 24px;
     }
-    .modal-image-wrap::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        radial-gradient(circle at 25% 25%, rgba(30,83,180,0.08), transparent 45%),
-        radial-gradient(circle at 75% 75%, rgba(200,16,46,0.08), transparent 45%);
+    .price-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; font-size: 0.95rem;
+      color: #475569; font-weight: 500;
     }
-    .modal-image-wrap img {
-      max-width: 100%; max-height: 380px;
-      object-fit: contain;
-      position: relative; z-index: 1;
-      filter: drop-shadow(0 30px 50px rgba(31,58,110,0.25));
-      transition: transform 0.6s;
+    .price-row .val { font-weight: 700; color: #0f1729; }
+    .price-divider { height: 1px; background: #e2e8f0; margin: 12px 0; }
+    .price-row.total {
+      font-size: 1.1rem; color: #0f1729;
+      font-weight: 900; padding-top: 4px;
     }
-    .modal-image-wrap:hover img { transform: scale(1.06) rotate(-2deg); }
+    .price-row.total .val { color: #0f1729; }
 
-    .modal-info-side { padding-top: 6px; }
-    .modal-cat-tag {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(200, 16, 46, 0.08);
-      color: var(--red);
-      padding: 7px 16px; border-radius: 30px;
-      font-size: 0.72rem; font-weight: 800;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      margin-bottom: 18px;
+    .atc-submit {
+      width: 100%; padding: 18px;
+      background: var(--navy); color: #fff; border: none;
+      border-radius: 40px; font-size: 1.05rem;
+      font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: all 0.25s;
+      box-shadow: 0 10px 25px rgba(30,83,180,0.35);
     }
-    .modal-cat-tag::before {
-      content: '';
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--red);
-      animation: pulse 2s infinite;
-    }
+    .atc-submit:hover { background: #173f8a; transform: translateY(-2px); box-shadow: 0 15px 35px rgba(30,83,180,0.45); }
+    .atc-submit:disabled { background: #b0b8c0; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    .modal-title {
-      font-size: 2.4rem; font-weight: 900;
-      color: var(--navy); letter-spacing: -1px;
-      line-height: 1.15; margin-bottom: 14px;
-    }
-    .modal-rating { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
-    .modal-rating .stars { font-size: 0.95rem; color: var(--gold); }
-    .modal-rating small { color: var(--text-muted); font-weight: 600; font-size: 0.85rem; }
-
-    .modal-available {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 0.82rem; font-weight: 700;
-      color: var(--green);
-      background: rgba(14, 122, 60, 0.1);
-      padding: 6px 14px; border-radius: 30px;
-      margin-bottom: 22px;
-    }
-    .modal-available i { font-size: 0.7rem; }
-
-    .modal-description {
-      color: var(--text-muted); font-size: 1rem;
-      line-height: 1.8; margin-bottom: 26px;
-      padding-bottom: 26px;
-      border-bottom: 1px dashed var(--border);
-    }
-
-    .modal-benefits { margin-bottom: 26px; }
-    .modal-benefits h4 {
-      font-size: 0.95rem; color: var(--navy);
-      font-weight: 800; margin-bottom: 14px;
-      letter-spacing: 0.5px; text-transform: uppercase;
-    }
-    .modal-benefits ul { display: flex; flex-direction: column; gap: 10px; }
-    .modal-benefits li {
-      display: flex; align-items: flex-start; gap: 12px;
-      color: var(--text-muted); font-size: 0.92rem; line-height: 1.6;
-    }
-    .modal-benefits li::before {
-      content: '\f00c';
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
-      color: var(--green);
-      background: rgba(14,122,60,0.1);
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem;
-      flex-shrink: 0; margin-top: 2px;
-    }
-
-    .modal-cta-row {
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 20px;
-      padding: 24px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 26px;
-      flex-wrap: wrap;
-    }
-    .modal-price-block { display: flex; flex-direction: column; }
-    .modal-price-block .price {
-      font-size: 2rem; font-weight: 900;
-      color: var(--navy); letter-spacing: -1px; line-height: 1;
-    }
-    .modal-price-block .old-price {
-      font-size: 0.9rem; color: var(--text-muted);
-      text-decoration: line-through; margin-top: 6px;
-    }
-    .modal-price-block .save-tag {
-      display: inline-block;
-      background: var(--orange); color: #fff;
-      font-size: 0.7rem; font-weight: 800;
-      padding: 3px 10px; border-radius: 30px;
-      margin-top: 8px; letter-spacing: 1px;
-      align-self: flex-start;
-    }
-
-    .btn-add-cart {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
-      color: #fff; border: none;
-      padding: 18px 40px; border-radius: 14px;
-      font-weight: 800; font-size: 0.95rem;
-      letter-spacing: 1px; text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex; align-items: center; gap: 12px;
-      transition: all 0.3s;
-      box-shadow: 0 12px 30px rgba(200,16,46,0.3);
-      position: relative; overflow: hidden;
-    }
-    .btn-add-cart::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.6s;
-    }
-    .btn-add-cart:hover::before { transform: translateX(100%); }
-    .btn-add-cart:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(200,16,46,0.5); }
-    .btn-add-cart.added {
-      background: linear-gradient(135deg, var(--green), #0a5f2e);
-      box-shadow: 0 12px 30px rgba(14,122,60,0.4);
-    }
-    .btn-add-cart i { font-size: 1.05rem; }
-
-    .accordion-group {
-      display: flex; flex-direction: column; gap: 0;
-      border-top: 1px solid var(--border); margin-top: 10px;
-    }
-    .accordion-item { border-bottom: 1px solid var(--border); }
-    .accordion-header {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 22px 4px;
-      cursor: pointer; user-select: none;
-      font-weight: 800; color: var(--navy);
-      font-size: 0.95rem; letter-spacing: 0.8px;
-      text-transform: uppercase;
-      transition: color 0.25s;
-    }
-    .accordion-header:hover { color: var(--red); }
-    .accordion-header .acc-icon {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: var(--bg-light);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--navy); font-size: 0.8rem;
-      transition: all 0.3s; flex-shrink: 0;
-    }
-    .accordion-item.open .accordion-header .acc-icon {
-      background: var(--red); color: #fff; transform: rotate(180deg);
-    }
-    .accordion-body {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.4s ease, padding 0.3s ease;
-      color: var(--text-muted); font-size: 0.92rem;
-      line-height: 1.75; padding: 0 4px;
-    }
-    .accordion-item.open .accordion-body { max-height: 400px; padding: 0 4px 22px; }
-    .accordion-body ul { display: flex; flex-direction: column; gap: 8px; }
-    .accordion-body ul li { display: flex; gap: 10px; align-items: flex-start; }
-    .accordion-body ul li::before {
-      content: '•'; color: var(--red);
-      font-weight: 900; flex-shrink: 0;
-    }
-
-    /* ============================================================
-       CART DRAWER
-       ============================================================ */
+    /* FLOATING CART BUTTON */
     .cart-toggle {
       position: fixed; bottom: 100px; right: 25px;
-      width: 62px; height: 62px;
-      border-radius: 50%;
+      width: 62px; height: 62px; border-radius: 50%;
       background: linear-gradient(135deg, var(--navy), var(--navy-deep));
       color: #fff; border: none;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.3rem; cursor: pointer;
       box-shadow: 0 10px 30px rgba(30,83,180,0.45);
-      z-index: 998;
-      transition: all 0.3s;
+      z-index: 998; transition: all 0.3s;
+      text-decoration: none;
     }
     .cart-toggle:hover { transform: scale(1.1) rotate(-8deg); }
     .cart-count {
       position: absolute; top: -6px; right: -6px;
       background: var(--red); color: #fff;
-      min-width: 24px; height: 24px;
-      border-radius: 12px;
+      min-width: 24px; height: 24px; border-radius: 12px;
       font-size: 0.72rem; font-weight: 800;
       display: flex; align-items: center; justify-content: center;
-      padding: 0 6px;
-      border: 2px solid var(--bg-white);
-      animation: pulse 2s infinite;
+      padding: 0 6px; border: 2px solid var(--bg-white);
     }
 
-    .cart-overlay {
-      position: fixed; inset: 0;
-      background: rgba(15, 23, 41, 0.5);
-      backdrop-filter: blur(4px);
-      opacity: 0; visibility: hidden;
-      transition: all 0.3s;
-      z-index: 1400;
+    /* TOAST */
+    .toast-message {
+      position: fixed; bottom: 30px; left: 30px;
+      padding: 16px 24px; background: #e5f4e6;
+      border-radius: 60px; color: var(--green);
+      font-weight: 700; font-size: 0.9rem;
+      display: none; align-items: center; gap: 12px;
+      border: 1px solid #b8d9b8;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      z-index: 3000; animation: slideUp 0.3s ease;
     }
-    .cart-overlay.open { opacity: 1; visibility: visible; }
+    .toast-message.show { display: flex; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    .cart-drawer {
-      position: fixed; top: 0; right: 0;
-      height: 100vh; width: 420px; max-width: 100%;
-      background: var(--bg-white);
-      box-shadow: -20px 0 60px rgba(0,0,0,0.2);
-      transform: translateX(100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1600;
-      display: flex; flex-direction: column;
-    }
-    .cart-drawer.open { transform: translateX(0); }
-
-    .cart-header {
-      padding: 24px 26px;
-      border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff;
-    }
-    .cart-header h3 {
-      font-size: 1.15rem; font-weight: 800;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .cart-header h3 i { color: var(--orange); }
-    .cart-close {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      color: #fff; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.25s;
-    }
-    .cart-close:hover { background: var(--red); transform: rotate(90deg); }
-
-    .cart-items { flex: 1; overflow-y: auto; padding: 20px 26px; }
-    .cart-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-    .cart-empty i { font-size: 3rem; color: var(--border); margin-bottom: 14px; }
-    .cart-empty p { font-size: 0.9rem; }
-
-    .cart-item {
-      display: flex; gap: 14px;
-      padding: 14px 0;
-      border-bottom: 1px dashed var(--border);
-      animation: cartItemIn 0.4s ease;
-    }
-    @keyframes cartItemIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    .cart-item-img {
-      width: 64px; height: 64px;
-      border-radius: 12px; object-fit: cover;
-      background: var(--bg-light); flex-shrink: 0;
-    }
-    .cart-item-info { flex: 1; min-width: 0; }
-    .cart-item-info h4 {
-      font-size: 0.88rem; color: var(--navy);
-      font-weight: 700; margin-bottom: 4px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .cart-item-info .price { font-size: 0.85rem; font-weight: 800; color: var(--red); }
-    .cart-item-qty { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-    .qty-btn {
-      width: 26px; height: 26px;
-      border-radius: 6px;
-      background: var(--bg-light);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; color: var(--navy);
-      transition: all 0.2s;
-    }
-    .qty-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
-    .qty-value { font-size: 0.85rem; font-weight: 700; min-width: 22px; text-align: center; }
-    .cart-item-remove {
-      background: none; border: none;
-      color: var(--text-muted); cursor: pointer;
-      font-size: 0.85rem; transition: color 0.2s;
-    }
-    .cart-item-remove:hover { color: var(--red); }
-
-    .cart-footer {
-      padding: 22px 26px 26px;
-      border-top: 1px solid var(--border);
-      background: var(--bg-light);
-    }
-    .cart-total-row {
-      display: flex; justify-content: space-between;
-      margin-bottom: 8px; font-size: 0.88rem;
-      color: var(--text-muted);
-    }
-    .cart-total-row.grand {
-      font-size: 1.2rem; font-weight: 900; color: var(--navy);
-      padding-top: 12px; margin-top: 12px;
-      border-top: 2px dashed var(--border);
-      margin-bottom: 18px;
-    }
-    .cart-total-row.grand span:last-child { color: var(--red); }
-
-    .btn-checkout {
-      width: 100%; padding: 16px; border-radius: 14px;
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
-      color: #fff; border: none;
-      font-weight: 800; cursor: pointer;
-      font-size: 0.95rem;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: all 0.3s;
-      box-shadow: 0 10px 25px rgba(200,16,46,0.3);
-    }
-    .btn-checkout:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(200,16,46,0.45); }
-
-    /* ---------- FOOTER ---------- */
+    /* FOOTER */
     .footer {
       background: var(--navy-deep); color: #c8d2e6;
       padding: 65px 0 0; font-size: 0.9rem;
@@ -1463,7 +1191,7 @@
       color: #7a88a8; font-size: 0.85rem;
     }
 
-    /* ---------- WHATSAPP ---------- */
+    /* WHATSAPP */
     .whatsapp-float {
       position: fixed; bottom: 25px; right: 25px;
       background: var(--green); color: #fff;
@@ -1474,15 +1202,6 @@
       z-index: 999; transition: transform 0.3s;
     }
     .whatsapp-float:hover { transform: scale(1.1); }
-
-    /* ---------- SCROLL PROGRESS ---------- */
-    .scroll-progress {
-      position: fixed; top: 0; left: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--navy), var(--red), var(--orange));
-      z-index: 1700; width: 0%;
-      transition: width 0.1s;
-    }
 
     /* ============================================================
        RESPONSIVE
@@ -1497,9 +1216,6 @@
       .shop-hero .container { grid-template-columns: 1fr; gap: 50px; }
       .shop-hero-card { max-width: 520px; }
       .shop-hero-left h1 { font-size: 2.6rem; }
-      .modal-body { grid-template-columns: 1fr; gap: 35px; padding: 40px 30px; }
-      .modal-image-side { position: static; }
-      .modal-image-wrap { min-height: 340px; }
     }
     @media (max-width: 1024px) {
       .nav-links, .nav-actions { display: none !important; }
@@ -1526,17 +1242,14 @@
       .product-image-wrap { height: 180px; }
       .product-body { padding: 16px 14px 18px; }
       .product-title { font-size: 0.92rem; }
-      .product-price .price { font-size: 1rem; }
-      .btn-add { width: 38px; height: 38px; font-size: 0.9rem; }
       .footer-grid { grid-template-columns: 1fr; gap: 36px; }
-      .cart-drawer { width: 100%; }
-      .modal-overlay { padding: 12px; }
-      .modal-content { border-radius: 20px; }
-      .modal-body { padding: 30px 22px; }
-      .modal-title { font-size: 1.7rem; }
-      .modal-price-block .price { font-size: 1.5rem; }
-      .btn-add-cart { padding: 14px 28px; font-size: 0.85rem; }
-      .modal-close { top: 12px; right: 12px; width: 38px; height: 38px; }
+      .atc-modal { padding: 26px 22px 24px; }
+      .atc-title { font-size: 1.5rem; }
+      .pack-btn { min-width: 90px; font-size: 0.85rem; padding: 10px 12px; }
+      .search-overlay { padding: 20px 12px 30px; }
+      .search-panel-header { padding: 14px 16px; }
+      .search-input-wrap input { font-size: 0.92rem; padding: 11px 14px; }
+      .search-close { width: 36px; height: 36px; }
     }
     @media (max-width: 480px) {
       .products-grid { grid-template-columns: 1fr; }
@@ -1544,15 +1257,14 @@
       .shop-hero-left h1 { font-size: 1.7rem; }
       .sort-select { width: 100%; }
       .filter-right { width: 100%; justify-content: space-between; }
+      .atc-modal { padding: 22px 18px; border-radius: 16px; }
+      .atc-title { font-size: 1.35rem; }
       .mobile-menu { width: 100%; max-width: 100%; }
       .cart-icon-btn, .hamburger { width: 40px; height: 40px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- ========== SCROLL PROGRESS ========== -->
-  <div class="scroll-progress" id="scrollProgress"></div>
 
   <!-- ========== TOP BAR ========== -->
   <div class="top-bar">
@@ -1575,6 +1287,7 @@
   <!-- ========== NAVIGATION ========== -->
   <nav class="main-nav" id="mainNav">
     <div class="container">
+
       <a href="../index.html" class="logo">
         <div>
           <span class="logo-mark">
@@ -1676,6 +1389,7 @@
           <span></span>
         </button>
       </div>
+
     </div>
   </nav>
 
@@ -1685,7 +1399,12 @@
       <div class="search-panel-header">
         <i class="fas fa-search"></i>
         <div class="search-input-wrap">
-          <input type="text" id="searchInput" placeholder="Search products, pages, categories..." autocomplete="off">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search products, pages, categories..."
+            autocomplete="off"
+          >
         </div>
         <button class="search-close" onclick="closeSearch()" aria-label="Close search">
           <i class="fas fa-times"></i>
@@ -1705,6 +1424,7 @@
   <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
   <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+
     <div class="mobile-menu-header">
       <a href="../index.html" class="logo">
         <div>
@@ -1775,11 +1495,10 @@
         <span><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</span>
       </div>
     </div>
+
   </aside>
 
-  <!-- ============================================================
-       SHOP HERO
-       ============================================================ -->
+  <!-- ========== SHOP HERO ========== -->
   <section class="shop-hero">
     <div class="shop-hero-orb shop-hero-orb-1"></div>
     <div class="shop-hero-orb shop-hero-orb-2"></div>
@@ -1805,31 +1524,23 @@
         <p>Jump straight to what you need.</p>
         <div class="hero-cat-list">
           <div class="hero-cat-item" onclick="filterCategory('feed-additives')">
-            <div class="cat-text">
-              Feed Additives
-              <small>Boost nutrition & growth</small>
-            </div>
+            <div class="cat-icon"><i class="fas fa-flask"></i></div>
+            <div class="cat-text">Feed Additives<small>Boost nutrition & growth</small></div>
             <i class="fas fa-arrow-right arrow"></i>
           </div>
           <div class="hero-cat-item" onclick="filterCategory('veterinary')">
-            <div class="cat-text">
-              Veterinary Products
-              <small>Health & wellness</small>
-            </div>
+            <div class="cat-icon"><i class="fas fa-syringe"></i></div>
+            <div class="cat-text">Veterinary Products<small>Health & wellness</small></div>
             <i class="fas fa-arrow-right arrow"></i>
           </div>
           <div class="hero-cat-item" onclick="filterCategory('injectables')">
-            <div class="cat-text">
-              Injectables
-              <small>Fast-acting treatment</small>
-            </div>
+            <div class="cat-icon"><i class="fas fa-prescription-bottle"></i></div>
+            <div class="cat-text">Injectables<small>Fast-acting treatment</small></div>
             <i class="fas fa-arrow-right arrow"></i>
           </div>
           <div class="hero-cat-item" onclick="filterCategory('premixes')">
-            <div class="cat-text">
-              Premixes
-              <small>Complete nutrition blend</small>
-            </div>
+            <div class="cat-icon"><i class="fas fa-capsules"></i></div>
+            <div class="cat-text">Premixes<small>Complete nutrition blend</small></div>
             <i class="fas fa-arrow-right arrow"></i>
           </div>
         </div>
@@ -1837,17 +1548,15 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       FILTER BAR
-       ============================================================ -->
+  <!-- ========== FILTER BAR ========== -->
   <div class="filter-bar">
     <div class="container">
       <div class="filter-chips" id="filterChips">
         <div class="chip active" data-cat="all"><i class="fas fa-th-large"></i> All Products</div>
-        <div class="chip" data-cat="feed-additives"> Feed Additives</div>
-        <div class="chip" data-cat="veterinary"> Veterinary Products</div>
-        <div class="chip" data-cat="injectables"> Injectables</div>
-        <div class="chip" data-cat="premixes"> Premixes</div>
+        <div class="chip" data-cat="feed-additives"><i class="fas fa-flask"></i> Feed Additives</div>
+        <div class="chip" data-cat="veterinary"><i class="fas fa-syringe"></i> Veterinary Products</div>
+        <div class="chip" data-cat="injectables"><i class="fas fa-prescription-bottle"></i> Injectables</div>
+        <div class="chip" data-cat="premixes"><i class="fas fa-capsules"></i> Premixes</div>
       </div>
 
       <div class="filter-right">
@@ -1863,13 +1572,10 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       PRODUCTS GRID
-       ============================================================ -->
+  <!-- ========== PRODUCTS GRID ========== -->
   <section class="products-section">
     <div class="container">
       <div class="products-grid" id="productsGrid"></div>
-
       <div class="empty-state" id="emptyState">
         <i class="fas fa-search-minus"></i>
         <h3>No products found</h3>
@@ -1879,59 +1585,61 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       PRODUCT DETAIL MODAL
-       ============================================================ -->
-  <div class="modal-overlay" id="productModal">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()" aria-label="Close">
+  <!-- ========== ADD-TO-CART MODAL ========== -->
+  <div class="atc-modal-overlay" id="atcModal">
+    <div class="atc-modal">
+      <button class="atc-close" onclick="closeAtcModal()" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
-      <div class="modal-body" id="modalBody"></div>
+
+      <h2 class="atc-title">Add to Cart</h2>
+      <div class="atc-product-name" id="atcProductName">—</div>
+
+      <label class="atc-section-label">Select Packaging</label>
+      <div class="pack-options" id="atcPackOptions"></div>
+
+      <label class="atc-section-label" for="atcQty">Number of Items</label>
+      <div class="qty-input-wrap">
+        <input type="number" class="qty-input" id="atcQty" value="1" min="1" step="1">
+      </div>
+
+      <div class="price-summary">
+        <div class="price-row">
+          <span>Price per unit</span>
+          <span class="val" id="atcUnitPrice">KES 0</span>
+        </div>
+        <div class="price-row">
+          <span>Selected pack</span>
+          <span class="val" id="atcPackLabel">—</span>
+        </div>
+        <div class="price-row">
+          <span>Quantity</span>
+          <span class="val" id="atcQtyLabel">1</span>
+        </div>
+        <div class="price-divider"></div>
+        <div class="price-row total">
+          <span>Total</span>
+          <span class="val" id="atcTotal">KES 0</span>
+        </div>
+      </div>
+
+      <button class="atc-submit" id="atcSubmitBtn" onclick="submitAddToCart()">
+        <i class="fas fa-shopping-cart"></i> Add to Cart
+      </button>
     </div>
   </div>
 
-  <!-- ============================================================
-       CART DRAWER
-       ============================================================ -->
-  <button class="cart-toggle" onclick="toggleCart()" aria-label="Open cart">
+  <!-- FLOATING CART -->
+  <a href="cart.html" class="cart-toggle" aria-label="Open cart">
     <i class="fas fa-shopping-bag"></i>
     <span class="cart-count" id="cartCount">0</span>
-  </button>
+  </a>
 
-  <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
-
-  <aside class="cart-drawer" id="cartDrawer">
-    <div class="cart-header">
-      <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
-      <button class="cart-close" onclick="toggleCart()" aria-label="Close">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="cart-items" id="cartItems">
-      <div class="cart-empty">
-        <i class="fas fa-shopping-basket"></i>
-        <p>Your cart is empty.<br>Start adding products!</p>
-      </div>
-    </div>
-    <div class="cart-footer">
-      <div class="cart-total-row">
-        <span>Subtotal</span>
-        <span id="cartSubtotal">KES 0</span>
-      </div>
-      <div class="cart-total-row">
-        <span>Delivery</span>
-        <span>Calculated at checkout</span>
-      </div>
-      <div class="cart-total-row grand">
-        <span>Total</span>
-        <span id="cartTotal">KES 0</span>
-      </div>
-      <button class="btn-checkout" onclick="window.location.href='cart.html'">
-        Proceed to Checkout <i class="fas fa-arrow-right"></i>
-      </button>
-    </div>
-  </aside>
+  <!-- TOAST -->
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText">Item added</span>
+  </div>
 
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
@@ -1961,14 +1669,14 @@
             <li><a href="aboutUs.html">About Us</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="shop.html">Shop Now</a></li>
+            <li><a href="product.html">Shop Now</a></li>
           </ul>
         </div>
 
         <div>
           <h4>Get In Touch</h4>
           <ul class="footer-contact">
-            <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5 </li>
+            <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</li>
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
             <li><i class="fas fa-phone-alt"></i> +254 725 538 297</li>
           </ul>
@@ -1976,8 +1684,8 @@
 
         <div>
           <h4>Newsletter</h4>
-          <p style="color: #a8b4cc; margin-bottom: 0;">Subscribe for agri-tips, product updates, and offers. No spam — promise.</p>
-          <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to Rise Axis Solutions!');">
+          <p style="color: #a8b4cc; margin-bottom: 0;">Subscribe for agri-tips, product updates, and offers.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
             <input type="email" placeholder="Enter your email" required>
             <button type="submit"><i class="fas fa-paper-plane"></i></button>
           </form>
@@ -1994,7 +1702,6 @@
     <i class="fab fa-whatsapp"></i>
   </a>
 
-  <!-- ========== JAVASCRIPT ========== -->
   <script>
     /* ============================================================
        SUPABASE CLIENT
@@ -2011,7 +1718,7 @@
     });
 
     /* ============================================================
-       SEARCH (site-wide overlay)
+       SEARCH
        ============================================================ */
     const SEARCH_INDEX = [
       { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
@@ -2304,94 +2011,102 @@
     });
 
     /* ============================================================
-       PRODUCT DATA
+       CART HELPERS — key: riseAxisCart
+       ============================================================ */
+    const CART_KEY = 'riseAxisCart';
+
+    function getCart() {
+      try { const raw = localStorage.getItem(CART_KEY); return raw ? JSON.parse(raw) : []; }
+      catch (e) { return []; }
+    }
+    function saveCart(cart) {
+      try {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        updateCartBadges();
+        window.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
+      } catch (e) {}
+    }
+    function addToCart(product, pack, qty) {
+      if (!product || !product.id) return;
+      const cart = getCart();
+      const existing = cart.find(i => i.productId === product.id && i.pack === pack.id);
+      if (existing) {
+        existing.quantity += qty;
+      } else {
+        cart.push({
+          productId: product.id,
+          name: product.name,
+          price: pack.price,
+          basePrice: product.price,
+          image: product.img || '',
+          quantity: qty,
+          qty: qty,
+          category: product.cat || '',
+          pack: pack.id,
+          packLabel: pack.label,
+          addedAt: Date.now()
+        });
+      }
+      saveCart(cart);
+    }
+    function getCartCount() { return getCart().reduce((s, i) => s + (i.quantity || i.qty || 0), 0); }
+
+    function updateCartBadges() {
+      const count = getCartCount();
+      ['navCartBadge', 'navCartBadgeMob', 'cartCount', 'headerCartBadge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = count;
+      });
+      document.querySelectorAll('.cart-badge').forEach(el => el.textContent = count);
+    }
+
+    /* ============================================================
+       PRODUCTS
        ============================================================ */
     const PRODUCTS = [
-      { id: 1, name: 'ProGrowth Feed Booster', cat: 'feed-additives', price: 2450, old: 2900, rating: 5, reviews: 124, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], available: '250g and 1kg sachets/packs', description: 'A premium feed additive formulated to enhance feed conversion, boost daily weight gain, and improve overall herd productivity in poultry, dairy, and beef cattle.', composition: 'Probiotics (Lactobacillus spp., Bacillus subtilis), enzymes, vitamins, trace minerals.', dosage: '1–2 kg per ton of feed, mixed evenly before serving.', indications: 'Improves feed efficiency, supports gut health, enhances immunity, and reduces mortality.', benefits: ['Enhances feed conversion and growth performance', 'Supports digestive health and gut microbiome', 'Reduces stress during feed transitions', 'Improves overall herd productivity', 'Safe for poultry, dairy, and beef cattle'] },
-      { id: 2, name: 'VitaMin Plus Supplement', cat: 'feed-additives', price: 1890, old: 1950, rating: 4, reviews: 87, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['new'], available: '500g and 1kg packs', description: 'A complete vitamin and mineral blend designed to fill nutritional gaps in livestock diets — promoting strong immunity, healthy growth, and better reproduction.', composition: 'Vitamins A, D3, E, K, B-complex, selenium, zinc, manganese, iodine.', dosage: '0.5–1 kg per ton of feed or as advised by a veterinarian.', indications: 'Supports immunity, fertility, and overall animal health in poultry, cattle, and pigs.', benefits: ['Complete vitamin and mineral blend', 'Boosts immunity and disease resistance', 'Improves fertility and reproductive health', 'Supports strong bone and muscle development', 'Enhances overall herd vitality'] },
-      { id: 3, name: 'EnzymeMax Digestive Aid', cat: 'feed-additives', price: 3200, old: 0, rating: 5, reviews: 56, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: [], available: '1kg and 5kg packs', description: 'A powerful enzyme complex that breaks down fibre, protein, and starch — improving digestion, nutrient absorption, and feed efficiency across all livestock.', composition: 'Cellulase, protease, amylase, xylanase, phytase.', dosage: '0.5–1 kg per ton of feed.', indications: 'Improves digestion in poultry, swine, and ruminants — especially with high-fibre diets.', benefits: ['Improves digestion and nutrient absorption', 'Reduces feed waste and overall costs', 'Supports gut health and immunity', 'Enhances performance on high-fibre diets', 'Compatible with most feed formulations'] },
-      { id: 4, name: 'VetCare Antibiotic Powder', cat: 'veterinary', price: 1750, old: 2100, rating: 4, reviews: 98, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', tags: ['sale'], available: '100g and 500g tubs', description: 'A broad-spectrum antibiotic powder for the treatment of common bacterial infections in poultry, cattle, and pigs — fast-acting and easy to administer through water or feed.', composition: 'Amoxicillin trihydrate, excipients.', dosage: 'As prescribed by a veterinarian — typically 20mg/kg body weight daily.', indications: 'Respiratory, gastrointestinal, and urinary tract infections.', benefits: ['Broad-spectrum antibacterial action', 'Fast-acting formula', 'Easy to administer via water or feed', 'Effective against common farm infections', 'Trusted by veterinarians across Kenya'] },
-      { id: 5, name: 'Dewormer Oral Suspension', cat: 'veterinary', price: 980, old: 0, rating: 5, reviews: 210, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], available: '1L and 5L bottles', description: 'An effective oral dewormer against a wide range of internal parasites in cattle, sheep, goats, and poultry — supporting healthier, more productive animals.', composition: 'Albendazole, levamisole, excipients.', dosage: '1ml per 10kg body weight — single dose, repeat after 3 weeks if needed.', indications: 'Roundworms, tapeworms, lungworms, and other internal parasites.', benefits: ['Effective against internal parasites', 'Improves weight gain and milk production', 'Reduces risk of anaemia and weakness', 'Safe for cattle, sheep, goats, and poultry', 'Easy-to-administer oral suspension'] },
-      { id: 6, name: 'Skin Heal Topical Spray', cat: 'veterinary', price: 1250, old: 0, rating: 4, reviews: 65, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['new'], available: '250ml spray bottle', description: 'A fast-acting topical spray for wounds, cuts, and skin conditions in livestock — protecting against infection while promoting rapid healing.', composition: 'Povidone-iodine, allantoin, herbal extracts.', dosage: 'Spray liberally on affected area 2–3 times daily until healed.', indications: 'Wounds, cuts, abrasions, and bacterial skin infections.', benefits: ['Fast-acting wound healing formula', 'Antiseptic and antibacterial protection', 'Soothes irritated skin', 'Easy spray-on application', 'Suitable for all livestock species'] },
-      { id: 7, name: 'Oxytetracycline Injection', cat: 'injectables', price: 1450, old: 1800, rating: 5, reviews: 145, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: ['sale'], available: '100ml and 250ml vials', description: 'A broad-spectrum injectable antibiotic for the treatment of bacterial infections in cattle, sheep, goats, and pigs — trusted for fast, reliable results.', composition: 'Oxytetracycline hydrochloride 20% w/v.', dosage: '1ml per 10kg body weight by intramuscular injection, once daily for 3–5 days.', indications: 'Respiratory, urinary, and gastrointestinal infections.', benefits: ['Broad-spectrum injectable antibiotic', 'Rapid absorption and action', 'Effective against common bacterial infections', 'Long-acting formulation', 'Trusted veterinary choice'] },
-      { id: 8, name: 'Ivermectin Injectable 1%', cat: 'injectables', price: 2100, old: 0, rating: 5, reviews: 178, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], available: '50ml and 100ml vials', description: 'A powerful antiparasitic injectable solution effective against internal and external parasites — supporting healthier, more productive livestock.', composition: 'Ivermectin 1% w/v.', dosage: '1ml per 50kg body weight by subcutaneous injection.', indications: 'Roundworms, lice, mites, and mange in cattle, sheep, and pigs.', benefits: ['Effective against internal & external parasites', 'Long-acting antiparasitic action', 'Improves weight gain and productivity', 'Safe for most livestock species', 'Easy subcutaneous administration'] },
-      { id: 9, name: 'Vitamin B-Complex Injection', cat: 'injectables', price: 1350, old: 0, rating: 4, reviews: 52, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', tags: ['new'], available: '100ml vial', description: 'A vitamin B-complex injectable supporting energy metabolism, appetite, and recovery — ideal for stressed or recovering animals.', composition: 'Vitamins B1, B2, B6, B12, niacinamide, panthenol.', dosage: '1–2ml per animal by intramuscular injection, as advised by a veterinarian.', indications: 'Stress, poor appetite, recovery after illness, and deficiencies.', benefits: ['Supports energy and appetite', 'Aids recovery after illness or stress', 'Improves overall animal vitality', 'Fast-absorbing injectable formula', 'Safe and well-tolerated'] },
-      { id: 10, name: 'Layer Premix Pro', cat: 'premixes', price: 3450, old: 3990, rating: 5, reviews: 210, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['sale'], available: '5kg and 25kg bags', description: 'A complete premix formulated for laying hens — supporting strong shells, consistent egg production, and optimal bird health.', composition: 'Calcium, phosphorus, vitamin D3, vitamin E, trace minerals, methionine.', dosage: '2.5–5 kg per ton of layer feed.', indications: 'Improves eggshell quality, production, and hen health.', benefits: ['Improves eggshell strength and quality', 'Supports consistent egg production', 'Balanced vitamins and minerals', 'Enhances hen health and longevity', 'Reduces cracked and soft eggs'] },
-      { id: 11, name: 'Dairy Premix Gold', cat: 'premixes', price: 4200, old: 0, rating: 5, reviews: 156, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], available: '10kg and 25kg bags', description: 'A premium dairy premix designed to optimise milk yield, fertility, and herd health — formulated for high-producing dairy cattle.', composition: 'Calcium, phosphorus, magnesium, vitamins A, D3, E, trace minerals, yeast culture.', dosage: '100–200g per cow per day, mixed with feed.', indications: 'Supports milk yield, fertility, and overall dairy herd health.', benefits: ['Boosts milk yield and butterfat content', 'Improves fertility and conception rates', 'Supports strong bones and hooves', 'Reduces risk of metabolic disorders', 'Improves overall herd health'] },
-      { id: 12, name: 'Broiler Premix Elite', cat: 'premixes', price: 3800, old: 0, rating: 4, reviews: 94, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: ['new'], available: '5kg and 25kg bags', description: 'A specialised premix formulated for rapid, healthy broiler growth — supporting feed efficiency, immunity, and uniform flock performance.', composition: 'Vitamins A, D3, E, K, B-complex, amino acids, trace minerals, antioxidants.', dosage: '2.5–5 kg per ton of broiler feed.', indications: 'Supports fast growth, immunity, and uniform broiler performance.', benefits: ['Accelerates healthy broiler growth', 'Improves feed conversion ratio', 'Supports immune system strength', 'Ensures uniform flock performance', 'Reduces mortality and culling'] }
+      { id: 'progrowth-feed-booster', name: 'ProGrowth Feed Booster', cat: 'feed-additives', price: 2450, old: 2900, rating: 5, reviews: 124, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '250g', label: '250 g', price: 2450 }, { id: '1kg', label: '1 kg', price: 8900 }, { id: '5kg', label: '5 kg', price: 42000 } ] },
+      { id: 'vitamin-plus', name: 'VitaMin Plus Supplement', cat: 'feed-additives', price: 1890, old: 0, rating: 4, reviews: 87, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['new'], packs: [ { id: '500g', label: '500 g', price: 1890 }, { id: '1kg', label: '1 kg', price: 3450 } ] },
+      { id: 'enzymemax', name: 'EnzymeMax Digestive Aid', cat: 'feed-additives', price: 3200, old: 0, rating: 5, reviews: 56, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: [], packs: [ { id: '1kg', label: '1 kg', price: 3200 }, { id: '5kg', label: '5 kg', price: 14800 } ] },
+      { id: 'vetcare-antibiotic', name: 'VetCare Antibiotic Powder', cat: 'veterinary', price: 1750, old: 2100, rating: 4, reviews: 98, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', tags: ['sale'], packs: [ { id: '100g', label: '100 g', price: 1750 }, { id: '500g', label: '500 g', price: 7900 } ] },
+      { id: 'dewormer-oral', name: 'Dewormer Oral Suspension', cat: 'veterinary', price: 980, old: 0, rating: 5, reviews: 210, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '1L', label: '1 Litre', price: 980 }, { id: '5L', label: '5 Litres', price: 4400 } ] },
+      { id: 'skin-heal', name: 'Skin Heal Topical Spray', cat: 'veterinary', price: 1250, old: 0, rating: 4, reviews: 65, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['new'], packs: [ { id: '250ml', label: '250 ml', price: 1250 }, { id: '500ml', label: '500 ml', price: 2200 } ] },
+      { id: 'oxytetracycline', name: 'Oxytetracycline Injection', cat: 'injectables', price: 1450, old: 1800, rating: 5, reviews: 145, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: ['sale'], packs: [ { id: '100ml', label: '100 ml', price: 1450 }, { id: '250ml', label: '250 ml', price: 3200 } ] },
+      { id: 'ivermectin', name: 'Ivermectin Injectable 1%', cat: 'injectables', price: 2100, old: 0, rating: 5, reviews: 178, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '50ml', label: '50 ml', price: 2100 }, { id: '100ml', label: '100 ml', price: 3800 } ] },
+      { id: 'vitamin-b', name: 'Vitamin B-Complex Injection', cat: 'injectables', price: 1350, old: 0, rating: 4, reviews: 52, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', tags: ['new'], packs: [ { id: '100ml', label: '100 ml', price: 1350 } ] },
+      { id: 'layer-premix', name: 'Layer Premix Pro', cat: 'premixes', price: 3450, old: 3990, rating: 5, reviews: 210, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['sale'], packs: [ { id: '5kg', label: '5 kg', price: 3450 }, { id: '25kg', label: '25 kg', price: 15900 } ] },
+      { id: 'dairy-premix', name: 'Dairy Premix Gold', cat: 'premixes', price: 4200, old: 0, rating: 5, reviews: 156, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '10kg', label: '10 kg', price: 4200 }, { id: '25kg', label: '25 kg', price: 9800 } ] },
+      { id: 'broiler-premix', name: 'Broiler Premix Elite', cat: 'premixes', price: 3800, old: 0, rating: 4, reviews: 94, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: ['new'], packs: [ { id: '5kg', label: '5 kg', price: 3800 }, { id: '25kg', label: '25 kg', price: 17500 } ] }
     ];
 
-    const CATEGORY_LABELS = {
-      'feed-additives': 'Feed Additives',
-      'veterinary': 'Veterinary Products',
-      'injectables': 'Injectables',
-      'premixes': 'Premixes'
-    };
+    const CATEGORY_LABELS = { 'feed-additives': 'Feed Additives', 'veterinary': 'Veterinary Products', 'injectables': 'Injectables', 'premixes': 'Premixes' };
+    let state = { category: 'all', search: '', sort: 'featured' };
 
-    /* ============================================================
-       STATE
-       ============================================================ */
-    let state = {
-      category: 'all',
-      search: '',
-      sort: 'featured',
-      cart: []
-    };
-
-    /* ============================================================
-       HELPERS
-       ============================================================ */
     const grid = document.getElementById('productsGrid');
     const emptyState = document.getElementById('emptyState');
     const resultCount = document.getElementById('resultCount');
 
-    function formatProductPrice(n) {
-      return 'KES ' + Number(n).toLocaleString();
-    }
-
-    function renderStars(rating) {
-      let html = '';
-      for (let i = 1; i <= 5; i++) {
-        html += i <= rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
-      }
-      return html;
-    }
+    function renderStars(r) { let h = ''; for (let i = 1; i <= 5; i++) h += i <= r ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>'; return h; }
 
     function getFilteredProducts() {
       let list = [...PRODUCTS];
-
-      if (state.category !== 'all') {
-        list = list.filter(p => p.cat === state.category);
-      }
-
+      if (state.category !== 'all') list = list.filter(p => p.cat === state.category);
       if (state.search.trim()) {
         const q = state.search.toLowerCase();
-        list = list.filter(p =>
-          p.name.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          CATEGORY_LABELS[p.cat].toLowerCase().includes(q)
-        );
+        list = list.filter(p => p.name.toLowerCase().includes(q) || CATEGORY_LABELS[p.cat].toLowerCase().includes(q));
       }
-
       switch (state.sort) {
-        case 'price-low': list.sort((a, b) => a.price - b.price); break;
-        case 'price-high': list.sort((a, b) => b.price - a.price); break;
-        case 'name': list.sort((a, b) => a.name.localeCompare(b.name)); break;
-        case 'rating': list.sort((a, b) => b.rating - a.rating); break;
+        case 'price-low': list.sort((a,b) => a.price - b.price); break;
+        case 'price-high': list.sort((a,b) => b.price - a.price); break;
+        case 'name': list.sort((a,b) => a.name.localeCompare(b.name)); break;
+        case 'rating': list.sort((a,b) => b.rating - a.rating); break;
       }
-
       return list;
     }
 
     function renderProducts() {
       const list = getFilteredProducts();
       resultCount.textContent = list.length;
-
-      if (list.length === 0) {
-        grid.innerHTML = '';
-        emptyState.classList.add('visible');
-        return;
-      }
+      if (list.length === 0) { grid.innerHTML = ''; emptyState.classList.add('visible'); return; }
       emptyState.classList.remove('visible');
 
       grid.innerHTML = list.map((p, idx) => {
@@ -2401,20 +2116,17 @@
           if (t === 'sale') return '<span class="badge badge-sale"><i class="fas fa-tag"></i> Sale</span>';
           return '';
         }).join('');
-
-        const oldPrice = p.old ? `<span class="old-price">${formatProductPrice(p.old)}</span>` : '';
+        const oldPrice = p.old ? `<span class="old-price">${formatPrice(p.old)}</span>` : '';
+        const packHint = p.packs.length > 1 ? `${p.packs.length} pack sizes` : p.packs[0].label;
 
         return `
           <div class="product-card" style="animation-delay:${idx * 0.05}s">
             <div class="product-image-wrap">
               <img src="${p.img}" alt="${p.name}" loading="lazy">
               <div class="product-badges">${badges}</div>
-              <div class="quick-actions">
-                <button class="quick-action" title="Add to Wishlist" onclick="event.stopPropagation(); toggleWishlist(this)"><i class="far fa-heart"></i></button>
-              </div>
               <div class="read-more-overlay">
-                <button class="read-more-btn" onclick="event.stopPropagation(); openModal(${p.id})">
-                  Read More <i class="fas fa-arrow-right"></i>
+                <button class="read-more-btn" onclick="event.stopPropagation(); openAtcModal('${p.id}')">
+                  Add to Cart <i class="fas fa-arrow-right"></i>
                 </button>
               </div>
             </div>
@@ -2427,10 +2139,11 @@
               </div>
               <div class="product-footer">
                 <div class="product-price">
-                  <span class="price">${formatProductPrice(p.price)}</span>
+                  <span class="price">${formatPrice(p.price)}</span>
                   ${oldPrice}
+                  <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;font-weight:600;">${packHint}</span>
                 </div>
-                <button class="btn-add" title="Add to Cart" onclick="event.stopPropagation(); addToCart(${p.id}, this)">
+                <button class="btn-add" title="Add to Cart" onclick="event.stopPropagation(); openAtcModal('${p.id}')">
                   <i class="fas fa-plus"></i>
                 </button>
               </div>
@@ -2441,119 +2154,100 @@
     }
 
     /* ============================================================
-       PRODUCT DETAIL MODAL
+       ADD-TO-CART MODAL LOGIC
        ============================================================ */
-    function openModal(id) {
-      const p = PRODUCTS.find(x => x.id === id);
-      if (!p) return;
+    let atcState = { product: null, selectedPackId: null, qty: 1 };
 
-      const oldPriceHTML = p.old ? `<span class="old-price">${formatProductPrice(p.old)}</span>` : '';
-      const saveTagHTML = p.old ? `<span class="save-tag">Save ${formatProductPrice(p.old - p.price)}</span>` : '';
+    function openAtcModal(productId) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
 
-      document.getElementById('modalBody').innerHTML = `
-        <div class="modal-image-side">
-          <div class="modal-image-wrap">
-            <img src="${p.img}" alt="${p.name}" loading="lazy">
-          </div>
-        </div>
+      atcState.product = product;
+      atcState.selectedPackId = product.packs[0].id;
+      atcState.qty = 1;
 
-        <div class="modal-info-side">
-          <div class="modal-cat-tag">${CATEGORY_LABELS[p.cat]}</div>
-          <h2 class="modal-title">${p.name}</h2>
+      document.getElementById('atcProductName').textContent = product.name;
 
-          <div class="modal-rating">
-            <span class="stars">${renderStars(p.rating)}</span>
-            <small>${p.rating}.0 · ${p.reviews} reviews</small>
-          </div>
+      const packWrap = document.getElementById('atcPackOptions');
+      packWrap.innerHTML = product.packs.map(pack => `
+        <button
+          type="button"
+          class="pack-btn ${pack.id === atcState.selectedPackId ? 'active' : ''}"
+          data-pack-id="${pack.id}"
+          onclick="selectPack('${pack.id}')">
+          ${pack.label}
+          <span class="pack-price-hint">${formatPrice(pack.price)}</span>
+        </button>
+      `).join('');
 
-          <div class="modal-available">
-            <i class="fas fa-circle"></i>
-            Available – ${p.available}
-          </div>
+      const qtyInput = document.getElementById('atcQty');
+      qtyInput.value = 1;
 
-          <p class="modal-description">
-            <strong style="color:var(--navy)">Description:</strong> ${p.description}
-          </p>
-
-          <div class="modal-benefits">
-            <h4>Benefits</h4>
-            <ul>${p.benefits.map(b => `<li>${b}</li>`).join('')}</ul>
-          </div>
-
-          <div class="modal-cta-row">
-            <div class="modal-price-block">
-              <span class="price">${formatProductPrice(p.price)}</span>
-              ${oldPriceHTML}
-              ${saveTagHTML}
-            </div>
-            <button class="btn-add-cart" id="modalAddBtn" onclick="addFromModal(${p.id}, this)">
-              <i class="fas fa-shopping-bag"></i> Add to Cart
-            </button>
-          </div>
-
-          <div class="accordion-group">
-            <div class="accordion-item">
-              <div class="accordion-header" onclick="toggleAccordion(this)">
-                <span>Composition</span>
-                <span class="acc-icon"><i class="fas fa-chevron-down"></i></span>
-              </div>
-              <div class="accordion-body"><p>${p.composition}</p></div>
-            </div>
-            <div class="accordion-item">
-              <div class="accordion-header" onclick="toggleAccordion(this)">
-                <span>Dosage and Administration</span>
-                <span class="acc-icon"><i class="fas fa-chevron-down"></i></span>
-              </div>
-              <div class="accordion-body"><p>${p.dosage}</p></div>
-            </div>
-            <div class="accordion-item">
-              <div class="accordion-header" onclick="toggleAccordion(this)">
-                <span>Indications</span>
-                <span class="acc-icon"><i class="fas fa-chevron-down"></i></span>
-              </div>
-              <div class="accordion-body"><p>${p.indications}</p></div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('productModal').classList.add('open');
+      updateAtcSummary();
+      document.getElementById('atcModal').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
 
-    function closeModal() {
-      document.getElementById('productModal').classList.remove('open');
+    function closeAtcModal() {
+      document.getElementById('atcModal').classList.remove('open');
       document.body.style.overflow = '';
+      atcState.product = null;
     }
 
-    document.getElementById('productModal').addEventListener('click', e => {
-      if (e.target.id === 'productModal') closeModal();
+    function selectPack(packId) {
+      atcState.selectedPackId = packId;
+      document.querySelectorAll('#atcPackOptions .pack-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.packId === packId);
+      });
+      updateAtcSummary();
+    }
+
+    function updateAtcSummary() {
+      const product = atcState.product;
+      if (!product) return;
+      const pack = product.packs.find(p => p.id === atcState.selectedPackId);
+      const qty = atcState.qty || 1;
+
+      document.getElementById('atcUnitPrice').textContent = formatPrice(pack.price);
+      document.getElementById('atcPackLabel').textContent = pack.label;
+      document.getElementById('atcQtyLabel').textContent = qty;
+      document.getElementById('atcTotal').textContent = formatPrice(pack.price * qty);
+    }
+
+    document.getElementById('atcQty').addEventListener('input', e => {
+      let v = parseInt(e.target.value, 10);
+      if (isNaN(v) || v < 1) v = 1;
+      atcState.qty = v;
+      updateAtcSummary();
+    });
+    document.getElementById('atcQty').addEventListener('blur', e => {
+      let v = parseInt(e.target.value, 10);
+      if (isNaN(v) || v < 1) v = 1;
+      e.target.value = v;
+      atcState.qty = v;
+      updateAtcSummary();
     });
 
+    function submitAddToCart() {
+      const product = atcState.product;
+      if (!product) return;
+      const pack = product.packs.find(p => p.id === atcState.selectedPackId);
+      const qty = atcState.qty || 1;
+
+      addToCart(product, pack, qty);
+      showToast(`"${product.name}" (${pack.label} × ${qty}) added to cart`);
+      closeAtcModal();
+    }
+
+    document.getElementById('atcModal').addEventListener('click', e => {
+      if (e.target.id === 'atcModal') closeAtcModal();
+    });
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') closeAtcModal();
     });
-
-    function toggleAccordion(header) {
-      const item = header.parentElement;
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    }
-
-    function addFromModal(id, btn) {
-      addToCart(id, btn);
-      btn.classList.add('added');
-      const original = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
-      setTimeout(() => {
-        btn.classList.remove('added');
-        btn.innerHTML = original;
-      }, 1600);
-    }
 
     /* ============================================================
-       FILTER / SORT HANDLERS
+       FILTERS / SORT / SEARCH (hero)
        ============================================================ */
     document.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -2564,215 +2258,45 @@
         document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
-
-    document.getElementById('heroSearchInput').addEventListener('input', e => {
-      state.search = e.target.value;
-      renderProducts();
-    });
-
-    document.getElementById('sortSelect').addEventListener('change', e => {
-      state.sort = e.target.value;
-      renderProducts();
-    });
-
+    document.getElementById('heroSearchInput').addEventListener('input', e => { state.search = e.target.value; renderProducts(); });
+    document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; renderProducts(); });
     function filterCategory(cat) {
-      state.category = cat;
-      state.search = '';
+      state.category = cat; state.search = '';
       const heroInput = document.getElementById('heroSearchInput');
       if (heroInput) heroInput.value = '';
-      document.querySelectorAll('.chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.cat === cat);
-      });
+      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
       renderProducts();
       document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-
     function resetFilters() {
-      state.category = 'all';
-      state.search = '';
-      state.sort = 'featured';
+      state = { category: 'all', search: '', sort: 'featured' };
       const heroInput = document.getElementById('heroSearchInput');
       if (heroInput) heroInput.value = '';
       document.getElementById('sortSelect').value = 'featured';
-      document.querySelectorAll('.chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.cat === 'all');
-      });
+      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
       renderProducts();
     }
 
     /* ============================================================
-       WISHLIST
+       TOAST
        ============================================================ */
-    function toggleWishlist(btn) {
-      btn.classList.toggle('active');
-      const icon = btn.querySelector('i');
-      if (btn.classList.contains('active')) {
-        icon.classList.remove('far');
-        icon.classList.add('fas');
-      } else {
-        icon.classList.remove('fas');
-        icon.classList.add('far');
-      }
-    }
-
-    /* ============================================================
-       CART — persisted to localStorage (key: riseAxisCart)
-       ============================================================ */
-    const CART_KEY = 'riseAxisCart';
-
-    function loadCart() {
-      try {
-        const raw = localStorage.getItem(CART_KEY);
-        state.cart = raw ? JSON.parse(raw) : [];
-      } catch (_) {
-        state.cart = [];
-      }
-    }
-
-    function saveCart() {
-      try {
-        localStorage.setItem(CART_KEY, JSON.stringify(state.cart));
-      } catch (_) {}
-    }
-
-    function updateNavCartBadge() {
-      const count = state.cart.reduce((s, i) => s + (i.qty || i.quantity || 0), 0);
-      const badge = document.getElementById('navCartBadge');
-      const badgeMob = document.getElementById('navCartBadgeMob');
-      if (badge) badge.textContent = count;
-      if (badgeMob) badgeMob.textContent = count;
-    }
-
-    function addToCart(id, btn) {
-      const product = PRODUCTS.find(p => p.id === id);
-      if (!product) return;
-
-      const existing = state.cart.find(c => c.id === id);
-      if (existing) {
-        existing.qty = (existing.qty || 0) + 1;
-      } else {
-        state.cart.push({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          img: product.img,
-          qty: 1,
-          quantity: 1
-        });
-      }
-
-      if (btn && !btn.classList.contains('btn-add-cart')) {
-        btn.classList.add('added');
-        const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i>';
-        setTimeout(() => {
-          btn.classList.remove('added');
-          btn.innerHTML = original;
-        }, 1200);
-      }
-
-      saveCart();
-      updateCartUI();
-      updateNavCartBadge();
-    }
-
-    function changeQty(id, delta) {
-      const item = state.cart.find(c => c.id === id);
-      if (!item) return;
-      item.qty = (item.qty || 0) + delta;
-      item.quantity = item.qty;
-      if (item.qty <= 0) {
-        state.cart = state.cart.filter(c => c.id !== id);
-      }
-      saveCart();
-      updateCartUI();
-      updateNavCartBadge();
-    }
-
-    function removeFromCart(id) {
-      state.cart = state.cart.filter(c => c.id !== id);
-      saveCart();
-      updateCartUI();
-      updateNavCartBadge();
-    }
-
-    function updateCartUI() {
-      const count = state.cart.reduce((s, c) => s + (c.qty || c.quantity || 0), 0);
-      document.getElementById('cartCount').textContent = count;
-
-      const itemsContainer = document.getElementById('cartItems');
-      const subtotalEl = document.getElementById('cartSubtotal');
-      const totalEl = document.getElementById('cartTotal');
-
-      if (state.cart.length === 0) {
-        itemsContainer.innerHTML = `
-          <div class="cart-empty">
-            <i class="fas fa-shopping-basket"></i>
-            <p>Your cart is empty.<br>Start adding products!</p>
-          </div>`;
-        subtotalEl.textContent = 'KES 0';
-        totalEl.textContent = 'KES 0';
-        return;
-      }
-
-      itemsContainer.innerHTML = state.cart.map(item => `
-        <div class="cart-item">
-          <img class="cart-item-img" src="${item.img}" alt="${item.name}" loading="lazy">
-          <div class="cart-item-info">
-            <h4>${item.name}</h4>
-            <div class="price">${formatProductPrice(item.price)}</div>
-            <div class="cart-item-qty">
-              <button class="qty-btn" onclick="changeQty(${item.id}, -1)"><i class="fas fa-minus"></i></button>
-              <span class="qty-value">${item.qty}</span>
-              <button class="qty-btn" onclick="changeQty(${item.id}, 1)"><i class="fas fa-plus"></i></button>
-            </div>
-          </div>
-          <button class="cart-item-remove" onclick="removeFromCart(${item.id})" title="Remove">
-            <i class="fas fa-trash-alt"></i>
-          </button>
-        </div>
-      `).join('');
-
-      const subtotal = state.cart.reduce((s, c) => s + c.price * (c.qty || c.quantity || 0), 0);
-      subtotalEl.textContent = formatProductPrice(subtotal);
-      totalEl.textContent = formatProductPrice(subtotal);
-    }
-
-    function toggleCart() {
-      document.getElementById('cartDrawer').classList.toggle('open');
-      document.getElementById('cartOverlay').classList.toggle('open');
+    let toastTimeout = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toastMessage');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
     }
 
     /* ============================================================
        INIT
        ============================================================ */
-    loadCart();
     renderProducts();
-    updateCartUI();
-    updateNavCartBadge();
+    updateCartBadges();
+    window.addEventListener('storage', e => { if (e.key === CART_KEY) updateCartBadges(); });
 
-    window.addEventListener('storage', e => {
-      if (e.key === CART_KEY) {
-        loadCart();
-        updateCartUI();
-        updateNavCartBadge();
-      }
-    });
-
-    /* ============================================================
-       SCROLL PROGRESS
-       ============================================================ */
-    const progress = document.getElementById('scrollProgress');
-    window.addEventListener('scroll', () => {
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      progress.style.width = (window.scrollY / total) * 100 + '%';
-    });
-
-    /* ============================================================
-       CONSOLE BRAND
-       ============================================================ */
-    console.log('%c RISE AXIS — Shop ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
-    console.log('%c Clarity · Direction · Results ', 'background: #E85D26; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
+    console.log('%c RISE AXIS — Shop (updated) ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
   </script>
 
 </body>

@@ -4,7 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rise Axis Solutions Ltd | Clarity, Direction, Results</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- ========== PERFORMANCE: PRECONNECTS ========== -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="dns-prefetch" href="https://feurddyhflvnomakexxs.supabase.co">
+
+  <!-- ========== FONTS + ICONS (non-blocking) ========== -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></noscript>
+
+  <!-- ========== SUPABASE (deferred so it doesn't block paint) ========== -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     /* ============================================================
        RISE AXIS SOLUTIONS — BRAND PALETTE
@@ -29,19 +42,33 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
       background: var(--bg-light);
       color: var(--text-dark);
       line-height: 1.6;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+    body.search-open { overflow: hidden; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; }
     img { display: block; max-width: 100%; }
+    button { font-family: inherit; }
     .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
+    /* Defer rendering offscreen sections until they near the viewport */
+    .why-standout,
+    .about-partner,
+    .stats-strip,
+    .welcome-section,
+    .cta-section,
+    .footer {
+      content-visibility: auto;
+      contain-intrinsic-size: 1px 800px;
+    }
+
     /* ---------- TOP BAR ---------- */
-   
     .top-bar {
       background: var(--navy); color: #fff;
       padding: 10px 0; font-size: 0.88rem;
@@ -54,7 +81,6 @@
     .top-item i { color: var(--orange); font-size: 0.95rem; }
     .top-item strong { color: #fff; font-weight: 600; }
 
-
     /* ---------- NAVIGATION ---------- */
     .main-nav {
       background: rgba(255,255,255,0.92);
@@ -64,13 +90,11 @@
       box-shadow: 0 1px 0 rgba(31, 58, 110, 0.06);
       transition: box-shadow 0.3s;
     }
-    .main-nav.scrolled {
-      box-shadow: 0 8px 30px rgba(31, 58, 110, 0.1);
-    }
+    .main-nav.scrolled { box-shadow: 0 8px 30px rgba(31, 58, 110, 0.1); }
     .main-nav .container {
       display: flex; align-items: center;
-      justify-content: space-between; min-height: 78px;
-      gap: 20px;
+      justify-content: space-between; min-height: 82px;
+      gap: 24px;
     }
 
     .logo {
@@ -78,6 +102,7 @@
       font-weight: 900; font-size: 1.4rem;
       letter-spacing: 0.5px;
       position: relative;
+      flex-shrink: 0;
     }
     .logo-mark {
       display: flex; align-items: center; gap: 2px;
@@ -100,17 +125,21 @@
       opacity: 0.7;
     }
 
+    /* ---------- NAV LINKS ---------- */
     .nav-links {
       display: flex; align-items: center; gap: 4px;
-      font-weight: 600; font-size: 0.92rem;
+      font-weight: 600; font-size: 0.9rem;
+      flex: 1;
+      justify-content: center;
     }
     .nav-links > li > a {
-      padding: 10px 16px;
+      padding: 9px 14px;
       border-radius: 8px;
       color: var(--navy);
       transition: all 0.25s;
       position: relative;
       display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap;
     }
     .nav-links > li > a:hover,
     .nav-links > li > a.active {
@@ -119,9 +148,7 @@
     }
 
     .dropdown { position: relative; }
-    .dropdown > a i {
-      font-size: 0.6rem; transition: transform 0.3s;
-    }
+    .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
     .dropdown:hover > a i { transform: rotate(180deg); }
     .dropdown-menu {
       position: absolute; top: calc(100% + 8px); left: 0;
@@ -156,11 +183,11 @@
       color: var(--red);
       transform: translateX(4px);
     }
-    .dropdown-menu a:hover i {
-      background: var(--red); color: #fff;
-    }
+    .dropdown-menu a:hover i { background: var(--red); color: #fff; }
 
-    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    /* ---------- NAV ACTIONS ---------- */
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
     .search-icon {
       color: var(--navy); font-size: 0.95rem;
       width: 42px; height: 42px;
@@ -168,6 +195,7 @@
       border: 1.5px solid var(--border); border-radius: 50%;
       cursor: pointer; transition: all 0.25s;
       background: var(--bg-white);
+      padding: 0;
     }
     .search-icon:hover {
       border-color: var(--navy);
@@ -175,54 +203,415 @@
       transform: rotate(90deg);
     }
 
-    .btn-catalogue {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
-      color: #fff;
-      padding: 12px 22px; border-radius: 120px;
-      font-weight: 700; border: none; cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.88rem;
-      box-shadow: 0 4px 14px rgba(200, 16, 46, 0.25);
+    .cart-icon-btn {
       position: relative;
-      overflow: hidden;
-    }
-    .btn-catalogue::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.6s;
-    }
-    .btn-catalogue:hover::before { transform: translateX(100%); }
-    .btn-catalogue:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(200, 16, 46, 0.4);
-    }
-
-    .btn-shop {
+      width: 42px; height: 42px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--green), #0a5f2e);
       color: #fff;
-      padding: 12px 22px; border-radius: 120px;
-      font-weight: 700; border: none; cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.88rem;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      transition: all 0.25s;
+      box-shadow: 0 4px 14px rgba(14,122,60,0.25);
+    }
+    .cart-icon-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(14,122,60,0.4);
+    }
+    .cart-badge-nav {
+      position: absolute;
+      top: -4px; right: -4px;
+      min-width: 20px; height: 20px;
+      padding: 0 6px;
+      border-radius: 20px;
+      background: var(--red); color: #fff;
+      font-size: 0.68rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #fff;
+      line-height: 1;
+    }
+
+    .auth-actions { display: inline-flex; align-items: center; }
+    .signin-dropdown { position: relative; display: inline-block; }
+    .btn-signin {
       display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 4px 14px rgba(14, 122, 60, 0.25);
-      position: relative;
-      overflow: hidden;
+      padding: 11px 20px; border-radius: 120px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff; border: none;
+      font-weight: 700; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.3s;
+      box-shadow: 0 4px 14px rgba(30,83,180,0.25);
     }
-    .btn-shop::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.6s;
-    }
-    .btn-shop:hover::before { transform: translateX(100%); }
-    .btn-shop:hover {
+    .btn-signin:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(14, 122, 60, 0.4);
+      box-shadow: 0 10px 24px rgba(30,83,180,0.4);
     }
+    .signin-menu {
+      position: absolute; top: calc(100% + 10px); right: 0;
+      min-width: 260px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 50px rgba(31,58,110,0.15);
+      padding: 8px;
+      opacity: 0; visibility: hidden;
+      transform: translateY(8px);
+      transition: all 0.22s;
+      z-index: 200;
+    }
+    .signin-dropdown:hover .signin-menu,
+    .signin-dropdown:focus-within .signin-menu {
+      opacity: 1; visibility: visible; transform: translateY(0);
+    }
+    .signin-menu a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 10px;
+      color: var(--navy); text-decoration: none;
+      transition: all 0.2s;
+    }
+    .signin-menu a:hover { background: #f5f9ff; color: var(--red); }
+    .signin-menu a i {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: #f0f4fa;
+      color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .signin-menu a:hover i { background: var(--red); color: #fff; }
+    .signin-menu a div { display: flex; flex-direction: column; }
+    .signin-menu a strong { font-size: 0.9rem; font-weight: 700; line-height: 1.2; }
+    .signin-menu a small { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+    /* ============================================================
+       SEARCH OVERLAY
+       ============================================================ */
+    .search-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(15, 23, 41, 0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1500;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s;
+      padding: 90px 24px 40px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    .search-overlay.open { opacity: 1; visibility: visible; }
+
+    .search-panel {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+      overflow: hidden;
+      transform: translateY(-20px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .search-overlay.open .search-panel { transform: translateY(0) scale(1); }
+
+    .search-panel-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+      background: #fafbff;
+    }
+    .search-panel-header > i { color: var(--navy); font-size: 1.1rem; }
+    .search-input-wrap { flex: 1; position: relative; }
+    .search-input-wrap input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fff;
+      outline: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .search-input-wrap input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(30,83,180,0.1);
+    }
+    .search-close {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+      flex-shrink: 0;
+    }
+    .search-close:hover {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+      transform: rotate(90deg);
+    }
+
+    .search-panel-body { padding: 8px; max-height: 60vh; overflow-y: auto; }
+
+    .search-hint {
+      padding: 30px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .search-hint i { font-size: 2rem; color: var(--border); display: block; margin-bottom: 10px; }
+    .search-hint strong { display: block; color: var(--navy); font-size: 1rem; margin-bottom: 4px; }
+
+    .search-group-title {
+      font-size: 0.7rem; font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 14px 16px 8px;
+    }
+    .search-result {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 12px;
+      cursor: pointer; transition: background 0.15s;
+      text-decoration: none; color: inherit;
+    }
+    .search-result:hover { background: #f5f9ff; }
+    .search-result-img {
+      width: 48px; height: 48px;
+      border-radius: 10px; object-fit: cover;
+      background: var(--bg-light); flex-shrink: 0;
+    }
+    .search-result-icon {
+      width: 48px; height: 48px;
+      border-radius: 10px; background: #f0f4fa;
+      color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .search-result-info { flex: 1; min-width: 0; }
+    .search-result-info strong {
+      display: block; font-size: 0.92rem; color: var(--navy);
+      font-weight: 700; line-height: 1.3;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .search-result-info small {
+      display: block; font-size: 0.75rem; color: var(--text-muted);
+      font-weight: 500; margin-top: 2px;
+    }
+    .search-result-price {
+      font-size: 0.88rem; font-weight: 800;
+      color: var(--red); white-space: nowrap;
+    }
+    .search-result-arrow { color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+
+    .search-no-results { padding: 40px 24px; text-align: center; color: var(--text-muted); }
+    .search-no-results i { font-size: 2rem; color: var(--border); margin-bottom: 12px; display: block; }
+    .search-no-results strong { display: block; color: var(--navy); font-size: 1rem; margin-bottom: 4px; }
+
+    /* ============================================================
+       MOBILE NAV
+       ============================================================ */
+    .mobile-nav-actions {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+    .hamburger {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.25s;
+      padding: 0;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2.5px;
+      background: var(--navy);
+      border-radius: 3px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hamburger:hover { border-color: var(--navy); background: var(--bg-light); }
+    .hamburger.active { background: var(--navy); border-color: var(--navy); }
+    .hamburger.active span { background: #fff; }
+    .hamburger.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scale(0); }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+    .mobile-menu-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 41, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 1500;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s;
+    }
+    .mobile-menu-overlay.open { opacity: 1; visibility: visible; }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0; right: 0;
+      width: 340px; max-width: 88vw;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -20px 0 60px rgba(0,0,0,0.2);
+      z-index: 1600;
+      transform: translateX(105%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+    }
+    .mobile-menu.open { transform: translateX(0); }
+
+    .mobile-menu-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbff;
+      flex-shrink: 0;
+    }
+    .mobile-menu-header .logo { display: flex; align-items: center; text-decoration: none; }
+    .mobile-menu-close {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+    }
+    .mobile-menu-close:hover { background: var(--red); border-color: var(--red); color: #fff; transform: rotate(90deg); }
+
+    .mobile-user {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f7fafd, #eef4fb);
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-user-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff; font-weight: 800; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .mobile-user-info { flex: 1; min-width: 0; }
+    .mobile-user-info strong { display: block; color: var(--navy); font-size: 0.95rem; font-weight: 800; }
+    .mobile-user-info small {
+      display: block; color: var(--text-muted); font-size: 0.78rem;
+      font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .mobile-menu-links { padding: 12px; flex: 1; overflow-y: auto; }
+    .mobile-menu-links > li { margin-bottom: 2px; }
+    .mobile-menu-links > li > a,
+    .mobile-dropdown-toggle {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      color: var(--navy);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .mobile-menu-links > li > a:hover,
+    .mobile-menu-links > li > a.active,
+    .mobile-dropdown-toggle:hover { background: #f5f9ff; color: var(--red); }
+    .mobile-menu-links > li > a i,
+    .mobile-dropdown-toggle i:first-child {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: #f0f4fa;
+      color: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.88rem;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .mobile-menu-links > li > a:hover i,
+    .mobile-menu-links > li > a.active i,
+    .mobile-dropdown-toggle:hover i:first-child { background: var(--red); color: #fff; }
+
+    .mobile-dropdown-toggle { justify-content: space-between; }
+    .mobile-dropdown-toggle > span { display: flex; align-items: center; gap: 14px; }
+    .mobile-dropdown-toggle > i:last-child {
+      font-size: 0.7rem; color: var(--text-muted); transition: transform 0.3s;
+    }
+    .mobile-dropdown-toggle.open > i:last-child { transform: rotate(180deg); }
+
+    .mobile-submenu {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s ease;
+      padding-left: 16px; margin-top: 2px;
+    }
+    .mobile-submenu.open { max-height: 400px; padding: 6px 0 6px 16px; }
+    .mobile-submenu a {
+      display: block; padding: 11px 14px;
+      color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+      border-radius: 10px; border-left: 3px solid transparent;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .mobile-submenu a:hover { background: #f5f9ff; color: var(--navy); border-left-color: var(--red); }
+
+    .mobile-menu-auth {
+      padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-auth-btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 13px 18px;
+      border-radius: 12px; font-weight: 700; font-size: 0.9rem;
+      text-decoration: none; transition: all 0.25s;
+      cursor: pointer; border: none; font-family: inherit;
+    }
+    .mobile-auth-outline { background: #fff; color: var(--navy); border: 1.5px solid var(--border); }
+    .mobile-auth-outline:hover { border-color: var(--navy); background: var(--bg-light); }
+    .mobile-auth-primary {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff; box-shadow: 0 6px 16px rgba(30,83,180,0.25);
+    }
+    .mobile-auth-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30,83,180,0.4); }
+    .mobile-auth-danger {
+      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      color: #fff; box-shadow: 0 6px 16px rgba(200,16,46,0.25);
+    }
+    .mobile-auth-danger:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(200,16,46,0.4); }
+
+    .mobile-menu-footer {
+      padding: 16px 22px 24px;
+      background: #fafbff;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mobile-menu-contact {
+      display: flex; flex-direction: column; gap: 8px;
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .mobile-menu-contact span { display: flex; align-items: center; gap: 8px; }
+    .mobile-menu-contact i { color: var(--orange); width: 16px; }
 
     /* ============================================================
        CINEMATIC HERO
@@ -236,50 +625,48 @@
       padding: 80px 0;
       color: #fff;
     }
-    .hero::before {
-      content: '';
+    /* Hero bg image as <img> (lazy-friendly) */
+    .hero-bg {
       position: absolute; inset: 0;
-      background: url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1600&q=80') center/cover no-repeat;
+      width: 100%; height: 100%;
+      object-fit: cover;
       opacity: 0.18;
       mix-blend-mode: luminosity;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-bg-zoom {
+      position: absolute; inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero-bg-zoom img {
+      width: 100%; height: 100%; object-fit: cover;
       transform: scale(1.1);
-      animation: slowZoom 20s ease-in-out infinite alternate;
+      animation: slowZoom 25s ease-in-out infinite alternate;
+      will-change: transform;
     }
     @keyframes slowZoom {
       0% { transform: scale(1.1) translate(0, 0); }
       100% { transform: scale(1.2) translate(-20px, -10px); }
     }
 
-    /* Floating orbs */
     .hero-orb {
       position: absolute; border-radius: 50%;
       filter: blur(70px); opacity: 0.5;
-      animation: orbFloat 10s ease-in-out infinite;
+      animation: orbFloat 12s ease-in-out infinite;
+      will-change: transform;
     }
-    .hero-orb-1 {
-      width: 400px; height: 400px;
-      background: var(--orange);
-      top: -100px; left: -100px;
-    }
-    .hero-orb-2 {
-      width: 300px; height: 300px;
-      background: var(--red);
-      bottom: -80px; right: 10%;
-      animation-delay: 3s;
-    }
-    .hero-orb-3 {
-      width: 250px; height: 250px;
-      background: var(--green);
-      top: 20%; right: -60px;
-      animation-delay: 5s;
-    }
+    .hero-orb-1 { width: 400px; height: 400px; background: var(--orange); top: -100px; left: -100px; }
+    .hero-orb-2 { width: 300px; height: 300px; background: var(--red); bottom: -80px; right: 10%; animation-delay: 3s; }
+    .hero-orb-3 { width: 250px; height: 250px; background: var(--green); top: 20%; right: -60px; animation-delay: 5s; }
     @keyframes orbFloat {
       0%, 100% { transform: translate(0, 0) scale(1); }
       33% { transform: translate(30px, -30px) scale(1.08); }
       66% { transform: translate(-20px, 20px) scale(0.95); }
     }
 
-    /* Grid pattern overlay */
     .hero::after {
       content: '';
       position: absolute; inset: 0;
@@ -289,6 +676,8 @@
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
       -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      z-index: 1;
+      pointer-events: none;
     }
 
     .hero .container {
@@ -338,9 +727,7 @@
     .hero-left h1 .word:nth-child(1) { animation-delay: 0.1s; }
     .hero-left h1 .word:nth-child(2) { animation-delay: 0.25s; }
     .hero-left h1 .word:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes wordIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes wordIn { to { opacity: 1; transform: translateY(0); } }
     .hero-left h1 .accent {
       background: linear-gradient(90deg, var(--orange), var(--gold), var(--orange));
       background-size: 200% auto;
@@ -349,9 +736,7 @@
       background-clip: text;
       animation: shine 3s linear infinite;
     }
-    @keyframes shine {
-      to { background-position: 200% center; }
-    }
+    @keyframes shine { to { background-position: 200% center; } }
 
     .hero-left p {
       font-size: 1.1rem;
@@ -372,8 +757,6 @@
       font-size: 0.95rem;
       display: inline-flex; align-items: center; gap: 10px;
       box-shadow: 0 12px 30px rgba(232, 93, 38, 0.35);
-      position: relative;
-      overflow: hidden;
     }
     .btn-hero-primary:hover {
       transform: translateY(-3px);
@@ -398,7 +781,6 @@
       transform: translateY(-3px);
     }
 
-    /* Hero floating card */
     .hero-card {
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.15);
@@ -424,9 +806,7 @@
       display: flex; justify-content: space-between;
       align-items: center; margin-bottom: 22px;
     }
-    .hero-card-header h3 {
-      color: #fff; font-size: 1.05rem; font-weight: 700;
-    }
+    .hero-card-header h3 { color: #fff; font-size: 1.05rem; font-weight: 700; }
     .hero-card-badge {
       background: var(--green);
       color: #fff;
@@ -444,17 +824,13 @@
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
     .stat-row:last-child { border-bottom: none; }
-    .stat-item {
-      text-align: left;
-    }
+    .stat-item { text-align: left; }
     .stat-item .num {
       font-size: 1.9rem; font-weight: 900;
       color: #fff; line-height: 1;
       letter-spacing: -1px;
     }
-    .stat-item .num .plus {
-      color: var(--orange); font-size: 1.3rem;
-    }
+    .stat-item .num .plus { color: var(--orange); font-size: 1.3rem; }
     .stat-item .lbl {
       font-size: 0.65rem;
       color: rgba(255,255,255,0.7);
@@ -478,6 +854,7 @@
       display: flex; gap: 60px;
       animation: scroll 30s linear infinite;
       white-space: nowrap;
+      will-change: transform;
     }
     .marquee-item {
       display: inline-flex; align-items: center; gap: 14px;
@@ -486,9 +863,7 @@
       opacity: 0.75;
       flex-shrink: 0;
     }
-    .marquee-item i {
-      color: var(--orange); font-size: 1.2rem;
-    }
+    .marquee-item i { color: var(--orange); font-size: 1.2rem; }
     @keyframes scroll {
       from { transform: translateX(0); }
       to { transform: translateX(-50%); }
@@ -535,10 +910,7 @@
     }
 
     /* ---------- WHY WE STAND OUT ---------- */
-    .why-standout {
-      background: var(--bg-white);
-      position: relative;
-    }
+    .why-standout { background: var(--bg-white); position: relative; }
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -549,7 +921,7 @@
       border-radius: 24px;
       background: var(--bg-white);
       border: 1px solid var(--border);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s;
       position: relative;
       overflow: hidden;
       cursor: default;
@@ -616,10 +988,7 @@
       gap: 80px;
       align-items: center;
     }
-    .about-images {
-      position: relative;
-      height: 540px;
-    }
+    .about-images { position: relative; height: 540px; }
     .about-img-main {
       position: absolute;
       top: 0; left: 0;
@@ -730,7 +1099,7 @@
       border-radius: 4px;
     }
 
-    /* ---------- WHY CHOOSE US — 3x2 GRID ---------- */
+    /* ---------- WHY CHOOSE US ---------- */
     .welcome-section {
       background: var(--bg-light);
       padding: 100px 0;
@@ -743,17 +1112,14 @@
       gap: 28px;
       margin-top: 20px;
     }
-    .why-grid .card {
-      display: flex;
-      flex-direction: column;
-    }
+    .why-grid .card { display: flex; flex-direction: column; }
 
     .card {
       background: var(--bg-white);
       border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(31, 58, 110, 0.06);
-      transition: all 0.4s;
+      transition: transform 0.4s, box-shadow 0.4s;
       border: 1px solid var(--border);
       display: flex; flex-direction: column;
       position: relative;
@@ -772,9 +1138,7 @@
       object-fit: cover;
       transition: transform 0.6s;
     }
-    .card:hover .card-img-wrap img {
-      transform: scale(1.08);
-    }
+    .card:hover .card-img-wrap img { transform: scale(1.08); }
     .card-img-wrap::after {
       content: '';
       position: absolute; inset: 0;
@@ -919,10 +1283,7 @@
     }
 
     /* ---------- CTA SECTION ---------- */
-    .cta-section {
-      background: var(--bg-white);
-      padding: 100px 0;
-    }
+    .cta-section { background: var(--bg-white); padding: 100px 0; }
     .cta-card {
       background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 50%, var(--red) 150%);
       border-radius: 32px;
@@ -960,18 +1321,14 @@
       letter-spacing: -1px;
       margin-bottom: 18px;
     }
-    .cta-left h2 span {
-      color: var(--gold);
-    }
+    .cta-left h2 span { color: var(--gold); }
     .cta-left p {
       font-size: 1.02rem;
       color: rgba(255,255,255,0.85);
       max-width: 500px;
       line-height: 1.7;
     }
-    .cta-actions {
-      display: flex; flex-direction: column; gap: 14px;
-    }
+    .cta-actions { display: flex; flex-direction: column; gap: 14px; }
     .cta-btn {
       display: flex; align-items: center; justify-content: space-between;
       padding: 20px 26px;
@@ -992,9 +1349,7 @@
       transform: translateX(6px);
       box-shadow: 0 15px 40px rgba(0,0,0,0.2);
     }
-    .cta-btn .btn-left {
-      display: flex; align-items: center; gap: 14px;
-    }
+    .cta-btn .btn-left { display: flex; align-items: center; gap: 14px; }
     .cta-btn .btn-icon {
       width: 44px; height: 44px;
       border-radius: 12px;
@@ -1003,9 +1358,7 @@
       font-size: 1.1rem;
       transition: all 0.3s;
     }
-    .cta-btn:hover .btn-icon {
-      background: var(--orange); color: #fff;
-    }
+    .cta-btn:hover .btn-icon { background: var(--orange); color: #fff; }
     .cta-btn .sub {
       display: block;
       font-size: 0.75rem;
@@ -1054,11 +1407,7 @@
     .footer-brand .logo-mark .rise { color: #fff; }
     .footer-brand .logo-mark .axis { color: var(--orange); }
     .footer-brand .logo-sub { color: var(--orange); }
-    .footer-brand p {
-      margin-bottom: 24px;
-      color: #a8b4cc;
-      line-height: 1.7;
-    }
+    .footer-brand p { margin-bottom: 24px; color: #a8b4cc; line-height: 1.7; }
     .footer-social { display: flex; gap: 10px; }
     .footer-social a {
       width: 42px; height: 42px;
@@ -1074,7 +1423,6 @@
       transform: translateY(-4px) rotate(-6deg);
       box-shadow: 0 12px 25px rgba(200,16,46,0.4);
     }
-
     .footer h4 {
       color: #fff;
       font-size: 1rem;
@@ -1103,12 +1451,8 @@
       background: var(--orange);
       transition: width 0.25s;
     }
-    .footer ul a:hover {
-      color: var(--orange);
-      transform: translateX(4px);
-    }
+    .footer ul a:hover { color: var(--orange); transform: translateX(4px); }
     .footer ul a:hover::before { width: 12px; }
-
     .footer-contact li {
       display: flex; gap: 12px;
       margin-bottom: 16px;
@@ -1121,7 +1465,6 @@
       width: 18px;
       flex-shrink: 0;
     }
-
     .newsletter-form {
       display: flex;
       margin-top: 18px;
@@ -1158,7 +1501,6 @@
     .newsletter-form button:hover {
       background: linear-gradient(135deg, var(--orange), #d44a15);
     }
-
     .footer-bottom {
       padding: 26px 0;
       text-align: center;
@@ -1194,9 +1536,7 @@
       0% { transform: scale(1); opacity: 1; }
       100% { transform: scale(1.4); opacity: 0; }
     }
-    .whatsapp-float:hover {
-      transform: scale(1.1) rotate(-8deg);
-    }
+    .whatsapp-float:hover { transform: scale(1.1) rotate(-8deg); }
 
     /* ---------- SCROLL PROGRESS ---------- */
     .scroll-progress {
@@ -1207,9 +1547,24 @@
       z-index: 1001;
       width: 0%;
       transition: width 0.1s;
+      will-change: width;
     }
 
-    /* ---------- RESPONSIVE ---------- */
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1200px) {
+      .nav-links { gap: 2px; font-size: 0.86rem; }
+      .nav-links > li > a { padding: 8px 10px; }
+      .btn-signin { padding: 10px 16px; font-size: 0.82rem; }
+    }
+
+    @media (max-width: 1024px) {
+      .nav-links, .nav-actions { display: none !important; }
+      .mobile-nav-actions { display: flex; }
+      .main-nav .container { min-height: 72px; }
+    }
+
     @media (max-width: 1100px) {
       .hero .container { grid-template-columns: 1fr; gap: 50px; }
       .hero-card { max-width: 520px; }
@@ -1219,15 +1574,6 @@
     }
     @media (max-width: 992px) {
       .top-bar .container { flex-direction: column; align-items: flex-start; }
-      .main-nav .container { flex-wrap: wrap; padding: 14px 24px; gap: 16px; }
-      .nav-links {
-        order: 3; width: 100%; justify-content: flex-start;
-        flex-wrap: wrap; gap: 2px;
-        padding-top: 12px;
-        border-top: 1px solid var(--border);
-      }
-      .nav-links > li > a { padding: 8px 12px; }
-      .nav-actions { margin-left: auto; }
       .features-grid { grid-template-columns: 1fr; }
       .about-grid { grid-template-columns: 1fr; gap: 70px; }
       .about-images { height: 420px; }
@@ -1246,8 +1592,6 @@
       .hero-left p { font-size: 1rem; }
       .section-title { font-size: 1.9rem; }
       .section-head { margin-bottom: 45px; }
-      .btn-catalogue, .btn-shop { padding: 10px 16px; font-size: 0.82rem; }
-      .btn-shop i { display: none; }
       .about-images { height: 340px; }
       .about-badge { left: -10px; padding: 14px 18px; }
       .about-badge .num { font-size: 1.8rem; }
@@ -1261,6 +1605,14 @@
       .marquee-track { gap: 40px; animation-duration: 20s; }
       .marquee-item { font-size: 0.85rem; }
       .why-grid { grid-template-columns: 1fr; }
+
+      .search-overlay { padding: 20px 12px 30px; }
+      .search-panel-header { padding: 14px 16px; }
+      .search-input-wrap input { font-size: 0.92rem; padding: 11px 14px; }
+      .search-close { width: 36px; height: 36px; }
+      .search-result-img,
+      .search-result-icon { width: 42px; height: 42px; }
+      .search-result-info strong { font-size: 0.86rem; }
     }
     @media (max-width: 480px) {
       .hero-left h1 { font-size: 1.75rem; }
@@ -1271,6 +1623,20 @@
       .stat-row .stat-item:nth-child(3) { grid-column: 1 / -1; }
       .section-title { font-size: 1.6rem; }
       .top-item .label { display: none; }
+      .mobile-menu { width: 100%; max-width: 100%; }
+      .cart-icon-btn, .hamburger { width: 40px; height: 40px; }
+    }
+
+    /* Respect users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
@@ -1278,9 +1644,8 @@
 
   <!-- ========== SCROLL PROGRESS ========== -->
   <div class="scroll-progress" id="scrollProgress"></div>
- 
-   <div class="top-bar">
-    <!-- ========== TOP BAR ========== -->
+
+  <!-- ========== TOP BAR ========== -->
   <div class="top-bar">
     <div class="container">
       <div class="top-item">
@@ -1297,11 +1662,11 @@
       </div>
     </div>
   </div>
-  </div>
 
   <!-- ========== NAVIGATION ========== -->
   <nav class="main-nav" id="mainNav">
     <div class="container">
+
       <a href="index.html" class="logo">
         <div>
           <span class="logo-mark">
@@ -1318,28 +1683,209 @@
         <li class="dropdown">
           <a href="pages/product.html">Products <i class="fas fa-chevron-down"></i></a>
           <ul class="dropdown-menu">
-            <li><a href="pages/product.html"> Feed Additives</a></li>
-            <li><a href="pages/product.html"> Veterinary Products</a></li>
-            <li><a href="pages/product.html"> Injectables</a></li>
-            <li><a href="pages/product.html"> Premixes</a></li>
+            <li><a href="pages/product.html"><i class="fas fa-flask"></i> Feed Additives</a></li>
+            <li><a href="pages/product.html"><i class="fas fa-syringe"></i> Veterinary Products</a></li>
+            <li><a href="pages/product.html"><i class="fas fa-prescription-bottle"></i> Injectables</a></li>
+            <li><a href="pages/product.html"><i class="fas fa-capsules"></i> Premixes</a></li>
           </ul>
         </li>
         <li><a href="pages/blog.html">Blog</a></li>
         <li><a href="pages/contact.html">Contact</a></li>
+        <li><a href="pages/shop.html">Shop</a></li>
       </ul>
 
       <div class="nav-actions">
-        <div class="search-icon"><i class="fas fa-search"></i></div>
-        <button class="btn-catalogue">Get Catalogue</button>
-        <button class="btn-shop" onclick="window.location.href='pages/shop.html'">
-          <i class="fas fa-shopping-cart"></i> Shop
+        <button class="search-icon" aria-label="Search" onclick="openSearch()">
+          <i class="fas fa-search"></i>
+        </button>
+
+        <a href="pages/cart.html" class="cart-icon-btn" aria-label="View cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge-nav" id="navCartBadge">0</span>
+        </a>
+
+        <span id="authLinks" class="auth-actions">
+          <div class="signin-dropdown">
+            <button class="btn-signin" type="button">
+              <i class="fas fa-user-circle"></i>
+              <span>Sign In</span>
+              <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
+            </button>
+            <div class="signin-menu">
+              <a href="pages/login.html">
+                <i class="fas fa-sign-in-alt"></i>
+                <div>
+                  <strong>Login</strong>
+                  <small>I already have an account</small>
+                </div>
+              </a>
+              <a href="pages/register.html">
+                <i class="fas fa-user-plus"></i>
+                <div>
+                  <strong>Create Account</strong>
+                  <small>New to Rise Axis</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </span>
+
+        <span id="userLinks" class="auth-actions" style="display:none;">
+          <div class="signin-dropdown">
+            <button class="btn-signin" type="button">
+              <i class="fas fa-user-circle"></i>
+              <span id="userMenuName">My Account</span>
+              <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
+            </button>
+            <div class="signin-menu">
+              <a href="pages/account.html">
+                <i class="fas fa-user"></i>
+                <div>
+                  <strong>My Account</strong>
+                  <small>Orders & profile</small>
+                </div>
+              </a>
+              <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <div>
+                  <strong>Logout</strong>
+                  <small>Sign out</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </span>
+      </div>
+
+      <div class="mobile-nav-actions">
+        <a href="pages/cart.html" class="cart-icon-btn" aria-label="View cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge-nav" id="navCartBadgeMob">0</span>
+        </a>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
       </div>
+
     </div>
   </nav>
 
+  <!-- ========== SEARCH OVERLAY ========== -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-panel">
+      <div class="search-panel-header">
+        <i class="fas fa-search"></i>
+        <div class="search-input-wrap">
+          <input type="text" id="searchInput" placeholder="Search products, pages, categories..." autocomplete="off">
+        </div>
+        <button class="search-close" onclick="closeSearch()" aria-label="Close search">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="search-panel-body" id="searchResults">
+        <div class="search-hint">
+          <i class="fas fa-search"></i>
+          <strong>Start typing to search</strong>
+          Try "feed additives", "premixes", "contact", or a product name.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MOBILE SLIDE MENU ========== -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+  <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="logo">
+        <div>
+          <span class="logo-mark">
+            <span class="rise">RISE</span>
+            <span class="axis">AXIS</span>
+          </span>
+          <span class="logo-sub">SOLUTIONS LTD</span>
+        </div>
+      </a>
+      <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="mobile-user" id="mobileUserBox" style="display:none;">
+      <div class="mobile-user-avatar" id="mobileUserInitials">··</div>
+      <div class="mobile-user-info">
+        <strong id="mobileUserName">Welcome</strong>
+        <small id="mobileUserEmail">—</small>
+      </div>
+    </div>
+
+    <ul class="mobile-menu-links">
+      <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="pages/aboutUs.html"><i class="fas fa-users"></i> About Us</a></li>
+
+      <li class="mobile-dropdown">
+        <button class="mobile-dropdown-toggle" id="mobileProductsToggle" aria-expanded="false">
+          <span><i class="fas fa-box"></i> Products</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <ul class="mobile-submenu" id="mobileProductsSubmenu">
+          <li><a href="pages/product.html">Feed Additives</a></li>
+          <li><a href="pages/product.html">Veterinary Products</a></li>
+          <li><a href="pages/product.html">Injectables</a></li>
+          <li><a href="pages/product.html">Premixes</a></li>
+        </ul>
+      </li>
+
+      <li><a href="pages/blog.html"><i class="fas fa-newspaper"></i> Blog</a></li>
+      <li><a href="pages/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+      <li><a href="pages/shop.html"><i class="fas fa-store"></i> Shop</a></li>
+      <li><a href="#" onclick="event.preventDefault(); closeMobileMenu(); openSearch();"><i class="fas fa-search"></i> Search</a></li>
+    </ul>
+
+    <div class="mobile-menu-auth" id="mobileAuthSection">
+      <a href="pages/login.html" class="mobile-auth-btn mobile-auth-outline">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+      <a href="pages/register.html" class="mobile-auth-btn mobile-auth-primary">
+        <i class="fas fa-user-plus"></i> Create Account
+      </a>
+    </div>
+
+    <div class="mobile-menu-auth" id="mobileUserSection" style="display:none;">
+      <a href="pages/account.html" class="mobile-auth-btn mobile-auth-primary">
+        <i class="fas fa-user-circle"></i> My Account
+      </a>
+      <a href="#" id="mobileLogoutBtn" class="mobile-auth-btn mobile-auth-danger">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </div>
+
+    <div class="mobile-menu-footer">
+      <div class="mobile-menu-contact">
+        <span><i class="fas fa-phone-alt"></i> +254 725 538 297</span>
+        <span><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</span>
+      </div>
+    </div>
+  </aside>
+
   <!-- ========== HERO ========== -->
   <section class="hero">
+    <!-- Hero background as lazy-capable <img> with fetchpriority -->
+    <div class="hero-bg-zoom" aria-hidden="true">
+      <img
+        class="hero-bg"
+        src="https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1600&q=75"
+        alt=""
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        width="1600"
+        height="900"
+      >
+    </div>
+
     <div class="hero-orb hero-orb-1"></div>
     <div class="hero-orb hero-orb-2"></div>
     <div class="hero-orb hero-orb-3"></div>
@@ -1374,7 +1920,7 @@
 
         <div class="stat-row">
           <div class="stat-item">
-            <div class="num" data-count="98 ">0<span class="plus">%</span></div>
+            <div class="num" data-count="98">0<span class="plus">%</span></div>
             <div class="lbl">Client Satisfaction</div>
           </div>
           <div class="stat-item">
@@ -1402,20 +1948,18 @@
   <!-- ========== MARQUEE ========== -->
   <div class="marquee">
     <div class="marquee-track">
-      <span class="marquee-item"> Feed Additives</span>
-      <span class="marquee-item"> Veterinary Product</span>
-      <span class="marquee-item"> Quality Seeds</span>
-      <span class="marquee-item"> Injectables</span>
-      <span class="marquee-item"> Premixes</span>
-      <span class="marquee-item"> Animal Health</span>
-      
-      <!-- duplicate for seamless loop -->
-      <span class="marquee-item"> Feed Additives</span>
-      <span class="marquee-item"> Veterinary Product</span>
-      <span class="marquee-item"> Quality Seeds</span>
-      <span class="marquee-item"> Injectables</span>
-      <span class="marquee-item"> Premixes</span>
-      <span class="marquee-item"> Animal Health</span>
+      <span class="marquee-item"><i class="fas fa-flask"></i> Feed Additives</span>
+      <span class="marquee-item"><i class="fas fa-syringe"></i> Veterinary Products</span>
+      <span class="marquee-item"><i class="fas fa-seedling"></i> Quality Seeds</span>
+      <span class="marquee-item"><i class="fas fa-prescription-bottle"></i> Injectables</span>
+      <span class="marquee-item"><i class="fas fa-capsules"></i> Premixes</span>
+      <span class="marquee-item"><i class="fas fa-heartbeat"></i> Animal Health</span>
+      <span class="marquee-item"><i class="fas fa-flask"></i> Feed Additives</span>
+      <span class="marquee-item"><i class="fas fa-syringe"></i> Veterinary Products</span>
+      <span class="marquee-item"><i class="fas fa-seedling"></i> Quality Seeds</span>
+      <span class="marquee-item"><i class="fas fa-prescription-bottle"></i> Injectables</span>
+      <span class="marquee-item"><i class="fas fa-capsules"></i> Premixes</span>
+      <span class="marquee-item"><i class="fas fa-heartbeat"></i> Animal Health</span>
     </div>
   </div>
 
@@ -1458,8 +2002,24 @@
     <div class="container">
       <div class="about-grid">
         <div class="about-images reveal">
-          <img class="about-img-main" src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=80" alt="Farmers in field">
-          <img class="about-img-accent" src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80" alt="Farmer inspecting crops">
+          <img
+            class="about-img-main"
+            src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&q=75"
+            alt="Farmers in field"
+            loading="lazy"
+            decoding="async"
+            width="800"
+            height="600"
+          >
+          <img
+            class="about-img-accent"
+            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=75"
+            alt="Farmer inspecting crops"
+            loading="lazy"
+            decoding="async"
+            width="600"
+            height="600"
+          >
           <div class="about-badge">
             <span class="num">98%</span>
             <span class="lbl">Client Satisfaction</span>
@@ -1511,7 +2071,7 @@
     </div>
   </section>
 
-  <!-- ========== WHY CHOOSE US — 3x2 GRID ========== -->
+  <!-- ========== WHY CHOOSE US ========== -->
   <section class="welcome-section">
     <div class="container">
       <div class="section-head">
@@ -1523,7 +2083,14 @@
       <div class="why-grid">
         <div class="card reveal">
           <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80" alt="Wheat field">
+            <img
+              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=75"
+              alt="Wheat field"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="400"
+            >
             <span class="card-tag">Supplier</span>
           </div>
           <div class="card-body">
@@ -1534,7 +2101,14 @@
 
         <div class="card reveal">
           <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80" alt="Soil and farming">
+            <img
+              src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=75"
+              alt="Soil and farming"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="400"
+            >
             <span class="card-tag">Experience</span>
           </div>
           <div class="card-body">
@@ -1545,7 +2119,14 @@
 
         <div class="card reveal">
           <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80" alt="Farming products">
+            <img
+              src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=75"
+              alt="Farming products"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="400"
+            >
             <span class="card-tag">Supply</span>
           </div>
           <div class="card-body">
@@ -1556,7 +2137,14 @@
 
         <div class="card reveal">
           <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80" alt="Roses">
+            <img
+              src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=75"
+              alt="Roses"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="400"
+            >
             <span class="card-tag">Quality</span>
           </div>
           <div class="card-body">
@@ -1567,7 +2155,14 @@
 
         <div class="card reveal">
           <div class="card-img-wrap">
-            <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80" alt="Farmer with produce">
+            <img
+              src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=75"
+              alt="Farmer with produce"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="400"
+            >
             <span class="card-tag">Service</span>
           </div>
           <div class="card-body">
@@ -1662,7 +2257,6 @@
             <li><a href="pages/aboutUs.html">About Us</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="pages/contact.html">Contact Us</a></li>
-            
             <li><a href="pages/product.html">Shop Now</a></li>
           </ul>
         </div>
@@ -1671,9 +2265,8 @@
           <h4>Get In Touch</h4>
           <ul class="footer-contact">
             <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5 </li>
-            
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
-            <li><i class="fas fa-phone-alt"></i> +254700123456</li>
+            <li><i class="fas fa-phone-alt"></i> +254 725 538 297</li>
           </ul>
         </div>
 
@@ -1693,92 +2286,441 @@
     </div>
   </footer>
 
-  <!-- ========== WHATSAPP FLOAT ========== -->
-  <a href="https://wa.me/254700123456" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+  <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
-  <!-- ========== JAVASCRIPT ========== -->
+  <!-- ========== JAVASCRIPT (deferred execution at end of body) ========== -->
   <script>
-    // ---------- SCROLL PROGRESS ----------
-    const progress = document.getElementById('scrollProgress');
-    window.addEventListener('scroll', () => {
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      const current = window.scrollY;
-      progress.style.width = (current / total) * 100 + '%';
-    });
+    // Wait until the deferred Supabase SDK has loaded
+    window.addEventListener('load', () => {
 
-    // ---------- STICKY NAV ----------
-    const nav = document.getElementById('mainNav');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 30) nav.classList.add('scrolled');
-      else nav.classList.remove('scrolled');
-    });
+      /* ============================================================
+         SUPABASE CLIENT
+         ============================================================ */
+      const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+      const supabaseClient = window.supabase
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
 
-    // ---------- SCROLL REVEAL ----------
-    const revealEls = document.querySelectorAll('.reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-          revealObserver.unobserve(entry.target);
+      /* ---------- SCROLL PROGRESS (rAF-throttled) ---------- */
+      const progress = document.getElementById('scrollProgress');
+      let ticking = false;
+      function onScrollProgress() {
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.width = (window.scrollY / total) * 100 + '%';
+        ticking = false;
+      }
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(onScrollProgress);
+        }
+      }, { passive: true });
+
+      /* ---------- STICKY NAV ---------- */
+      const nav = document.getElementById('mainNav');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 30) nav.classList.add('scrolled');
+        else nav.classList.remove('scrolled');
+      }, { passive: true });
+
+      /* ---------- SCROLL REVEAL ---------- */
+      const revealEls = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      revealEls.forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(40px)';
+        el.style.transition = `opacity 0.8s ease ${i * 0.05}s, transform 0.8s ease ${i * 0.05}s`;
+        revealObserver.observe(el);
+      });
+
+      /* ---------- COUNT-UP NUMBERS ---------- */
+      const counters = document.querySelectorAll('[data-count]');
+      const countObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.dataset.count);
+            const suffix = el.innerHTML.replace(/^0/, '').replace(/[0-9]/g, '');
+            let current = 0;
+            const duration = 1500;
+            const step = target / (duration / 16);
+            const tick = () => {
+              current += step;
+              if (current < target) {
+                el.innerHTML = Math.floor(current) + suffix;
+                requestAnimationFrame(tick);
+              } else {
+                el.innerHTML = target + suffix;
+              }
+            };
+            tick();
+            countObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.4 });
+
+      counters.forEach(c => countObserver.observe(c));
+
+      /* ---------- CARD MAGNETIC TILT (desktop only) ---------- */
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.querySelectorAll('.feature-item, .card').forEach(card => {
+          let raf = null;
+          card.addEventListener('mousemove', e => {
+            if (raf) return;
+            raf = requestAnimationFrame(() => {
+              const rect = card.getBoundingClientRect();
+              const x = (e.clientX - rect.left) / rect.width - 0.5;
+              const y = (e.clientY - rect.top) / rect.height - 0.5;
+              card.style.transform = `translateY(-10px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
+              card.style.transformStyle = 'preserve-3d';
+              raf = null;
+            });
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+          });
+        });
+      }
+
+      /* ============================================================
+         SEARCH
+         ============================================================ */
+      const SEARCH_INDEX = [
+        { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=75', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
+        { type: 'product', name: 'VitaMin Plus Supplement', cat: 'Feed Additives', price: 1890, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=75', desc: 'Complete vitamin and mineral blend for livestock.' },
+        { type: 'product', name: 'EnzymeMax Digestive Aid', cat: 'Feed Additives', price: 3200, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=75', desc: 'Powerful enzyme complex for digestion and nutrient absorption.' },
+        { type: 'product', name: 'VetCare Antibiotic Powder', cat: 'Veterinary Products', price: 1750, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=75', desc: 'Broad-spectrum antibiotic for common infections.' },
+        { type: 'product', name: 'Dewormer Oral Suspension', cat: 'Veterinary Products', price: 980, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=75', desc: 'Effective oral dewormer against internal parasites.' },
+        { type: 'product', name: 'Skin Heal Topical Spray', cat: 'Veterinary Products', price: 1250, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=75', desc: 'Fast-acting spray for wounds and skin conditions.' },
+        { type: 'product', name: 'Oxytetracycline Injection', cat: 'Injectables', price: 1450, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=75', desc: 'Broad-spectrum injectable antibiotic.' },
+        { type: 'product', name: 'Ivermectin Injectable 1%', cat: 'Injectables', price: 2100, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=75', desc: 'Antiparasitic injectable for internal and external parasites.' },
+        { type: 'product', name: 'Vitamin B-Complex Injection', cat: 'Injectables', price: 1350, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=75', desc: 'Supports energy, appetite, and recovery.' },
+        { type: 'product', name: 'Layer Premix Pro', cat: 'Premixes', price: 3450, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=75', desc: 'Complete premix for laying hens.' },
+        { type: 'product', name: 'Dairy Premix Gold', cat: 'Premixes', price: 4200, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=75', desc: 'Premium dairy premix for milk yield and fertility.' },
+        { type: 'product', name: 'Broiler Premix Elite', cat: 'Premixes', price: 3800, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=75', desc: 'Specialised premix for rapid broiler growth.' },
+        { type: 'page', name: 'Home', url: 'index.html', icon: 'fa-home', desc: 'Rise Axis Solutions homepage' },
+        { type: 'page', name: 'About Us', url: 'pages/aboutUs.html', icon: 'fa-users', desc: 'Our story, mission, and values' },
+        { type: 'page', name: 'Products', url: 'pages/product.html', icon: 'fa-box', desc: 'Browse our full product range' },
+        { type: 'page', name: 'Blog', url: 'pages/blog.html', icon: 'fa-newspaper', desc: 'Agri-input insights and farming tips' },
+        { type: 'page', name: 'Contact', url: 'pages/contact.html', icon: 'fa-envelope', desc: 'Get in touch with our team' },
+        { type: 'page', name: 'Shop', url: 'pages/shop.html', icon: 'fa-store', desc: 'Order agri-inputs online' },
+        { type: 'page', name: 'Cart', url: 'pages/cart.html', icon: 'fa-shopping-bag', desc: 'View your shopping cart' },
+        { type: 'page', name: 'Login', url: 'pages/login.html', icon: 'fa-sign-in-alt', desc: 'Sign in to your account' },
+        { type: 'page', name: 'Register', url: 'pages/register.html', icon: 'fa-user-plus', desc: 'Create a new account' },
+        { type: 'category', name: 'Feed Additives', url: 'pages/shop.html', icon: 'fa-flask', desc: 'Nutritional supplements and feed enhancers' },
+        { type: 'category', name: 'Veterinary Products', url: 'pages/shop.html', icon: 'fa-syringe', desc: 'Animal health and wellness products' },
+        { type: 'category', name: 'Injectables', url: 'pages/shop.html', icon: 'fa-prescription-bottle', desc: 'Fast-acting injectable treatments' },
+        { type: 'category', name: 'Premixes', url: 'pages/shop.html', icon: 'fa-capsules', desc: 'Complete nutrition blends for livestock' }
+      ];
+
+      const searchOverlay = document.getElementById('searchOverlay');
+      const searchInput = document.getElementById('searchInput');
+      const searchResults = document.getElementById('searchResults');
+
+      window.openSearch = function() {
+        searchOverlay.classList.add('open');
+        document.body.classList.add('search-open');
+        setTimeout(() => searchInput.focus(), 150);
+      };
+
+      window.closeSearch = function() {
+        searchOverlay.classList.remove('open');
+        document.body.classList.remove('search-open');
+        searchInput.value = '';
+        searchResults.innerHTML = `
+          <div class="search-hint">
+            <i class="fas fa-search"></i>
+            <strong>Start typing to search</strong>
+            Try "feed additives", "premixes", "contact", or a product name.
+          </div>`;
+      };
+
+      function formatPrice(n) { return 'KES ' + Number(n).toLocaleString(); }
+
+      function escapeHtml(s) {
+        return String(s ?? '')
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function runSearch(query) {
+        const q = query.trim().toLowerCase();
+
+        if (!q) {
+          searchResults.innerHTML = `
+            <div class="search-hint">
+              <i class="fas fa-search"></i>
+              <strong>Start typing to search</strong>
+              Try "feed additives", "premixes", "contact", or a product name.
+            </div>`;
+          return;
+        }
+
+        const matches = SEARCH_INDEX.filter(item =>
+          item.name.toLowerCase().includes(q) ||
+          (item.desc && item.desc.toLowerCase().includes(q)) ||
+          (item.cat && item.cat.toLowerCase().includes(q))
+        );
+
+        if (matches.length === 0) {
+          searchResults.innerHTML = `
+            <div class="search-no-results">
+              <i class="fas fa-search-minus"></i>
+              <strong>No results for "${escapeHtml(query)}"</strong>
+              <p>Try a different keyword, or browse the Shop.</p>
+            </div>`;
+          return;
+        }
+
+        const products = matches.filter(m => m.type === 'product');
+        const pages = matches.filter(m => m.type === 'page');
+        const categories = matches.filter(m => m.type === 'category');
+
+        let html = '';
+
+        if (products.length) {
+          html += `<div class="search-group-title">Products · ${products.length}</div>`;
+          html += products.slice(0, 6).map(p => `
+            <a class="search-result" href="pages/shop.html?search=${encodeURIComponent(p.name)}">
+              <img class="search-result-img" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
+              <div class="search-result-info">
+                <strong>${escapeHtml(p.name)}</strong>
+                <small>${escapeHtml(p.cat)}</small>
+              </div>
+              <div class="search-result-price">${formatPrice(p.price)}</div>
+              <i class="fas fa-chevron-right search-result-arrow"></i>
+            </a>
+          `).join('');
+        }
+
+        if (categories.length) {
+          html += `<div class="search-group-title">Categories · ${categories.length}</div>`;
+          html += categories.map(c => `
+            <a class="search-result" href="${escapeHtml(c.url)}?category=${encodeURIComponent(c.name)}">
+              <div class="search-result-icon"><i class="fas ${escapeHtml(c.icon)}"></i></div>
+              <div class="search-result-info">
+                <strong>${escapeHtml(c.name)}</strong>
+                <small>${escapeHtml(c.desc)}</small>
+              </div>
+              <i class="fas fa-chevron-right search-result-arrow"></i>
+            </a>
+          `).join('');
+        }
+
+        if (pages.length) {
+          html += `<div class="search-group-title">Pages · ${pages.length}</div>`;
+          html += pages.map(pg => `
+            <a class="search-result" href="${escapeHtml(pg.url)}">
+              <div class="search-result-icon"><i class="fas ${escapeHtml(pg.icon)}"></i></div>
+              <div class="search-result-info">
+                <strong>${escapeHtml(pg.name)}</strong>
+                <small>${escapeHtml(pg.desc)}</small>
+              </div>
+              <i class="fas fa-chevron-right search-result-arrow"></i>
+            </a>
+          `).join('');
+        }
+
+        searchResults.innerHTML = html;
+      }
+
+      // Debounced live search
+      let searchDebounce = null;
+      searchInput?.addEventListener('input', e => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => runSearch(e.target.value), 120);
+      });
+
+      searchInput?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const q = searchInput.value.trim();
+          if (!q) return;
+          window.location.href = `pages/shop.html?search=${encodeURIComponent(q)}`;
+        }
+        if (e.key === 'Escape') window.closeSearch();
+      });
+
+      searchOverlay?.addEventListener('click', e => {
+        if (e.target === searchOverlay) window.closeSearch();
+      });
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && searchOverlay.classList.contains('open')) {
+          window.closeSearch();
         }
       });
-    }, { threshold: 0.12 });
 
-    revealEls.forEach((el, i) => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(40px)';
-      el.style.transition = `opacity 0.8s ease ${i * 0.05}s, transform 0.8s ease ${i * 0.05}s`;
-      revealObserver.observe(el);
-    });
+      /* ============================================================
+         AUTH UI
+         ============================================================ */
+      function applyAuthUI(user, profile) {
+        const authLinks = document.getElementById('authLinks');
+        const userLinks = document.getElementById('userLinks');
+        const mobileAuth = document.getElementById('mobileAuthSection');
+        const mobileUser = document.getElementById('mobileUserSection');
+        const mobileUserBox = document.getElementById('mobileUserBox');
 
-    // ---------- COUNT-UP NUMBERS ----------
-    const counters = document.querySelectorAll('[data-count]');
-    const countObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const target = parseInt(el.dataset.count);
-          const suffix = el.innerHTML.replace(/^0/, '').replace(/[0-9]/g, '');
-          let current = 0;
-          const duration = 1800;
-          const step = target / (duration / 16);
-          const tick = () => {
-            current += step;
-            if (current < target) {
-              el.innerHTML = Math.floor(current) + suffix;
-              requestAnimationFrame(tick);
-            } else {
-              el.innerHTML = target + suffix;
-            }
-          };
-          tick();
-          countObserver.unobserve(el);
+        if (user) {
+          if (authLinks) authLinks.style.display = 'none';
+          if (userLinks) userLinks.style.display = 'inline-flex';
+          if (mobileAuth) mobileAuth.style.display = 'none';
+          if (mobileUser) mobileUser.style.display = 'flex';
+
+          const initials = (
+            (profile?.first_name || user.email || 'U')[0] +
+            (profile?.last_name || '')[0] || ''
+          ).toUpperCase();
+          const name = profile?.first_name
+            ? `${profile.first_name}${profile.last_name ? ' ' + profile.last_name : ''}`
+            : (user.email || 'User').split('@')[0];
+
+          const initialsEl = document.getElementById('mobileUserInitials');
+          const nameEl = document.getElementById('mobileUserName');
+          const emailEl = document.getElementById('mobileUserEmail');
+          const menuNameEl = document.getElementById('userMenuName');
+
+          if (initialsEl) initialsEl.textContent = initials || '··';
+          if (nameEl) nameEl.textContent = name;
+          if (emailEl) emailEl.textContent = user.email;
+          if (menuNameEl) menuNameEl.textContent = name.length > 12 ? 'Account' : name;
+          if (mobileUserBox) mobileUserBox.style.display = 'flex';
+        } else {
+          if (authLinks) authLinks.style.display = 'inline-flex';
+          if (userLinks) userLinks.style.display = 'none';
+          if (mobileAuth) mobileAuth.style.display = 'flex';
+          if (mobileUser) mobileUser.style.display = 'none';
+          if (mobileUserBox) mobileUserBox.style.display = 'none';
         }
-      });
-    }, { threshold: 0.5 });
+      }
 
-    counters.forEach(c => countObserver.observe(c));
+      async function fetchAndApplyAuth() {
+        if (!supabaseClient) { applyAuthUI(null); return; }
+        try {
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          if (!user) { applyAuthUI(null); return; }
 
-    // ---------- CARD MAGNETIC TILT (subtle) ----------
-    document.querySelectorAll('.feature-item, .card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `translateY(-10px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
-        card.style.transformStyle = 'preserve-3d';
+          let profile = null;
+          try {
+            const { data } = await supabaseClient
+              .from('profiles')
+              .select('first_name, last_name, role')
+              .eq('id', user.id)
+              .single();
+            profile = data;
+          } catch (_) {}
+
+          applyAuthUI(user, profile);
+        } catch (_) {
+          applyAuthUI(null);
+        }
+      }
+
+      fetchAndApplyAuth();
+      supabaseClient?.auth.onAuthStateChange(() => { fetchAndApplyAuth(); });
+
+      async function doLogout(e) {
+        if (e) e.preventDefault();
+        if (!confirm('Sign out of your account?')) return;
+        if (supabaseClient) await supabaseClient.auth.signOut();
+        window.location.reload();
+      }
+      document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
+      document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
+
+      /* ============================================================
+         HAMBURGER / MOBILE MENU
+         ============================================================ */
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+      const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+      function openMobileMenu() {
+        mobileMenu.classList.add('open');
+        mobileMenuOverlay.classList.add('open');
+        hamburgerBtn.classList.add('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+        mobileMenu.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.remove('open');
+        mobileMenuOverlay.classList.remove('open');
+        hamburgerBtn.classList.remove('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      window.closeMobileMenu = closeMobileMenu;
+
+      hamburgerBtn?.addEventListener('click', () => {
+        if (mobileMenu.classList.contains('open')) closeMobileMenu();
+        else openMobileMenu();
       });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
+
+      mobileMenuClose?.addEventListener('click', closeMobileMenu);
+      mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMobileMenu();
       });
+
+      const mobileProductsToggle = document.getElementById('mobileProductsToggle');
+      const mobileProductsSubmenu = document.getElementById('mobileProductsSubmenu');
+
+      mobileProductsToggle?.addEventListener('click', () => {
+        const isOpen = mobileProductsSubmenu.classList.toggle('open');
+        mobileProductsToggle.classList.toggle('open', isOpen);
+        mobileProductsToggle.setAttribute('aria-expanded', isOpen);
+      });
+
+      mobileMenu?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          if (link.id === 'mobileLogoutBtn') return;
+          closeMobileMenu();
+        });
+      });
+
+      /* ============================================================
+         CART BADGE
+         ============================================================ */
+      function updateNavCartBadge() {
+        try {
+          const raw = localStorage.getItem('riseAxisCart');
+          const cart = raw ? JSON.parse(raw) : [];
+          const count = cart.reduce((s, i) => s + (i.quantity || i.qty || 0), 0);
+          const badge = document.getElementById('navCartBadge');
+          const badgeMob = document.getElementById('navCartBadgeMob');
+          if (badge) badge.textContent = count;
+          if (badgeMob) badgeMob.textContent = count;
+        } catch (_) {}
+      }
+      updateNavCartBadge();
+
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'riseAxisCart') updateNavCartBadge();
+      });
+
+      /* ---------- CONSOLE BRAND ---------- */
+      console.log('%c RISE AXIS SOLUTIONS ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
+      console.log('%c Clarity · Direction · Results ', 'background: #E85D26; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
     });
-
-    // ---------- CONSOLE BRAND ----------
-    console.log('%c RISE AXIS SOLUTIONS ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
-    console.log('%c Clarity · Direction · Results ', 'background: #E85D26; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
   </script>
 
 </body>
