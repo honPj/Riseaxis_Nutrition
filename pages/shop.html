@@ -3,13 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop | Rise Axis Solutions Ltd</title>
+
+  <!-- ========== SEO ========== -->
+  <title>Shop | Rise Axis Solutions Ltd — Agri-Inputs, Feed Additives & Veterinary Products</title>
+  <meta name="description" content="Browse Rise Axis Solutions' full range of agri-inputs — feed additives, veterinary products, injectables, and premixes. Quality products trusted by farmers across East Africa.">
+  <meta name="keywords" content="agri-inputs Kenya, feed additives, veterinary products, injectables, premixes, animal health, Rise Axis Solutions">
+  <meta name="author" content="Rise Axis Solutions Ltd">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://riseaxissolutions.com/pages/shop.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Shop | Rise Axis Solutions Ltd">
+  <meta property="og:description" content="Browse our full range of agri-inputs — feed additives, veterinary products, injectables, and premixes.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80">
+  <meta property="og:url" content="https://riseaxissolutions.com/pages/shop.html">
+  <meta property="og:site_name" content="Rise Axis Solutions Ltd">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Shop | Rise Axis Solutions Ltd">
+  <meta name="twitter:description" content="Browse our full range of agri-inputs — feed additives, veterinary products, injectables, and premixes.">
+  <meta name="twitter:image" content="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="preconnect" href="https://feurddyhflvnomakexxs.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- JSON-LD structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Rise Axis Solutions Ltd",
+    "description": "Agri-input supplier in Kenya — feed additives, veterinary products, injectables, premixes.",
+    "url": "https://riseaxissolutions.com/pages/shop.html",
+    "telephone": "+254725538297",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "188 Hood Avenue, 3rd Floor, 72 Riverside Drive, Office 5",
+      "addressLocality": "Nairobi",
+      "addressCountry": "KE"
+    }
+  }
+  </script>
+
   <style>
-    /* ============================================================
-       RISE AXIS SOLUTIONS — BRAND PALETTE
-       ============================================================ */
     :root {
       --navy: #1e53b4;
       --navy-deep: #12326e;
@@ -44,14 +88,8 @@
     .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 
     /* ---------- TOP BAR ---------- */
-    .top-bar {
-      background: var(--navy); color: #fff;
-      padding: 10px 0; font-size: 0.88rem;
-    }
-    .top-bar .container {
-      display: flex; flex-wrap: wrap;
-      justify-content: space-between; align-items: center; gap: 12px;
-    }
+    .top-bar { background: var(--navy); color: #fff; padding: 10px 0; font-size: 0.88rem; }
+    .top-bar .container { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
     .top-item { display: flex; align-items: center; gap: 8px; }
     .top-item i { color: var(--orange); font-size: 0.95rem; }
     .top-item strong { color: #fff; font-weight: 600; }
@@ -66,902 +104,217 @@
       transition: box-shadow 0.3s;
     }
     .main-nav.scrolled { box-shadow: 0 8px 30px rgba(31, 58, 110, 0.1); }
-    .main-nav .container {
-      display: flex; align-items: center;
-      justify-content: space-between; min-height: 82px;
-      gap: 24px;
-    }
+    .main-nav .container { display: flex; align-items: center; justify-content: space-between; min-height: 82px; gap: 24px; }
 
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 900; font-size: 1.4rem;
-      letter-spacing: 0.5px;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .logo-mark {
-      display: flex; align-items: center; gap: 2px;
-      font-size: 1.55rem; font-weight: 900;
-    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 1.4rem; letter-spacing: 0.5px; position: relative; flex-shrink: 0; }
+    .logo-mark { display: flex; align-items: center; gap: 2px; font-size: 1.55rem; font-weight: 900; }
     .logo-mark .rise { color: var(--navy); }
     .logo-mark .axis { color: var(--red); }
-    .logo-sub {
-      display: block; font-size: 0.52rem;
-      letter-spacing: 3px; color: var(--bronze);
-      font-weight: 700; margin-top: -3px;
-    }
-    .logo::after {
-      content: '';
-      position: absolute;
-      right: -8px; top: 4px; bottom: 4px;
-      width: 3px;
-      background: linear-gradient(180deg, var(--red), var(--orange), var(--green));
-      border-radius: 3px;
-      opacity: 0.7;
-    }
+    .logo-sub { display: block; font-size: 0.52rem; letter-spacing: 3px; color: var(--bronze); font-weight: 700; margin-top: -3px; }
+    .logo::after { content: ''; position: absolute; right: -8px; top: 4px; bottom: 4px; width: 3px; background: linear-gradient(180deg, var(--red), var(--orange), var(--green)); border-radius: 3px; opacity: 0.7; }
 
-    .nav-links {
-      display: flex; align-items: center; gap: 4px;
-      font-weight: 600; font-size: 0.9rem;
-      flex: 1;
-      justify-content: center;
-    }
-    .nav-links > li > a {
-      padding: 9px 14px;
-      border-radius: 8px;
-      color: var(--navy);
-      transition: all 0.25s;
-      position: relative;
-      display: inline-flex; align-items: center; gap: 4px;
-      white-space: nowrap;
-    }
-    .nav-links > li > a:hover,
-    .nav-links > li > a.active {
-      background: rgba(30, 83, 180, 0.06);
-      color: var(--red);
-    }
+    .nav-links { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 0.9rem; flex: 1; justify-content: center; }
+    .nav-links > li > a { padding: 9px 14px; border-radius: 8px; color: var(--navy); transition: all 0.25s; position: relative; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .nav-links > li > a:hover, .nav-links > li > a.active { background: rgba(30, 83, 180, 0.06); color: var(--red); }
 
     .dropdown { position: relative; }
     .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
     .dropdown:hover > a i { transform: rotate(180deg); }
-    .dropdown-menu {
-      position: absolute; top: calc(100% + 8px); left: 0;
-      background: var(--bg-white); min-width: 230px;
-      border-radius: 14px; padding: 10px;
-      box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15);
-      border: 1px solid var(--border);
-      opacity: 0; visibility: hidden;
-      transform: translateY(10px);
-      transition: all 0.25s;
-      z-index: 100;
-    }
-    .dropdown:hover .dropdown-menu {
-      opacity: 1; visibility: visible; transform: translateY(0);
-    }
-    .dropdown-menu a {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px;
-      color: var(--navy); font-weight: 500; font-size: 0.88rem;
-      border-radius: 10px;
-      transition: all 0.2s;
-    }
-    .dropdown-menu a i {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: var(--bg-light);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
-      color: var(--red);
-      transition: all 0.2s;
-    }
-    .dropdown-menu a:hover {
-      background: var(--bg-light);
-      color: var(--red);
-      transform: translateX(4px);
-    }
+    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; background: var(--bg-white); min-width: 230px; border-radius: 14px; padding: 10px; box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15); border: 1px solid var(--border); opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.25s; z-index: 100; }
+    .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; color: var(--navy); font-weight: 500; font-size: 0.88rem; border-radius: 10px; transition: all 0.2s; }
+    .dropdown-menu a i { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--red); transition: all 0.2s; }
+    .dropdown-menu a:hover { background: var(--bg-light); color: var(--red); transform: translateX(4px); }
     .dropdown-menu a:hover i { background: var(--red); color: #fff; }
 
-    .nav-actions {
-      display: flex; align-items: center; gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .search-icon {
-      color: var(--navy); font-size: 0.95rem;
-      width: 42px; height: 42px;
-      display: flex; align-items: center; justify-content: center;
-      border: 1.5px solid var(--border); border-radius: 50%;
-      cursor: pointer; transition: all 0.25s;
-      background: var(--bg-white);
-      padding: 0;
-    }
-    .search-icon:hover {
-      border-color: var(--navy);
-      background: var(--navy); color: #fff;
-      transform: rotate(90deg);
-    }
-
-    .cart-icon-btn {
-      position: relative;
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--green), #0a5f2e);
-      color: #fff;
-      font-size: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      text-decoration: none;
-      transition: all 0.25s;
-      box-shadow: 0 4px 14px rgba(14,122,60,0.25);
-    }
-    .cart-icon-btn:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 10px 25px rgba(14,122,60,0.4);
-    }
-    .cart-badge-nav {
-      position: absolute;
-      top: -4px; right: -4px;
-      min-width: 20px; height: 20px;
-      padding: 0 6px;
-      border-radius: 20px;
-      background: var(--red); color: #fff;
-      font-size: 0.68rem; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      border: 2px solid #fff;
-      line-height: 1;
-    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .search-icon { color: var(--navy); font-size: 0.95rem; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); border-radius: 50%; cursor: pointer; transition: all 0.25s; background: var(--bg-white); padding: 0; }
+    .search-icon:hover { border-color: var(--navy); background: var(--navy); color: #fff; transform: rotate(90deg); }
+    .cart-icon-btn { position: relative; width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--green), #0a5f2e); color: #fff; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.25s; box-shadow: 0 4px 14px rgba(14,122,60,0.25); }
+    .cart-icon-btn:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 10px 25px rgba(14,122,60,0.4); }
+    .cart-badge-nav { position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 20px; background: var(--red); color: #fff; font-size: 0.68rem; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; line-height: 1; }
 
     .auth-actions { display: inline-flex; align-items: center; }
     .signin-dropdown { position: relative; display: inline-block; }
-    .btn-signin {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 11px 20px; border-radius: 120px;
-      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff; border: none;
-      font-weight: 700; font-size: 0.88rem;
-      cursor: pointer; transition: all 0.3s;
-      box-shadow: 0 4px 14px rgba(30,83,180,0.25);
-    }
-    .btn-signin:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(30,83,180,0.4);
-    }
-    .signin-menu {
-      position: absolute; top: calc(100% + 10px); right: 0;
-      min-width: 260px;
-      background: #fff;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 50px rgba(31,58,110,0.15);
-      padding: 8px;
-      opacity: 0; visibility: hidden;
-      transform: translateY(8px);
-      transition: all 0.22s;
-      z-index: 200;
-    }
-    .signin-dropdown:hover .signin-menu,
-    .signin-dropdown:focus-within .signin-menu {
-      opacity: 1; visibility: visible; transform: translateY(0);
-    }
-    .signin-menu a {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-radius: 10px;
-      color: var(--navy); text-decoration: none;
-      transition: all 0.2s;
-    }
+    .btn-signin { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 120px; background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff; border: none; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 14px rgba(30,83,180,0.25); }
+    .btn-signin:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30,83,180,0.4); }
+    .signin-menu { position: absolute; top: calc(100% + 10px); right: 0; min-width: 260px; background: #fff; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(31,58,110,0.15); padding: 8px; opacity: 0; visibility: hidden; transform: translateY(8px); transition: all 0.22s; z-index: 200; }
+    .signin-dropdown:hover .signin-menu, .signin-dropdown:focus-within .signin-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .signin-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; color: var(--navy); transition: all 0.2s; }
     .signin-menu a:hover { background: #f5f9ff; color: var(--red); }
-    .signin-menu a i {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: #f0f4fa;
-      color: var(--navy);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem; flex-shrink: 0;
-      transition: all 0.2s;
-    }
+    .signin-menu a i { width: 36px; height: 36px; border-radius: 10px; background: #f0f4fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; transition: all 0.2s; }
     .signin-menu a:hover i { background: var(--red); color: #fff; }
     .signin-menu a div { display: flex; flex-direction: column; }
     .signin-menu a strong { font-size: 0.9rem; font-weight: 700; line-height: 1.2; }
     .signin-menu a small { font-size: 0.72rem; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
 
-    /* ============================================================
-       SEARCH OVERLAY
-       ============================================================ */
-    .search-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      background: rgba(15, 23, 41, 0.55);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 1500;
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.3s;
-      padding: 90px 24px 40px;
-      overflow-y: auto;
-      max-height: 100vh;
-    }
+    /* SEARCH OVERLAY */
+    .search-overlay { position: fixed; top: 0; left: 0; right: 0; background: rgba(15, 23, 41, 0.55); backdrop-filter: blur(6px); z-index: 1500; opacity: 0; visibility: hidden; transition: opacity 0.3s; padding: 90px 24px 40px; overflow-y: auto; max-height: 100vh; }
     .search-overlay.open { opacity: 1; visibility: visible; }
-
-    .search-panel {
-      max-width: 760px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
-      overflow: hidden;
-      transform: translateY(-20px) scale(0.97);
-      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    .search-panel { max-width: 760px; margin: 0 auto; background: #fff; border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); overflow: hidden; transform: translateY(-20px) scale(0.97); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
     .search-overlay.open .search-panel { transform: translateY(0) scale(1); }
-
-    .search-panel-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 14px;
-      background: #fafbff;
-    }
+    .search-panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; background: #fafbff; }
     .search-panel-header > i { color: var(--navy); font-size: 1.1rem; }
-    .search-input-wrap { flex: 1; position: relative; }
-    .search-input-wrap input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-size: 1rem;
-      background: #fff;
-      outline: none;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-    .search-input-wrap input:focus {
-      border-color: var(--navy);
-      box-shadow: 0 0 0 3px rgba(30,83,180,0.1);
-    }
-    .search-close {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      color: var(--navy);
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.25s;
-      flex-shrink: 0;
-    }
-    .search-close:hover {
-      background: var(--red);
-      border-color: var(--red);
-      color: #fff;
-      transform: rotate(90deg);
-    }
+    .search-input-wrap { flex: 1; }
+    .search-input-wrap input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 1rem; outline: none; transition: all 0.2s; }
+    .search-input-wrap input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,83,180,0.1); }
+    .search-close { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid var(--border); color: var(--navy); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s; flex-shrink: 0; }
+    .search-close:hover { background: var(--red); border-color: var(--red); color: #fff; transform: rotate(90deg); }
     .search-panel-body { padding: 8px; max-height: 60vh; overflow-y: auto; }
-
-    .search-hint {
-      padding: 30px 24px; text-align: center;
-      color: var(--text-muted); font-size: 0.9rem;
-    }
+    .search-hint { padding: 30px 24px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
     .search-hint i { font-size: 2rem; color: var(--border); display: block; margin-bottom: 10px; }
     .search-hint strong { display: block; color: var(--navy); font-size: 1rem; margin-bottom: 4px; }
-
-    .search-group-title {
-      font-size: 0.7rem; font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 14px 16px 8px;
-    }
-    .search-result {
-      display: flex; align-items: center; gap: 14px;
-      padding: 12px 16px; border-radius: 12px;
-      cursor: pointer; transition: background 0.15s;
-      text-decoration: none; color: inherit;
-    }
+    .search-group-title { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; padding: 14px 16px 8px; }
+    .search-result { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 12px; transition: background 0.15s; }
     .search-result:hover { background: #f5f9ff; }
-    .search-result-img {
-      width: 48px; height: 48px;
-      border-radius: 10px; object-fit: cover;
-      background: var(--bg-light); flex-shrink: 0;
-    }
-    .search-result-icon {
-      width: 48px; height: 48px;
-      border-radius: 10px; background: #f0f4fa;
-      color: var(--navy);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; flex-shrink: 0;
-    }
+    .search-result-img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: var(--bg-light); flex-shrink: 0; }
+    .search-result-icon { width: 48px; height: 48px; border-radius: 10px; background: #f0f4fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
     .search-result-info { flex: 1; min-width: 0; }
-    .search-result-info strong {
-      display: block; font-size: 0.92rem; color: var(--navy);
-      font-weight: 700; line-height: 1.3;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .search-result-info small {
-      display: block; font-size: 0.75rem; color: var(--text-muted);
-      font-weight: 500; margin-top: 2px;
-    }
-    .search-result-price {
-      font-size: 0.88rem; font-weight: 800;
-      color: var(--red); white-space: nowrap;
-    }
+    .search-result-info strong { display: block; font-size: 0.92rem; color: var(--navy); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .search-result-info small { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+    .search-result-price { font-size: 0.88rem; font-weight: 800; color: var(--red); white-space: nowrap; }
     .search-result-arrow { color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
-
-    .search-no-results {
-      padding: 40px 24px; text-align: center; color: var(--text-muted);
-    }
+    .search-no-results { padding: 40px 24px; text-align: center; color: var(--text-muted); }
     .search-no-results i { font-size: 2rem; color: var(--border); margin-bottom: 12px; display: block; }
     .search-no-results strong { display: block; color: var(--navy); font-size: 1rem; margin-bottom: 4px; }
 
-    /* ============================================================
-       MOBILE NAV
-       ============================================================ */
-    .mobile-nav-actions {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      margin-left: auto;
-    }
-    .hamburger {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all 0.25s;
-      padding: 0;
-    }
-    .hamburger span {
-      display: block;
-      width: 22px; height: 2.5px;
-      background: var(--navy);
-      border-radius: 3px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .hamburger:hover { border-color: var(--navy); background: var(--bg-light); }
+    /* MOBILE NAV */
+    .mobile-nav-actions { display: none; align-items: center; gap: 10px; margin-left: auto; }
+    .hamburger { width: 44px; height: 44px; border-radius: 12px; background: #fff; border: 1.5px solid var(--border); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: all 0.25s; padding: 0; }
+    .hamburger span { display: block; width: 22px; height: 2.5px; background: var(--navy); border-radius: 3px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
     .hamburger.active { background: var(--navy); border-color: var(--navy); }
     .hamburger.active span { background: #fff; }
     .hamburger.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
     .hamburger.active span:nth-child(2) { opacity: 0; transform: scale(0); }
     .hamburger.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
-    .mobile-menu-overlay {
-      position: fixed; inset: 0;
-      background: rgba(15, 23, 41, 0.55);
-      backdrop-filter: blur(4px);
-      z-index: 1500;
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.3s;
-    }
+    .mobile-menu-overlay { position: fixed; inset: 0; background: rgba(15, 23, 41, 0.55); backdrop-filter: blur(4px); z-index: 1500; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
     .mobile-menu-overlay.open { opacity: 1; visibility: visible; }
-
-    .mobile-menu {
-      position: fixed;
-      top: 0; right: 0;
-      width: 340px; max-width: 88vw;
-      height: 100vh;
-      background: #fff;
-      box-shadow: -20px 0 60px rgba(0,0,0,0.2);
-      z-index: 1600;
-      transform: translateX(105%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex; flex-direction: column;
-      overflow-y: auto;
-    }
+    .mobile-menu { position: fixed; top: 0; right: 0; width: 340px; max-width: 88vw; height: 100vh; background: #fff; box-shadow: -20px 0 60px rgba(0,0,0,0.2); z-index: 1600; transform: translateX(105%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; overflow-y: auto; }
     .mobile-menu.open { transform: translateX(0); }
-
-    .mobile-menu-header {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      padding: 20px 22px;
-      border-bottom: 1px solid var(--border);
-      background: #fafbff;
-      flex-shrink: 0;
-    }
-    .mobile-menu-header .logo { display: flex; align-items: center; text-decoration: none; }
-    .mobile-menu-close {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: #fff;
-      border: 1.5px solid var(--border);
-      color: var(--navy);
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.25s;
-    }
+    .mobile-menu-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid var(--border); background: #fafbff; flex-shrink: 0; }
+    .mobile-menu-close { width: 40px; height: 40px; border-radius: 10px; background: #fff; border: 1.5px solid var(--border); color: var(--navy); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s; }
     .mobile-menu-close:hover { background: var(--red); border-color: var(--red); color: #fff; transform: rotate(90deg); }
-
-    .mobile-user {
-      display: flex; align-items: center; gap: 14px;
-      padding: 18px 22px;
-      background: linear-gradient(135deg, #f7fafd, #eef4fb);
-      border-bottom: 1px solid var(--border);
-    }
-    .mobile-user-avatar {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff; font-weight: 800; font-size: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .mobile-user-info { flex: 1; min-width: 0; }
+    .mobile-user { display: flex; align-items: center; gap: 14px; padding: 18px 22px; background: linear-gradient(135deg, #f7fafd, #eef4fb); border-bottom: 1px solid var(--border); }
+    .mobile-user-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff; font-weight: 800; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mobile-user-info strong { display: block; color: var(--navy); font-size: 0.95rem; font-weight: 800; }
-    .mobile-user-info small {
-      display: block; color: var(--text-muted); font-size: 0.78rem;
-      font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-
+    .mobile-user-info small { display: block; color: var(--text-muted); font-size: 0.78rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .mobile-menu-links { padding: 12px; flex: 1; overflow-y: auto; }
-    .mobile-menu-links > li { margin-bottom: 2px; }
-    .mobile-menu-links > li > a,
-    .mobile-dropdown-toggle {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 16px;
-      border-radius: 12px;
-      color: var(--navy);
-      font-weight: 600;
-      font-size: 0.95rem;
-      text-decoration: none;
-      transition: all 0.2s;
-      background: none;
-      border: none;
-      width: 100%;
-      text-align: left;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .mobile-menu-links > li > a:hover,
-    .mobile-menu-links > li > a.active,
-    .mobile-dropdown-toggle:hover { background: #f5f9ff; color: var(--red); }
-    .mobile-menu-links > li > a i,
-    .mobile-dropdown-toggle i:first-child {
-      width: 34px; height: 34px;
-      border-radius: 10px;
-      background: #f0f4fa;
-      color: var(--navy);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.88rem;
-      flex-shrink: 0;
-      transition: all 0.2s;
-    }
-    .mobile-menu-links > li > a:hover i,
-    .mobile-menu-links > li > a.active i,
-    .mobile-dropdown-toggle:hover i:first-child { background: var(--red); color: #fff; }
-
+    .mobile-menu-links > li > a, .mobile-dropdown-toggle { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--navy); font-weight: 600; font-size: 0.95rem; background: none; border: none; width: 100%; text-align: left; cursor: pointer; transition: all 0.2s; }
+    .mobile-menu-links > li > a:hover, .mobile-menu-links > li > a.active, .mobile-dropdown-toggle:hover { background: #f5f9ff; color: var(--red); }
+    .mobile-menu-links > li > a i, .mobile-dropdown-toggle i:first-child { width: 34px; height: 34px; border-radius: 10px; background: #f0f4fa; color: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 0.88rem; flex-shrink: 0; transition: all 0.2s; }
+    .mobile-menu-links > li > a:hover i, .mobile-menu-links > li > a.active i { background: var(--red); color: #fff; }
     .mobile-dropdown-toggle { justify-content: space-between; }
     .mobile-dropdown-toggle > span { display: flex; align-items: center; gap: 14px; }
-    .mobile-dropdown-toggle > i:last-child {
-      font-size: 0.7rem; color: var(--text-muted); transition: transform 0.3s;
-    }
+    .mobile-dropdown-toggle > i:last-child { font-size: 0.7rem; color: var(--text-muted); transition: transform 0.3s; }
     .mobile-dropdown-toggle.open > i:last-child { transform: rotate(180deg); }
-
-    .mobile-submenu {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.35s ease, padding 0.25s ease;
-      padding-left: 16px; margin-top: 2px;
-    }
+    .mobile-submenu { max-height: 0; overflow: hidden; transition: max-height 0.35s, padding 0.25s; padding-left: 16px; }
     .mobile-submenu.open { max-height: 400px; padding: 6px 0 6px 16px; }
-    .mobile-submenu a {
-      display: block; padding: 11px 14px;
-      color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
-      border-radius: 10px; border-left: 3px solid transparent;
-      text-decoration: none; transition: all 0.2s;
-    }
+    .mobile-submenu a { display: block; padding: 11px 14px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; border-radius: 10px; border-left: 3px solid transparent; transition: all 0.2s; }
     .mobile-submenu a:hover { background: #f5f9ff; color: var(--navy); border-left-color: var(--red); }
-
-    .mobile-menu-auth {
-      padding: 16px 20px;
-      display: flex; flex-direction: column; gap: 10px;
-      border-top: 1px solid var(--border);
-    }
-    .mobile-auth-btn {
-      display: flex; align-items: center; justify-content: center;
-      gap: 10px; padding: 13px 18px;
-      border-radius: 12px; font-weight: 700; font-size: 0.9rem;
-      text-decoration: none; transition: all 0.25s;
-      cursor: pointer; border: none; font-family: inherit;
-    }
+    .mobile-menu-auth { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border); }
+    .mobile-auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 18px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; transition: all 0.25s; cursor: pointer; border: none; }
     .mobile-auth-outline { background: #fff; color: var(--navy); border: 1.5px solid var(--border); }
-    .mobile-auth-outline:hover { border-color: var(--navy); background: var(--bg-light); }
-    .mobile-auth-primary {
-      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff; box-shadow: 0 6px 16px rgba(30,83,180,0.25);
-    }
-    .mobile-auth-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30,83,180,0.4); }
-    .mobile-auth-danger {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
-      color: #fff; box-shadow: 0 6px 16px rgba(200,16,46,0.25);
-    }
-    .mobile-auth-danger:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(200,16,46,0.4); }
-
-    .mobile-menu-footer {
-      padding: 16px 22px 24px;
-      background: #fafbff;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .mobile-menu-contact {
-      display: flex; flex-direction: column; gap: 8px;
-      font-size: 0.8rem; color: var(--text-muted);
-    }
+    .mobile-auth-primary { background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff; box-shadow: 0 6px 16px rgba(30,83,180,0.25); }
+    .mobile-auth-danger { background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fff; box-shadow: 0 6px 16px rgba(200,16,46,0.25); }
+    .mobile-menu-footer { padding: 16px 22px 24px; background: #fafbff; border-top: 1px solid var(--border); }
+    .mobile-menu-contact { display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: var(--text-muted); }
     .mobile-menu-contact span { display: flex; align-items: center; gap: 8px; }
     .mobile-menu-contact i { color: var(--orange); width: 16px; }
 
     /* ============================================================
        SHOP HERO
        ============================================================ */
-    .shop-hero {
-      position: relative;
-      padding: 100px 0 90px;
-      background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--red) 140%);
-      color: #fff;
-      overflow: hidden;
-    }
-    .shop-hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image:
-        radial-gradient(circle at 15% 20%, rgba(232,93,38,0.35), transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(200,16,46,0.35), transparent 45%);
-    }
-    .shop-hero-orb {
-      position: absolute; border-radius: 50%;
-      filter: blur(80px); opacity: 0.5;
-      animation: orbFloat 12s ease-in-out infinite;
-    }
+    .shop-hero { position: relative; padding: 100px 0 90px; background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, var(--red) 140%); color: #fff; overflow: hidden; }
+    .shop-hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 15% 20%, rgba(232,93,38,0.35), transparent 45%), radial-gradient(circle at 85% 80%, rgba(200,16,46,0.35), transparent 45%); }
+    .shop-hero-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: orbFloat 12s ease-in-out infinite; }
     .shop-hero-orb-1 { width: 340px; height: 340px; background: var(--orange); top: -100px; left: -80px; }
     .shop-hero-orb-2 { width: 280px; height: 280px; background: var(--green); bottom: -80px; right: -40px; animation-delay: 4s; }
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(30px, -20px) scale(1.08); }
-    }
-    .shop-hero .container {
-      position: relative; z-index: 3;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 50px;
-      align-items: center;
-    }
-    .shop-hero-left .eyebrow {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
-      padding: 7px 18px 7px 7px;
-      border-radius: 30px;
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 22px;
-      backdrop-filter: blur(10px);
-    }
-    .shop-hero-left .eyebrow .dot {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: var(--orange);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(232,93,38,0.7); }
-      50% { box-shadow: 0 0 0 10px rgba(232,93,38,0); }
-    }
-    .shop-hero-left h1 {
-      font-size: 3.2rem;
-      font-weight: 900;
-      line-height: 1.08;
-      letter-spacing: -1px;
-      margin-bottom: 18px;
-    }
-    .shop-hero-left h1 span {
-      background: linear-gradient(90deg, var(--orange), var(--gold), var(--orange));
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shine 3s linear infinite;
-    }
+    @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, -20px) scale(1.08); } }
+    .shop-hero .container { position: relative; z-index: 3; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 50px; align-items: center; }
+    .shop-hero-left .eyebrow { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); padding: 7px 18px 7px 7px; border-radius: 30px; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px; backdrop-filter: blur(10px); }
+    .shop-hero-left .eyebrow .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,93,38,0.7); } 50% { box-shadow: 0 0 0 10px rgba(232,93,38,0); } }
+    .shop-hero-left h1 { font-size: 3.2rem; font-weight: 900; line-height: 1.08; letter-spacing: -1px; margin-bottom: 18px; }
+    .shop-hero-left h1 span { background: linear-gradient(90deg, var(--orange), var(--gold), var(--orange)); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shine 3s linear infinite; }
     @keyframes shine { to { background-position: 200% center; } }
-    .shop-hero-left p {
-      font-size: 1.05rem;
-      color: rgba(255,255,255,0.9);
-      max-width: 540px;
-      line-height: 1.75;
-      font-weight: 300;
-      margin-bottom: 28px;
-    }
-    .hero-search {
-      display: flex;
-      align-items: center;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 14px;
-      padding: 6px 6px 6px 18px;
-      backdrop-filter: blur(14px);
-      max-width: 560px;
-    }
-    .hero-search i {
-      color: rgba(255,255,255,0.7);
-      margin-right: 12px;
-      font-size: 1rem;
-    }
-    .hero-search input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 0.95rem;
-      padding: 12px 0;
-    }
+    .shop-hero-left p { font-size: 1.05rem; color: rgba(255,255,255,0.9); max-width: 540px; line-height: 1.75; font-weight: 300; margin-bottom: 28px; }
+    .hero-search { display: flex; align-items: center; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 6px 6px 6px 18px; backdrop-filter: blur(14px); max-width: 560px; }
+    .hero-search i { color: rgba(255,255,255,0.7); margin-right: 12px; font-size: 1rem; }
+    .hero-search input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 0.95rem; padding: 12px 0; }
     .hero-search input::placeholder { color: rgba(255,255,255,0.6); }
-    .hero-search button {
-      background: var(--orange);
-      color: #fff;
-      border: none;
-      padding: 12px 22px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.25s;
-      font-size: 0.88rem;
-    }
+    .hero-search button { background: var(--orange); color: #fff; border: none; padding: 12px 22px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.25s; font-size: 0.88rem; }
     .hero-search button:hover { background: #d44a15; transform: translateY(-1px); }
 
-    .shop-hero-card {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 24px;
-      padding: 32px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
-      animation: floatCard 6s ease-in-out infinite;
-    }
-    @keyframes floatCard {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
-    }
+    .shop-hero-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 32px; backdrop-filter: blur(20px); box-shadow: 0 30px 80px rgba(0,0,0,0.3); animation: floatCard 6s ease-in-out infinite; }
+    @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
     .shop-hero-card h3 { color: #fff; font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
     .shop-hero-card > p { color: rgba(255,255,255,0.7); font-size: 0.85rem; margin-bottom: 22px; }
     .hero-cat-list { display: flex; flex-direction: column; gap: 12px; }
-    .hero-cat-item {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px; border-radius: 14px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08);
-      transition: all 0.3s; cursor: pointer;
-    }
-    .hero-cat-item:hover {
-      background: rgba(255,255,255,0.14);
-      transform: translateX(6px);
-      border-color: rgba(232,93,38,0.4);
-    }
-    .hero-cat-item .cat-icon {
-      width: 42px; height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--orange), #d44a15);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1rem;
-      flex-shrink: 0;
-    }
+    .hero-cat-item { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s; cursor: pointer; }
+    .hero-cat-item:hover { background: rgba(255,255,255,0.14); transform: translateX(6px); border-color: rgba(232,93,38,0.4); }
+    .hero-cat-item .cat-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--orange), #d44a15); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; flex-shrink: 0; }
     .hero-cat-item:nth-child(2) .cat-icon { background: linear-gradient(135deg, var(--green), #0a5f2e); }
     .hero-cat-item:nth-child(3) .cat-icon { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
     .hero-cat-item:nth-child(4) .cat-icon { background: linear-gradient(135deg, var(--navy), var(--navy-deep)); }
     .hero-cat-item .cat-text { flex: 1; color: #fff; font-weight: 600; font-size: 0.92rem; }
-    .hero-cat-item .cat-text small {
-      display: block; font-size: 0.72rem;
-      color: rgba(255,255,255,0.55); font-weight: 500; margin-top: 2px;
-    }
-    .hero-cat-item i.arrow {
-      color: rgba(255,255,255,0.4); font-size: 0.8rem; transition: all 0.3s;
-    }
+    .hero-cat-item .cat-text small { display: block; font-size: 0.72rem; color: rgba(255,255,255,0.55); font-weight: 500; margin-top: 2px; }
+    .hero-cat-item i.arrow { color: rgba(255,255,255,0.4); font-size: 0.8rem; transition: all 0.3s; }
     .hero-cat-item:hover i.arrow { color: var(--orange); transform: translateX(4px); }
 
-    /* ============================================================
-       FILTER BAR
-       ============================================================ */
-    .filter-bar {
-      background: var(--bg-white);
-      border-bottom: 1px solid var(--border);
-      padding: 22px 0;
-      position: sticky;
-      top: 82px;
-      z-index: 900;
-      box-shadow: 0 4px 20px rgba(31, 58, 110, 0.05);
-    }
-    .filter-bar .container {
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 20px; flex-wrap: wrap;
-    }
+    /* FILTER BAR */
+    .filter-bar { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 22px 0; position: sticky; top: 82px; z-index: 900; box-shadow: 0 4px 20px rgba(31, 58, 110, 0.05); }
+    .filter-bar .container { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
     .filter-chips { display: flex; gap: 10px; flex-wrap: wrap; }
-    .chip {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 18px; border-radius: 30px;
-      background: var(--bg-light);
-      border: 1.5px solid var(--border);
-      color: var(--navy); font-weight: 600; font-size: 0.85rem;
-      cursor: pointer; transition: all 0.25s; user-select: none;
-    }
+    .chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 30px; background: var(--bg-light); border: 1.5px solid var(--border); color: var(--navy); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.25s; user-select: none; }
     .chip i { font-size: 0.85rem; color: var(--red); }
     .chip:hover { border-color: var(--navy); transform: translateY(-2px); }
-    .chip.active {
-      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      border-color: var(--navy); color: #fff;
-      box-shadow: 0 8px 20px rgba(30, 83, 180, 0.3);
-    }
+    .chip.active { background: linear-gradient(135deg, var(--navy), var(--navy-deep)); border-color: var(--navy); color: #fff; box-shadow: 0 8px 20px rgba(30, 83, 180, 0.3); }
     .chip.active i { color: var(--orange); }
-
     .filter-right { display: flex; align-items: center; gap: 12px; }
-    .sort-select {
-      padding: 11px 38px 11px 16px;
-      border-radius: 12px;
-      border: 1.5px solid var(--border);
-      background: var(--bg-white);
-      color: var(--navy); font-weight: 600; font-size: 0.85rem;
-      cursor: pointer; outline: none; appearance: none;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231e53b4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      transition: all 0.25s;
-    }
+    .sort-select { padding: 11px 38px 11px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg-white); color: var(--navy); font-weight: 600; font-size: 0.85rem; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231e53b4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; transition: all 0.25s; }
     .sort-select:hover { border-color: var(--navy); }
-
     .results-count { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
     .results-count strong { color: var(--navy); }
 
-    /* ============================================================
-       PRODUCTS GRID
-       ============================================================ */
+    /* PRODUCTS GRID */
     .products-section { padding: 60px 0 100px; background: var(--bg-light); }
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 26px;
-    }
-    .product-card {
-      background: var(--bg-white);
-      border-radius: 22px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 6px 20px rgba(31, 58, 110, 0.05);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex; flex-direction: column;
-      position: relative;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: cardIn 0.6s ease forwards;
-    }
+    .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+    .product-card { background: var(--bg-white); border-radius: 22px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 6px 20px rgba(31, 58, 110, 0.05); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; position: relative; opacity: 0; transform: translateY(30px); animation: cardIn 0.6s ease forwards; }
     @keyframes cardIn { to { opacity: 1; transform: translateY(0); } }
-    .product-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 30px 60px rgba(31, 58, 110, 0.15);
-      border-color: transparent;
-    }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 30px 60px rgba(31, 58, 110, 0.15); border-color: transparent; }
 
-    .product-image-wrap {
-      position: relative;
-      height: 240px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #f0f4fa, #e6ecf5);
-    }
-    .product-image-wrap img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    .product-image-wrap { position: relative; height: 240px; overflow: hidden; background: linear-gradient(135deg, #f0f4fa, #e6ecf5); }
+    .product-image-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
     .product-card:hover .product-image-wrap img { transform: scale(1.1) rotate(-1.5deg); }
-    .product-image-wrap::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, transparent 55%, rgba(30,83,180,0.15));
-      pointer-events: none;
-    }
+    .product-image-wrap::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(30,83,180,0.15)); pointer-events: none; }
 
-    .read-more-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, transparent 40%, rgba(18,50,110,0.75));
-      display: flex; align-items: flex-end; justify-content: center;
-      padding: 20px; opacity: 0;
-      transition: opacity 0.35s ease;
-      z-index: 2;
-    }
+    .read-more-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(18,50,110,0.75)); display: flex; align-items: flex-end; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.35s ease; z-index: 2; }
     .product-card:hover .read-more-overlay { opacity: 1; }
-    .read-more-btn {
-      background: rgba(255,255,255,0.95);
-      color: var(--navy);
-      border: none;
-      padding: 12px 22px;
-      border-radius: 30px;
-      font-weight: 800; font-size: 0.82rem;
-      letter-spacing: 1px; text-transform: uppercase;
-      cursor: pointer;
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      transform: translateY(10px);
-      transition: all 0.3s;
-      backdrop-filter: blur(10px);
-    }
+    .read-more-btn { background: rgba(255,255,255,0.95); color: var(--navy); border: none; padding: 12px 22px; border-radius: 30px; font-weight: 800; font-size: 0.82rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: translateY(10px); transition: all 0.3s; backdrop-filter: blur(10px); }
     .product-card:hover .read-more-btn { transform: translateY(0); }
-    .read-more-btn:hover {
-      background: var(--orange); color: #fff;
-      transform: translateY(-2px) scale(1.04);
-    }
+    .read-more-btn:hover { background: var(--orange); color: #fff; transform: translateY(-2px) scale(1.04); }
 
-    .product-badges {
-      position: absolute; top: 14px; left: 14px;
-      display: flex; flex-direction: column; gap: 6px;
-      z-index: 3;
-    }
-    .badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 11px; border-radius: 30px;
-      font-size: 0.65rem; font-weight: 800;
-      letter-spacing: 0.8px; text-transform: uppercase;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
+    .product-badges { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 6px; z-index: 3; }
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 30px; font-size: 0.65rem; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .badge-new { background: linear-gradient(135deg, var(--green), #0a5f2e); }
     .badge-hot { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
     .badge-sale { background: linear-gradient(135deg, var(--orange), #d44a15); }
     .badge i { font-size: 0.6rem; }
 
-    .product-body {
-      padding: 22px 20px 24px;
-      flex: 1; display: flex; flex-direction: column;
-    }
-    .product-cat {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.68rem; font-weight: 800;
-      color: var(--red); letter-spacing: 1.2px;
-      text-transform: uppercase; margin-bottom: 10px;
-    }
-    .product-cat::before {
-      content: ''; width: 14px; height: 2px;
-      background: var(--red); border-radius: 2px;
-    }
-    .product-title {
-      font-size: 1.02rem; color: var(--navy);
-      font-weight: 800; line-height: 1.35;
-      margin-bottom: 8px; min-height: 2.7em;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      transition: color 0.25s;
-    }
+    .product-body { padding: 22px 20px 24px; flex: 1; display: flex; flex-direction: column; }
+    .product-cat { display: inline-flex; align-items: center; gap: 6px; font-size: 0.68rem; font-weight: 800; color: var(--red); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 10px; }
+    .product-cat::before { content: ''; width: 14px; height: 2px; background: var(--red); border-radius: 2px; }
+    .product-title { font-size: 1.02rem; color: var(--navy); font-weight: 800; line-height: 1.35; margin-bottom: 8px; min-height: 2.7em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.25s; }
     .product-card:hover .product-title { color: var(--red); }
-
     .product-rating { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
     .stars { color: var(--gold); font-size: 0.75rem; letter-spacing: 1px; }
     .product-rating small { color: var(--text-muted); font-size: 0.74rem; font-weight: 600; }
-
-    .product-footer {
-      display: flex; align-items: center;
-      justify-content: space-between; gap: 10px;
-      margin-top: auto; padding-top: 16px;
-      border-top: 1px dashed var(--border);
-    }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 16px; border-top: 1px dashed var(--border); }
     .product-price { display: flex; flex-direction: column; }
-    .product-price .price {
-      font-size: 1.15rem; font-weight: 900;
-      color: var(--navy); line-height: 1; letter-spacing: -0.5px;
-    }
-    .product-price .old-price {
-      font-size: 0.75rem; color: var(--text-muted);
-      text-decoration: line-through; margin-top: 3px;
-    }
-
-    .btn-add {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
-      color: #fff; border: none;
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: all 0.3s;
-      font-size: 1rem;
-      box-shadow: 0 6px 16px rgba(200,16,46,0.25);
-    }
+    .product-price .price { font-size: 1.15rem; font-weight: 900; color: var(--navy); line-height: 1; letter-spacing: -0.5px; }
+    .product-price .old-price { font-size: 0.75rem; color: var(--text-muted); text-decoration: line-through; margin-top: 3px; }
+    .btn-add { background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fff; border: none; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; font-size: 1rem; box-shadow: 0 6px 16px rgba(200,16,46,0.25); }
     .btn-add:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 25px rgba(200,16,46,0.45); }
     .btn-add:active { transform: scale(0.95); }
 
@@ -970,249 +323,92 @@
     .empty-state i { font-size: 4rem; color: var(--border); margin-bottom: 20px; }
     .empty-state h3 { font-size: 1.4rem; color: var(--navy); font-weight: 800; margin-bottom: 10px; }
     .empty-state p { color: var(--text-muted); margin-bottom: 22px; }
-    .empty-state button {
-      background: var(--navy); color: #fff;
-      border: none; padding: 12px 24px;
-      border-radius: 10px; font-weight: 700; cursor: pointer;
-      transition: all 0.25s;
-    }
+    .empty-state button { background: var(--navy); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.25s; }
     .empty-state button:hover { background: var(--red); transform: translateY(-2px); }
 
-    /* ============================================================
-       ADD-TO-CART MODAL
-       ============================================================ */
-    .atc-modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(15,23,41,0.55);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-      opacity: 0; visibility: hidden;
-      transition: all 0.35s;
-    }
+    /* Loading skeleton */
+    .products-skeleton { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+    .skeleton-card { background: #fff; border-radius: 22px; overflow: hidden; border: 1px solid var(--border); }
+    .skeleton-img { height: 240px; background: linear-gradient(90deg, #f0f4fa 25%, #e6ecf5 50%, #f0f4fa 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    .skeleton-body { padding: 22px 20px 24px; }
+    .skeleton-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #f0f4fa 25%, #e6ecf5 50%, #f0f4fa 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; margin-bottom: 10px; }
+    .skeleton-line.w-40 { width: 40%; }
+    .skeleton-line.w-80 { width: 80%; }
+    .skeleton-line.w-60 { width: 60%; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ADD-TO-CART MODAL */
+    .atc-modal-overlay { position: fixed; inset: 0; background: rgba(15,23,41,0.55); backdrop-filter: blur(8px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; visibility: hidden; transition: all 0.35s; }
     .atc-modal-overlay.open { opacity: 1; visibility: visible; }
-    .atc-modal {
-      background: #fff;
-      border-radius: 20px;
-      width: 100%; max-width: 560px;
-      max-height: 92vh; overflow-y: auto;
-      padding: 32px 34px 30px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.35);
-      position: relative;
-      transform: translateY(20px) scale(0.98);
-      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-    }
+    .atc-modal { background: #fff; border-radius: 20px; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; padding: 32px 34px 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); position: relative; transform: translateY(20px) scale(0.98); transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
     .atc-modal-overlay.open .atc-modal { transform: translateY(0) scale(1); }
-    .atc-close {
-      position: absolute; top: 18px; right: 20px;
-      background: none; border: none;
-      width: 34px; height: 34px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      color: #94a3b8; font-size: 1.2rem; cursor: pointer;
-      transition: all 0.2s;
-    }
+    .atc-close { position: absolute; top: 18px; right: 20px; background: none; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
     .atc-close:hover { background: #f1f5f9; color: var(--red); transform: rotate(90deg); }
-    .atc-title {
-      font-size: 1.9rem; font-weight: 900;
-      color: #0f1729; letter-spacing: -0.5px;
-      margin-bottom: 6px;
-    }
-    .atc-product-name {
-      font-size: 1rem; color: #64748b; font-weight: 500;
-      padding-bottom: 20px;
-      border-bottom: 1px solid #e2e8f0;
-      margin-bottom: 24px;
-    }
-    .atc-section-label {
-      font-size: 0.95rem; font-weight: 700;
-      color: #0f1729; margin-bottom: 12px; display: block;
-    }
-    .pack-options {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-    .pack-btn {
-      flex: 1 1 auto; min-width: 110px;
-      padding: 12px 16px; border-radius: 30px;
-      border: 1.5px solid #d7dee8; background: #fff;
-      color: #1e3a5f; font-weight: 700; font-size: 0.9rem;
-      cursor: pointer; transition: all 0.2s;
-      text-align: center; font-family: inherit;
-    }
+    .atc-title { font-size: 1.9rem; font-weight: 900; color: #0f1729; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .atc-product-name { font-size: 1rem; color: #64748b; font-weight: 500; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; }
+    .atc-section-label { font-size: 0.95rem; font-weight: 700; color: #0f1729; margin-bottom: 12px; display: block; }
+    .pack-options { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .pack-btn { flex: 1 1 auto; min-width: 110px; padding: 12px 16px; border-radius: 30px; border: 1.5px solid #d7dee8; background: #fff; color: #1e3a5f; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; text-align: center; font-family: inherit; }
     .pack-btn:hover { border-color: var(--navy); background: #f7fafd; }
-    .pack-btn.active {
-      background: var(--navy); border-color: var(--navy);
-      color: #fff;
-      box-shadow: 0 6px 18px rgba(30,83,180,0.3);
-    }
-    .pack-btn .pack-price-hint {
-      display: block; font-size: 0.72rem;
-      font-weight: 600; opacity: 0.75; margin-top: 2px;
-    }
+    .pack-btn.active { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 6px 18px rgba(30,83,180,0.3); }
+    .pack-btn .pack-price-hint { display: block; font-size: 0.72rem; font-weight: 600; opacity: 0.75; margin-top: 2px; }
     .pack-btn.active .pack-price-hint { color: rgba(255,255,255,0.9); }
-
     .qty-input-wrap { position: relative; margin-bottom: 24px; }
-    .qty-input {
-      width: 100%; padding: 14px 18px;
-      border: 1.5px solid #d7dee8; border-radius: 12px;
-      font-size: 1rem; font-weight: 600;
-      color: #0f1729; background: #fff;
-      outline: none; font-family: inherit;
-      transition: border-color 0.2s;
-    }
+    .qty-input { width: 100%; padding: 14px 18px; border: 1.5px solid #d7dee8; border-radius: 12px; font-size: 1rem; font-weight: 600; color: #0f1729; background: #fff; outline: none; font-family: inherit; transition: border-color 0.2s; }
     .qty-input:focus { border-color: var(--navy); }
-
-    .price-summary {
-      background: #f7f9fc; border-radius: 16px;
-      padding: 22px 24px; margin-bottom: 24px;
-    }
-    .price-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 0; font-size: 0.95rem;
-      color: #475569; font-weight: 500;
-    }
+    .price-summary { background: #f7f9fc; border-radius: 16px; padding: 22px 24px; margin-bottom: 24px; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 0.95rem; color: #475569; font-weight: 500; }
     .price-row .val { font-weight: 700; color: #0f1729; }
     .price-divider { height: 1px; background: #e2e8f0; margin: 12px 0; }
-    .price-row.total {
-      font-size: 1.1rem; color: #0f1729;
-      font-weight: 900; padding-top: 4px;
-    }
+    .price-row.total { font-size: 1.1rem; color: #0f1729; font-weight: 900; padding-top: 4px; }
     .price-row.total .val { color: #0f1729; }
-
-    .atc-submit {
-      width: 100%; padding: 18px;
-      background: var(--navy); color: #fff; border: none;
-      border-radius: 40px; font-size: 1.05rem;
-      font-weight: 800; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: all 0.25s;
-      box-shadow: 0 10px 25px rgba(30,83,180,0.35);
-    }
+    .atc-submit { width: 100%; padding: 18px; background: var(--navy); color: #fff; border: none; border-radius: 40px; font-size: 1.05rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.25s; box-shadow: 0 10px 25px rgba(30,83,180,0.35); }
     .atc-submit:hover { background: #173f8a; transform: translateY(-2px); box-shadow: 0 15px 35px rgba(30,83,180,0.45); }
     .atc-submit:disabled { background: #b0b8c0; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* FLOATING CART BUTTON */
-    .cart-toggle {
-      position: fixed; bottom: 100px; right: 25px;
-      width: 62px; height: 62px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
-      color: #fff; border: none;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; cursor: pointer;
-      box-shadow: 0 10px 30px rgba(30,83,180,0.45);
-      z-index: 998; transition: all 0.3s;
-      text-decoration: none;
-    }
+    .cart-toggle { position: fixed; bottom: 100px; right: 25px; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; box-shadow: 0 10px 30px rgba(30,83,180,0.45); z-index: 998; transition: all 0.3s; }
     .cart-toggle:hover { transform: scale(1.1) rotate(-8deg); }
-    .cart-count {
-      position: absolute; top: -6px; right: -6px;
-      background: var(--red); color: #fff;
-      min-width: 24px; height: 24px; border-radius: 12px;
-      font-size: 0.72rem; font-weight: 800;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 6px; border: 2px solid var(--bg-white);
-    }
+    .cart-count { position: absolute; top: -6px; right: -6px; background: var(--red); color: #fff; min-width: 24px; height: 24px; border-radius: 12px; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 6px; border: 2px solid var(--bg-white); }
 
-    /* TOAST */
-    .toast-message {
-      position: fixed; bottom: 30px; left: 30px;
-      padding: 16px 24px; background: #e5f4e6;
-      border-radius: 60px; color: var(--green);
-      font-weight: 700; font-size: 0.9rem;
-      display: none; align-items: center; gap: 12px;
-      border: 1px solid #b8d9b8;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      z-index: 3000; animation: slideUp 0.3s ease;
-    }
+    .toast-message { position: fixed; bottom: 30px; left: 30px; padding: 16px 24px; background: #e5f4e6; border-radius: 60px; color: var(--green); font-weight: 700; font-size: 0.9rem; display: none; align-items: center; gap: 12px; border: 1px solid #b8d9b8; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 3000; animation: slideUp 0.3s ease; }
     .toast-message.show { display: flex; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     /* FOOTER */
-    .footer {
-      background: var(--navy-deep); color: #c8d2e6;
-      padding: 65px 0 0; font-size: 0.9rem;
-      border-top: 4px solid var(--red);
-    }
-    .footer-grid {
-      display: grid; grid-template-columns: 1.5fr 1fr 1.2fr 1.3fr;
-      gap: 40px; padding-bottom: 45px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .footer-brand .logo {
-      font-size: 1.5rem; margin-bottom: 15px;
-      display: inline-flex; color: #fff;
-    }
+    .footer { background: var(--navy-deep); color: #c8d2e6; padding: 65px 0 0; font-size: 0.9rem; border-top: 4px solid var(--red); }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1.2fr 1.3fr; gap: 40px; padding-bottom: 45px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .footer-brand .logo { font-size: 1.5rem; margin-bottom: 15px; display: inline-flex; color: #fff; }
     .footer-brand .logo-mark .rise { color: #fff; }
     .footer-brand .logo-mark .axis { color: var(--orange); }
     .footer-brand .logo-sub { color: var(--orange); }
     .footer-brand p { margin-bottom: 20px; color: #a8b4cc; line-height: 1.65; }
     .footer-social { display: flex; gap: 12px; }
-    .footer-social a {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; transition: background 0.2s, transform 0.2s;
-    }
+    .footer-social a { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: #fff; transition: background 0.2s, transform 0.2s; }
     .footer-social a:hover { background: var(--red); transform: translateY(-2px); }
-    .footer h4 {
-      color: #fff; font-size: 1rem; margin-bottom: 20px;
-      position: relative; padding-bottom: 10px;
-    }
-    .footer h4::after {
-      content: ''; position: absolute; bottom: 0; left: 0;
-      width: 40px; height: 3px; background: var(--orange); border-radius: 2px;
-    }
+    .footer h4 { color: #fff; font-size: 1rem; margin-bottom: 20px; position: relative; padding-bottom: 10px; }
+    .footer h4::after { content: ''; position: absolute; bottom: 0; left: 0; width: 40px; height: 3px; background: var(--orange); border-radius: 2px; }
     .footer ul li { margin-bottom: 10px; }
     .footer ul a { color: #a8b4cc; transition: color 0.2s; }
     .footer ul a:hover { color: var(--orange); }
     .footer-contact li { display: flex; gap: 10px; margin-bottom: 14px; color: #a8b4cc; }
     .footer-contact i { color: var(--orange); margin-top: 3px; }
-    .newsletter-form {
-      display: flex; margin-top: 15px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 8px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .newsletter-form input {
-      flex: 1; padding: 12px 15px;
-      background: transparent; border: none;
-      color: #fff; outline: none; font-size: 0.9rem;
-    }
+    .newsletter-form { display: flex; margin-top: 15px; background: rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+    .newsletter-form input { flex: 1; padding: 12px 15px; background: transparent; border: none; color: #fff; outline: none; font-size: 0.9rem; }
     .newsletter-form input::placeholder { color: #7a88a8; }
-    .newsletter-form button {
-      background: var(--red); color: #fff;
-      border: none; padding: 0 20px;
-      cursor: pointer; font-weight: 700;
-    }
+    .newsletter-form button { background: var(--red); color: #fff; border: none; padding: 0 20px; cursor: pointer; font-weight: 700; }
     .newsletter-form button:hover { background: var(--red-dark); }
-    .footer-bottom {
-      padding: 22px 0; text-align: center;
-      color: #7a88a8; font-size: 0.85rem;
-    }
-
-    /* WHATSAPP */
-    .whatsapp-float {
-      position: fixed; bottom: 25px; right: 25px;
-      background: var(--green); color: #fff;
-      width: 58px; height: 58px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      box-shadow: 0 6px 20px rgba(14, 122, 60, 0.45);
-      z-index: 999; transition: transform 0.3s;
-    }
+    .footer-bottom { padding: 22px 0; text-align: center; color: #7a88a8; font-size: 0.85rem; }
+    .whatsapp-float { position: fixed; bottom: 25px; right: 25px; background: var(--green); color: #fff; width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 6px 20px rgba(14, 122, 60, 0.45); z-index: 999; transition: transform 0.3s; }
     .whatsapp-float:hover { transform: scale(1.1); }
 
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
+    /* RESPONSIVE */
     @media (max-width: 1200px) {
       .nav-links { gap: 2px; font-size: 0.86rem; }
       .nav-links > li > a { padding: 8px 10px; }
       .btn-signin { padding: 10px 16px; font-size: 0.82rem; }
     }
     @media (max-width: 1100px) {
-      .products-grid { grid-template-columns: repeat(3, 1fr); }
+      .products-grid, .products-skeleton { grid-template-columns: repeat(3, 1fr); }
       .shop-hero .container { grid-template-columns: 1fr; gap: 50px; }
       .shop-hero-card { max-width: 520px; }
       .shop-hero-left h1 { font-size: 2.6rem; }
@@ -1225,7 +421,7 @@
     @media (max-width: 992px) {
       .top-bar .container { flex-direction: column; align-items: flex-start; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .products-grid, .products-skeleton { grid-template-columns: repeat(2, 1fr); }
       .filter-bar { top: auto; position: relative; }
     }
     @media (max-width: 768px) {
@@ -1238,8 +434,8 @@
       .hero-search button { width: 100%; }
       .filter-chips { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 6px; }
       .chip { flex-shrink: 0; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-      .product-image-wrap { height: 180px; }
+      .products-grid, .products-skeleton { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .product-image-wrap, .skeleton-img { height: 180px; }
       .product-body { padding: 16px 14px 18px; }
       .product-title { font-size: 0.92rem; }
       .footer-grid { grid-template-columns: 1fr; gap: 36px; }
@@ -1252,8 +448,8 @@
       .search-close { width: 36px; height: 36px; }
     }
     @media (max-width: 480px) {
-      .products-grid { grid-template-columns: 1fr; }
-      .product-image-wrap { height: 240px; }
+      .products-grid, .products-skeleton { grid-template-columns: 1fr; }
+      .product-image-wrap, .skeleton-img { height: 240px; }
       .shop-hero-left h1 { font-size: 1.7rem; }
       .sort-select { width: 100%; }
       .filter-right { width: 100%; justify-content: space-between; }
@@ -1266,34 +462,21 @@
 </head>
 <body>
 
-  <!-- ========== TOP BAR ========== -->
+  <!-- TOP BAR -->
   <div class="top-bar">
     <div class="container">
-      <div class="top-item">
-        <i class="fas fa-phone-alt"></i>
-        <span><strong>Phone:</strong> +254 725 538 297</span>
-      </div>
-      <div class="top-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <span><strong>Office:</strong> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</span>
-      </div>
-      <div class="top-item">
-        <i class="fas fa-envelope"></i>
-        <span><strong>Email:</strong> contact@riseaxissolutions.com</span>
-      </div>
+      <div class="top-item"><i class="fas fa-phone-alt"></i><span><strong>Phone:</strong> +254 725 538 297</span></div>
+      <div class="top-item"><i class="fas fa-map-marker-alt"></i><span><strong>Office:</strong> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</span></div>
+      <div class="top-item"><i class="fas fa-envelope"></i><span><strong>Email:</strong> contact@riseaxissolutions.com</span></div>
     </div>
   </div>
 
-  <!-- ========== NAVIGATION ========== -->
+  <!-- NAVIGATION -->
   <nav class="main-nav" id="mainNav">
     <div class="container">
-
       <a href="../index.html" class="logo">
         <div>
-          <span class="logo-mark">
-            <span class="rise">RISE</span>
-            <span class="axis">AXIS</span>
-          </span>
+          <span class="logo-mark"><span class="rise">RISE</span><span class="axis">AXIS</span></span>
           <span class="logo-sub">SOLUTIONS LTD</span>
         </div>
       </a>
@@ -1304,10 +487,10 @@
         <li class="dropdown">
           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
           <ul class="dropdown-menu">
-            <li><a href="product.html"><i class="fas fa-flask"></i> Feed Additives</a></li>
-            <li><a href="product.html"><i class="fas fa-syringe"></i> Veterinary Products</a></li>
-            <li><a href="product.html"><i class="fas fa-prescription-bottle"></i> Injectables</a></li>
-            <li><a href="product.html"><i class="fas fa-capsules"></i> Premixes</a></li>
+            <li><a href="shop.html?category=feed-additives"><i class="fas fa-flask"></i> Feed Additives</a></li>
+            <li><a href="shop.html?category=veterinary"><i class="fas fa-syringe"></i> Veterinary Products</a></li>
+            <li><a href="shop.html?category=injectables"><i class="fas fa-prescription-bottle"></i> Injectables</a></li>
+            <li><a href="shop.html?category=premixes"><i class="fas fa-capsules"></i> Premixes</a></li>
           </ul>
         </li>
         <li><a href="blog.html">Blog</a></li>
@@ -1319,12 +502,10 @@
         <button class="search-icon" aria-label="Search" onclick="openSearch()">
           <i class="fas fa-search"></i>
         </button>
-
         <a href="cart.html" class="cart-icon-btn" aria-label="View cart">
           <i class="fas fa-shopping-bag"></i>
           <span class="cart-badge-nav" id="navCartBadge">0</span>
         </a>
-
         <span id="authLinks" class="auth-actions">
           <div class="signin-dropdown">
             <button class="btn-signin" type="button">
@@ -1333,24 +514,11 @@
               <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
             </button>
             <div class="signin-menu">
-              <a href="login.html">
-                <i class="fas fa-sign-in-alt"></i>
-                <div>
-                  <strong>Login</strong>
-                  <small>I already have an account</small>
-                </div>
-              </a>
-              <a href="register.html">
-                <i class="fas fa-user-plus"></i>
-                <div>
-                  <strong>Create Account</strong>
-                  <small>New to Rise Axis</small>
-                </div>
-              </a>
+              <a href="login.html"><i class="fas fa-sign-in-alt"></i><div><strong>Login</strong><small>I already have an account</small></div></a>
+              <a href="register.html"><i class="fas fa-user-plus"></i><div><strong>Create Account</strong><small>New to Rise Axis</small></div></a>
             </div>
           </div>
         </span>
-
         <span id="userLinks" class="auth-actions" style="display:none;">
           <div class="signin-dropdown">
             <button class="btn-signin" type="button">
@@ -1359,20 +527,8 @@
               <i class="fas fa-chevron-down" style="font-size:0.6rem;margin-left:2px;"></i>
             </button>
             <div class="signin-menu">
-              <a href="account.html">
-                <i class="fas fa-user"></i>
-                <div>
-                  <strong>My Account</strong>
-                  <small>Orders & profile</small>
-                </div>
-              </a>
-              <a href="#" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                <div>
-                  <strong>Logout</strong>
-                  <small>Sign out</small>
-                </div>
-              </a>
+              <a href="account.html"><i class="fas fa-user"></i><div><strong>My Account</strong><small>Orders & profile</small></div></a>
+              <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><div><strong>Logout</strong><small>Sign out</small></div></a>
             </div>
           </div>
         </span>
@@ -1384,27 +540,19 @@
           <span class="cart-badge-nav" id="navCartBadgeMob">0</span>
         </a>
         <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
-          <span></span>
-          <span></span>
-          <span></span>
+          <span></span><span></span><span></span>
         </button>
       </div>
-
     </div>
   </nav>
 
-  <!-- ========== SEARCH OVERLAY ========== -->
+  <!-- SEARCH OVERLAY -->
   <div class="search-overlay" id="searchOverlay">
     <div class="search-panel">
       <div class="search-panel-header">
         <i class="fas fa-search"></i>
         <div class="search-input-wrap">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search products, pages, categories..."
-            autocomplete="off"
-          >
+          <input type="text" id="searchInput" placeholder="Search products, pages, categories..." autocomplete="off">
         </div>
         <button class="search-close" onclick="closeSearch()" aria-label="Close search">
           <i class="fas fa-times"></i>
@@ -1420,18 +568,13 @@
     </div>
   </div>
 
-  <!-- ========== MOBILE SLIDE MENU ========== -->
+  <!-- MOBILE SLIDE MENU -->
   <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-
   <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
-
     <div class="mobile-menu-header">
       <a href="../index.html" class="logo">
         <div>
-          <span class="logo-mark">
-            <span class="rise">RISE</span>
-            <span class="axis">AXIS</span>
-          </span>
+          <span class="logo-mark"><span class="rise">RISE</span><span class="axis">AXIS</span></span>
           <span class="logo-sub">SOLUTIONS LTD</span>
         </div>
       </a>
@@ -1451,20 +594,18 @@
     <ul class="mobile-menu-links">
       <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
       <li><a href="aboutUs.html"><i class="fas fa-users"></i> About Us</a></li>
-
       <li class="mobile-dropdown">
         <button class="mobile-dropdown-toggle" id="mobileProductsToggle" aria-expanded="false">
           <span><i class="fas fa-box"></i> Products</span>
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
-          <li><a href="product.html">Feed Additives</a></li>
-          <li><a href="product.html">Veterinary Products</a></li>
-          <li><a href="product.html">Injectables</a></li>
-          <li><a href="product.html">Premixes</a></li>
+          <li><a href="shop.html?category=feed-additives">Feed Additives</a></li>
+          <li><a href="shop.html?category=veterinary">Veterinary Products</a></li>
+          <li><a href="shop.html?category=injectables">Injectables</a></li>
+          <li><a href="shop.html?category=premixes">Premixes</a></li>
         </ul>
       </li>
-
       <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog</a></li>
       <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
       <li><a href="shop.html" class="active"><i class="fas fa-store"></i> Shop</a></li>
@@ -1472,21 +613,12 @@
     </ul>
 
     <div class="mobile-menu-auth" id="mobileAuthSection">
-      <a href="login.html" class="mobile-auth-btn mobile-auth-outline">
-        <i class="fas fa-sign-in-alt"></i> Login
-      </a>
-      <a href="register.html" class="mobile-auth-btn mobile-auth-primary">
-        <i class="fas fa-user-plus"></i> Create Account
-      </a>
+      <a href="login.html" class="mobile-auth-btn mobile-auth-outline"><i class="fas fa-sign-in-alt"></i> Login</a>
+      <a href="register.html" class="mobile-auth-btn mobile-auth-primary"><i class="fas fa-user-plus"></i> Create Account</a>
     </div>
-
     <div class="mobile-menu-auth" id="mobileUserSection" style="display:none;">
-      <a href="account.html" class="mobile-auth-btn mobile-auth-primary">
-        <i class="fas fa-user-circle"></i> My Account
-      </a>
-      <a href="#" id="mobileLogoutBtn" class="mobile-auth-btn mobile-auth-danger">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </a>
+      <a href="account.html" class="mobile-auth-btn mobile-auth-primary"><i class="fas fa-user-circle"></i> My Account</a>
+      <a href="#" id="mobileLogoutBtn" class="mobile-auth-btn mobile-auth-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
     <div class="mobile-menu-footer">
@@ -1495,10 +627,9 @@
         <span><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</span>
       </div>
     </div>
-
   </aside>
 
-  <!-- ========== SHOP HERO ========== -->
+  <!-- SHOP HERO -->
   <section class="shop-hero">
     <div class="shop-hero-orb shop-hero-orb-1"></div>
     <div class="shop-hero-orb shop-hero-orb-2"></div>
@@ -1522,7 +653,7 @@
       <div class="shop-hero-card">
         <h3>Shop by Category</h3>
         <p>Jump straight to what you need.</p>
-        <div class="hero-cat-list">
+        <div class="hero-cat-list" id="heroCatList">
           <div class="hero-cat-item" onclick="filterCategory('feed-additives')">
             <div class="cat-icon"><i class="fas fa-flask"></i></div>
             <div class="cat-text">Feed Additives<small>Boost nutrition & growth</small></div>
@@ -1548,7 +679,7 @@
     </div>
   </section>
 
-  <!-- ========== FILTER BAR ========== -->
+  <!-- FILTER BAR -->
   <div class="filter-bar">
     <div class="container">
       <div class="filter-chips" id="filterChips">
@@ -1560,7 +691,7 @@
       </div>
 
       <div class="filter-right">
-        <span class="results-count"><strong id="resultCount">12</strong> products</span>
+        <span class="results-count"><strong id="resultCount">—</strong> products</span>
         <select class="sort-select" id="sortSelect">
           <option value="featured">Featured</option>
           <option value="price-low">Price: Low to High</option>
@@ -1572,7 +703,7 @@
     </div>
   </div>
 
-  <!-- ========== PRODUCTS GRID ========== -->
+  <!-- PRODUCTS GRID -->
   <section class="products-section">
     <div class="container">
       <div class="products-grid" id="productsGrid"></div>
@@ -1585,73 +716,51 @@
     </div>
   </section>
 
-  <!-- ========== ADD-TO-CART MODAL ========== -->
+  <!-- ADD-TO-CART MODAL -->
   <div class="atc-modal-overlay" id="atcModal">
     <div class="atc-modal">
       <button class="atc-close" onclick="closeAtcModal()" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
-
       <h2 class="atc-title">Add to Cart</h2>
       <div class="atc-product-name" id="atcProductName">—</div>
-
       <label class="atc-section-label">Select Packaging</label>
       <div class="pack-options" id="atcPackOptions"></div>
-
       <label class="atc-section-label" for="atcQty">Number of Items</label>
       <div class="qty-input-wrap">
         <input type="number" class="qty-input" id="atcQty" value="1" min="1" step="1">
       </div>
-
       <div class="price-summary">
-        <div class="price-row">
-          <span>Price per unit</span>
-          <span class="val" id="atcUnitPrice">KES 0</span>
-        </div>
-        <div class="price-row">
-          <span>Selected pack</span>
-          <span class="val" id="atcPackLabel">—</span>
-        </div>
-        <div class="price-row">
-          <span>Quantity</span>
-          <span class="val" id="atcQtyLabel">1</span>
-        </div>
+        <div class="price-row"><span>Price per unit</span><span class="val" id="atcUnitPrice">KES 0</span></div>
+        <div class="price-row"><span>Selected pack</span><span class="val" id="atcPackLabel">—</span></div>
+        <div class="price-row"><span>Quantity</span><span class="val" id="atcQtyLabel">1</span></div>
         <div class="price-divider"></div>
-        <div class="price-row total">
-          <span>Total</span>
-          <span class="val" id="atcTotal">KES 0</span>
-        </div>
+        <div class="price-row total"><span>Total</span><span class="val" id="atcTotal">KES 0</span></div>
       </div>
-
       <button class="atc-submit" id="atcSubmitBtn" onclick="submitAddToCart()">
         <i class="fas fa-shopping-cart"></i> Add to Cart
       </button>
     </div>
   </div>
 
-  <!-- FLOATING CART -->
   <a href="cart.html" class="cart-toggle" aria-label="Open cart">
     <i class="fas fa-shopping-bag"></i>
     <span class="cart-count" id="cartCount">0</span>
   </a>
 
-  <!-- TOAST -->
   <div class="toast-message" id="toastMessage">
     <i class="fas fa-check-circle"></i>
     <span id="toastText">Item added</span>
   </div>
 
-  <!-- ========== FOOTER ========== -->
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="../index.html" class="logo">
             <div>
-              <span class="logo-mark">
-                <span class="rise">RISE</span>
-                <span class="axis">AXIS</span>
-              </span>
+              <span class="logo-mark"><span class="rise">RISE</span><span class="axis">AXIS</span></span>
               <span class="logo-sub">SOLUTIONS LTD</span>
             </div>
           </a>
@@ -1662,17 +771,15 @@
             <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
           </div>
         </div>
-
         <div>
           <h4>Information</h4>
           <ul>
             <li><a href="aboutUs.html">About Us</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="product.html">Shop Now</a></li>
+            <li><a href="shop.html">Shop Now</a></li>
           </ul>
         </div>
-
         <div>
           <h4>Get In Touch</h4>
           <ul class="footer-contact">
@@ -1681,7 +788,6 @@
             <li><i class="fas fa-phone-alt"></i> +254 725 538 297</li>
           </ul>
         </div>
-
         <div>
           <h4>Newsletter</h4>
           <p style="color: #a8b4cc; margin-bottom: 0;">Subscribe for agri-tips, product updates, and offers.</p>
@@ -1691,7 +797,6 @@
           </form>
         </div>
       </div>
-
       <div class="footer-bottom">
         Copyright © 2026 <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
       </div>
@@ -1710,395 +815,153 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    /* ---------- STICKY NAV ---------- */
-    const nav = document.getElementById('mainNav');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 30) nav.classList.add('scrolled');
-      else nav.classList.remove('scrolled');
-    });
-
     /* ============================================================
-       SEARCH
+       STATE
        ============================================================ */
-    const SEARCH_INDEX = [
-      { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
-      { type: 'product', name: 'VitaMin Plus Supplement', cat: 'Feed Additives', price: 1890, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Complete vitamin and mineral blend for livestock.' },
-      { type: 'product', name: 'EnzymeMax Digestive Aid', cat: 'Feed Additives', price: 3200, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Powerful enzyme complex for digestion and nutrient absorption.' },
-      { type: 'product', name: 'VetCare Antibiotic Powder', cat: 'Veterinary Products', price: 1750, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', desc: 'Broad-spectrum antibiotic for common infections.' },
-      { type: 'product', name: 'Dewormer Oral Suspension', cat: 'Veterinary Products', price: 980, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Effective oral dewormer against internal parasites.' },
-      { type: 'product', name: 'Skin Heal Topical Spray', cat: 'Veterinary Products', price: 1250, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Fast-acting spray for wounds and skin conditions.' },
-      { type: 'product', name: 'Oxytetracycline Injection', cat: 'Injectables', price: 1450, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Broad-spectrum injectable antibiotic.' },
-      { type: 'product', name: 'Ivermectin Injectable 1%', cat: 'Injectables', price: 2100, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Antiparasitic injectable for internal and external parasites.' },
-      { type: 'product', name: 'Vitamin B-Complex Injection', cat: 'Injectables', price: 1350, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', desc: 'Supports energy, appetite, and recovery.' },
-      { type: 'product', name: 'Layer Premix Pro', cat: 'Premixes', price: 3450, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Complete premix for laying hens.' },
-      { type: 'product', name: 'Dairy Premix Gold', cat: 'Premixes', price: 4200, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium dairy premix for milk yield and fertility.' },
-      { type: 'product', name: 'Broiler Premix Elite', cat: 'Premixes', price: 3800, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Specialised premix for rapid broiler growth.' },
-      { type: 'page', name: 'Home', url: '../index.html', icon: 'fa-home', desc: 'Rise Axis Solutions homepage' },
-      { type: 'page', name: 'About Us', url: 'aboutUs.html', icon: 'fa-users', desc: 'Our story, mission, and values' },
-      { type: 'page', name: 'Products', url: 'product.html', icon: 'fa-box', desc: 'Browse our full product range' },
-      { type: 'page', name: 'Blog', url: 'blog.html', icon: 'fa-newspaper', desc: 'Agri-input insights and farming tips' },
-      { type: 'page', name: 'Contact', url: 'contact.html', icon: 'fa-envelope', desc: 'Get in touch with our team' },
-      { type: 'page', name: 'Shop', url: 'shop.html', icon: 'fa-store', desc: 'Order agri-inputs online' },
-      { type: 'page', name: 'Cart', url: 'cart.html', icon: 'fa-shopping-bag', desc: 'View your shopping cart' },
-      { type: 'page', name: 'Login', url: 'login.html', icon: 'fa-sign-in-alt', desc: 'Sign in to your account' },
-      { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' },
-      { type: 'category', name: 'Feed Additives', url: 'shop.html', icon: 'fa-flask', desc: 'Nutritional supplements and feed enhancers' },
-      { type: 'category', name: 'Veterinary Products', url: 'shop.html', icon: 'fa-syringe', desc: 'Animal health and wellness products' },
-      { type: 'category', name: 'Injectables', url: 'shop.html', icon: 'fa-prescription-bottle', desc: 'Fast-acting injectable treatments' },
-      { type: 'category', name: 'Premixes', url: 'shop.html', icon: 'fa-capsules', desc: 'Complete nutrition blends for livestock' }
-    ];
-
-    const searchOverlay = document.getElementById('searchOverlay');
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-
-    function openSearch() {
-      searchOverlay.classList.add('open');
-      document.body.classList.add('search-open');
-      setTimeout(() => searchInput.focus(), 150);
-    }
-
-    function closeSearch() {
-      searchOverlay.classList.remove('open');
-      document.body.classList.remove('search-open');
-      searchInput.value = '';
-      searchResults.innerHTML = `
-        <div class="search-hint">
-          <i class="fas fa-search"></i>
-          <strong>Start typing to search</strong>
-          Try "feed additives", "premixes", "contact", or a product name.
-        </div>`;
-    }
-
-    function formatPrice(n) { return 'KES ' + Number(n).toLocaleString(); }
-    function escapeHtml(s) {
-      return String(s ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function runSearch(query) {
-      const q = query.trim().toLowerCase();
-
-      if (!q) {
-        searchResults.innerHTML = `
-          <div class="search-hint">
-            <i class="fas fa-search"></i>
-            <strong>Start typing to search</strong>
-            Try "feed additives", "premixes", "contact", or a product name.
-          </div>`;
-        return;
-      }
-
-      const matches = SEARCH_INDEX.filter(item =>
-        item.name.toLowerCase().includes(q) ||
-        (item.desc && item.desc.toLowerCase().includes(q)) ||
-        (item.cat && item.cat.toLowerCase().includes(q))
-      );
-
-      if (matches.length === 0) {
-        searchResults.innerHTML = `
-          <div class="search-no-results">
-            <i class="fas fa-search-minus"></i>
-            <strong>No results for "${escapeHtml(query)}"</strong>
-            <p>Try a different keyword, or browse the Shop.</p>
-          </div>`;
-        return;
-      }
-
-      const products = matches.filter(m => m.type === 'product');
-      const pages = matches.filter(m => m.type === 'page');
-      const categories = matches.filter(m => m.type === 'category');
-
-      let html = '';
-
-      if (products.length) {
-        html += `<div class="search-group-title">Products · ${products.length}</div>`;
-        html += products.slice(0, 6).map(p => `
-          <a class="search-result" href="shop.html?search=${encodeURIComponent(p.name)}">
-            <img class="search-result-img" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy">
-            <div class="search-result-info">
-              <strong>${escapeHtml(p.name)}</strong>
-              <small>${escapeHtml(p.cat)}</small>
-            </div>
-            <div class="search-result-price">${formatPrice(p.price)}</div>
-            <i class="fas fa-chevron-right search-result-arrow"></i>
-          </a>
-        `).join('');
-      }
-
-      if (categories.length) {
-        html += `<div class="search-group-title">Categories · ${categories.length}</div>`;
-        html += categories.map(c => `
-          <a class="search-result" href="${escapeHtml(c.url)}?category=${encodeURIComponent(c.name)}">
-            <div class="search-result-icon"><i class="fas ${escapeHtml(c.icon)}"></i></div>
-            <div class="search-result-info">
-              <strong>${escapeHtml(c.name)}</strong>
-              <small>${escapeHtml(c.desc)}</small>
-            </div>
-            <i class="fas fa-chevron-right search-result-arrow"></i>
-          </a>
-        `).join('');
-      }
-
-      if (pages.length) {
-        html += `<div class="search-group-title">Pages · ${pages.length}</div>`;
-        html += pages.map(pg => `
-          <a class="search-result" href="${escapeHtml(pg.url)}">
-            <div class="search-result-icon"><i class="fas ${escapeHtml(pg.icon)}"></i></div>
-            <div class="search-result-info">
-              <strong>${escapeHtml(pg.name)}</strong>
-              <small>${escapeHtml(pg.desc)}</small>
-            </div>
-            <i class="fas fa-chevron-right search-result-arrow"></i>
-          </a>
-        `).join('');
-      }
-
-      searchResults.innerHTML = html;
-    }
-
-    searchInput?.addEventListener('input', e => runSearch(e.target.value));
-    searchInput?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const q = searchInput.value.trim();
-        if (!q) return;
-        closeSearch();
-        state.search = q;
-        const heroInput = document.getElementById('heroSearchInput');
-        if (heroInput) heroInput.value = q;
-        renderProducts();
-      }
-      if (e.key === 'Escape') closeSearch();
-    });
-    searchOverlay?.addEventListener('click', e => {
-      if (e.target === searchOverlay) closeSearch();
-    });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && searchOverlay.classList.contains('open')) closeSearch();
-    });
-
-    /* ============================================================
-       AUTH UI
-       ============================================================ */
-    function applyAuthUI(user, profile) {
-      const authLinks = document.getElementById('authLinks');
-      const userLinks = document.getElementById('userLinks');
-      const mobileAuth = document.getElementById('mobileAuthSection');
-      const mobileUser = document.getElementById('mobileUserSection');
-      const mobileUserBox = document.getElementById('mobileUserBox');
-
-      if (user) {
-        if (authLinks) authLinks.style.display = 'none';
-        if (userLinks) userLinks.style.display = 'inline-flex';
-        if (mobileAuth) mobileAuth.style.display = 'none';
-        if (mobileUser) mobileUser.style.display = 'flex';
-
-        const initials = (
-          (profile?.first_name || user.email || 'U')[0] +
-          (profile?.last_name || '')[0] || ''
-        ).toUpperCase();
-        const name = profile?.first_name
-          ? `${profile.first_name}${profile.last_name ? ' ' + profile.last_name : ''}`
-          : (user.email || 'User').split('@')[0];
-
-        const initialsEl = document.getElementById('mobileUserInitials');
-        const nameEl = document.getElementById('mobileUserName');
-        const emailEl = document.getElementById('mobileUserEmail');
-        const menuNameEl = document.getElementById('userMenuName');
-
-        if (initialsEl) initialsEl.textContent = initials || '··';
-        if (nameEl) nameEl.textContent = name;
-        if (emailEl) emailEl.textContent = user.email;
-        if (menuNameEl) menuNameEl.textContent = name.length > 12 ? 'Account' : name;
-        if (mobileUserBox) mobileUserBox.style.display = 'flex';
-      } else {
-        if (authLinks) authLinks.style.display = 'inline-flex';
-        if (userLinks) userLinks.style.display = 'none';
-        if (mobileAuth) mobileAuth.style.display = 'flex';
-        if (mobileUser) mobileUser.style.display = 'none';
-        if (mobileUserBox) mobileUserBox.style.display = 'none';
-      }
-    }
-
-    async function fetchAndApplyAuth() {
-      try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) { applyAuthUI(null); return; }
-
-        let profile = null;
-        try {
-          const { data } = await supabaseClient
-            .from('profiles')
-            .select('first_name, last_name, role')
-            .eq('id', user.id)
-            .single();
-          profile = data;
-        } catch (_) {}
-
-        applyAuthUI(user, profile);
-      } catch (_) {
-        applyAuthUI(null);
-      }
-    }
-
-    fetchAndApplyAuth();
-    supabaseClient.auth.onAuthStateChange(() => { fetchAndApplyAuth(); });
-
-    async function doLogout(e) {
-      if (e) e.preventDefault();
-      if (!confirm('Sign out of your account?')) return;
-      await supabaseClient.auth.signOut();
-      window.location.reload();
-    }
-    document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
-    document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
-
-    /* ============================================================
-       HAMBURGER / MOBILE MENU
-       ============================================================ */
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    const mobileMenuClose = document.getElementById('mobileMenuClose');
-
-    function openMobileMenu() {
-      mobileMenu.classList.add('open');
-      mobileMenuOverlay.classList.add('open');
-      hamburgerBtn.classList.add('active');
-      hamburgerBtn.setAttribute('aria-expanded', 'true');
-      mobileMenu.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeMobileMenu() {
-      mobileMenu.classList.remove('open');
-      mobileMenuOverlay.classList.remove('open');
-      hamburgerBtn.classList.remove('active');
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-      mobileMenu.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-    }
-
-    hamburgerBtn?.addEventListener('click', () => {
-      if (mobileMenu.classList.contains('open')) closeMobileMenu();
-      else openMobileMenu();
-    });
-
-    mobileMenuClose?.addEventListener('click', closeMobileMenu);
-    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMobileMenu();
-    });
-
-    const mobileProductsToggle = document.getElementById('mobileProductsToggle');
-    const mobileProductsSubmenu = document.getElementById('mobileProductsSubmenu');
-
-    mobileProductsToggle?.addEventListener('click', () => {
-      const isOpen = mobileProductsSubmenu.classList.toggle('open');
-      mobileProductsToggle.classList.toggle('open', isOpen);
-      mobileProductsToggle.setAttribute('aria-expanded', isOpen);
-    });
-
-    mobileMenu?.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        if (link.id === 'mobileLogoutBtn') return;
-        closeMobileMenu();
-      });
-    });
-
-    /* ============================================================
-       CART HELPERS — key: riseAxisCart
-       ============================================================ */
-    const CART_KEY = 'riseAxisCart';
-
-    function getCart() {
-      try { const raw = localStorage.getItem(CART_KEY); return raw ? JSON.parse(raw) : []; }
-      catch (e) { return []; }
-    }
-    function saveCart(cart) {
-      try {
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
-        updateCartBadges();
-        window.dispatchEvent(new CustomEvent('cart:updated', { detail: cart }));
-      } catch (e) {}
-    }
-    function addToCart(product, pack, qty) {
-      if (!product || !product.id) return;
-      const cart = getCart();
-      const existing = cart.find(i => i.productId === product.id && i.pack === pack.id);
-      if (existing) {
-        existing.quantity += qty;
-      } else {
-        cart.push({
-          productId: product.id,
-          name: product.name,
-          price: pack.price,
-          basePrice: product.price,
-          image: product.img || '',
-          quantity: qty,
-          qty: qty,
-          category: product.cat || '',
-          pack: pack.id,
-          packLabel: pack.label,
-          addedAt: Date.now()
-        });
-      }
-      saveCart(cart);
-    }
-    function getCartCount() { return getCart().reduce((s, i) => s + (i.quantity || i.qty || 0), 0); }
-
-    function updateCartBadges() {
-      const count = getCartCount();
-      ['navCartBadge', 'navCartBadgeMob', 'cartCount', 'headerCartBadge'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = count;
-      });
-      document.querySelectorAll('.cart-badge').forEach(el => el.textContent = count);
-    }
-
-    /* ============================================================
-       PRODUCTS
-       ============================================================ */
-    const PRODUCTS = [
-      { id: 'progrowth-feed-booster', name: 'ProGrowth Feed Booster', cat: 'feed-additives', price: 2450, old: 2900, rating: 5, reviews: 124, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '250g', label: '250 g', price: 2450 }, { id: '1kg', label: '1 kg', price: 8900 }, { id: '5kg', label: '5 kg', price: 42000 } ] },
-      { id: 'vitamin-plus', name: 'VitaMin Plus Supplement', cat: 'feed-additives', price: 1890, old: 0, rating: 4, reviews: 87, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['new'], packs: [ { id: '500g', label: '500 g', price: 1890 }, { id: '1kg', label: '1 kg', price: 3450 } ] },
-      { id: 'enzymemax', name: 'EnzymeMax Digestive Aid', cat: 'feed-additives', price: 3200, old: 0, rating: 5, reviews: 56, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: [], packs: [ { id: '1kg', label: '1 kg', price: 3200 }, { id: '5kg', label: '5 kg', price: 14800 } ] },
-      { id: 'vetcare-antibiotic', name: 'VetCare Antibiotic Powder', cat: 'veterinary', price: 1750, old: 2100, rating: 4, reviews: 98, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', tags: ['sale'], packs: [ { id: '100g', label: '100 g', price: 1750 }, { id: '500g', label: '500 g', price: 7900 } ] },
-      { id: 'dewormer-oral', name: 'Dewormer Oral Suspension', cat: 'veterinary', price: 980, old: 0, rating: 5, reviews: 210, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '1L', label: '1 Litre', price: 980 }, { id: '5L', label: '5 Litres', price: 4400 } ] },
-      { id: 'skin-heal', name: 'Skin Heal Topical Spray', cat: 'veterinary', price: 1250, old: 0, rating: 4, reviews: 65, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['new'], packs: [ { id: '250ml', label: '250 ml', price: 1250 }, { id: '500ml', label: '500 ml', price: 2200 } ] },
-      { id: 'oxytetracycline', name: 'Oxytetracycline Injection', cat: 'injectables', price: 1450, old: 1800, rating: 5, reviews: 145, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: ['sale'], packs: [ { id: '100ml', label: '100 ml', price: 1450 }, { id: '250ml', label: '250 ml', price: 3200 } ] },
-      { id: 'ivermectin', name: 'Ivermectin Injectable 1%', cat: 'injectables', price: 2100, old: 0, rating: 5, reviews: 178, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '50ml', label: '50 ml', price: 2100 }, { id: '100ml', label: '100 ml', price: 3800 } ] },
-      { id: 'vitamin-b', name: 'Vitamin B-Complex Injection', cat: 'injectables', price: 1350, old: 0, rating: 4, reviews: 52, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', tags: ['new'], packs: [ { id: '100ml', label: '100 ml', price: 1350 } ] },
-      { id: 'layer-premix', name: 'Layer Premix Pro', cat: 'premixes', price: 3450, old: 3990, rating: 5, reviews: 210, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', tags: ['sale'], packs: [ { id: '5kg', label: '5 kg', price: 3450 }, { id: '25kg', label: '25 kg', price: 15900 } ] },
-      { id: 'dairy-premix', name: 'Dairy Premix Gold', cat: 'premixes', price: 4200, old: 0, rating: 5, reviews: 156, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', tags: ['hot'], packs: [ { id: '10kg', label: '10 kg', price: 4200 }, { id: '25kg', label: '25 kg', price: 9800 } ] },
-      { id: 'broiler-premix', name: 'Broiler Premix Elite', cat: 'premixes', price: 3800, old: 0, rating: 4, reviews: 94, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', tags: ['new'], packs: [ { id: '5kg', label: '5 kg', price: 3800 }, { id: '25kg', label: '25 kg', price: 17500 } ] }
-    ];
-
-    const CATEGORY_LABELS = { 'feed-additives': 'Feed Additives', 'veterinary': 'Veterinary Products', 'injectables': 'Injectables', 'premixes': 'Premixes' };
+    let PRODUCTS = [];
+    let CATEGORIES = [];
+    let PRODUCT_MAP_BY_ID = {};
     let state = { category: 'all', search: '', sort: 'featured' };
+    let atcState = { product: null, selectedPackId: null, qty: 1 };
+    const CART_KEY = 'riseAxisCart';
 
     const grid = document.getElementById('productsGrid');
     const emptyState = document.getElementById('emptyState');
     const resultCount = document.getElementById('resultCount');
 
-    function renderStars(r) { let h = ''; for (let i = 1; i <= 5; i++) h += i <= r ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>'; return h; }
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const formatPrice = n => 'KES ' + Number(n || 0).toLocaleString('en-KE');
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const categoryName = catId => {
+      const c = CATEGORIES.find(x => x.id === catId);
+      return c ? c.name : 'Uncategorized';
+    };
+    const categorySlug = catId => {
+      const c = CATEGORIES.find(x => x.id === catId);
+      return c ? c.slug : '';
+    };
+    const categoryIdFromSlug = slug => {
+      const c = CATEGORIES.find(x => x.slug === slug);
+      return c ? c.id : null;
+    };
+
+    /* ---------- STICKY NAV ---------- */
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 30) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    }, { passive: true });
+
+    /* ============================================================
+       LOAD PRODUCTS + CATEGORIES
+       ============================================================ */
+    async function loadData() {
+      showSkeleton();
+
+      try {
+        // Parallel fetch
+        const [catRes, prodRes] = await Promise.all([
+          supabaseClient.from('categories').select('id, name, slug').order('name'),
+          supabaseClient.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false })
+        ]);
+
+        if (catRes.error) throw catRes.error;
+        if (prodRes.error) throw prodRes.error;
+
+        CATEGORIES = catRes.data || [];
+        PRODUCTS = prodRes.data || [];
+        PRODUCT_MAP_BY_ID = {};
+        PRODUCTS.forEach(p => PRODUCT_MAP_BY_ID[p.id] = p);
+
+        // Handle URL params
+        const params = new URLSearchParams(window.location.search);
+        const urlCategory = params.get('category');
+        const urlSearch = params.get('search');
+
+        if (urlCategory) {
+          const cid = categoryIdFromSlug(urlCategory);
+          if (cid) {
+            state.category = cid;
+            document.querySelectorAll('.chip').forEach(c => {
+              c.classList.toggle('active', c.dataset.cat === urlCategory);
+            });
+          }
+        }
+        if (urlSearch) {
+          state.search = urlSearch;
+          const heroInput = document.getElementById('heroSearchInput');
+          if (heroInput) heroInput.value = urlSearch;
+        }
+
+        renderProducts();
+      } catch (err) {
+        console.error('Failed to load products:', err);
+        grid.innerHTML = `
+          <div style="grid-column:1/-1; padding:60px 20px; text-align:center;">
+            <i class="fas fa-exclamation-triangle" style="font-size:3rem;color:var(--red);margin-bottom:16px;"></i>
+            <h3 style="color:var(--navy);font-weight:800;margin-bottom:8px;">Could not load products</h3>
+            <p style="color:var(--text-muted);">${escapeHtml(err.message || 'Please refresh the page.')}</p>
+          </div>`;
+      }
+    }
+
+    function showSkeleton() {
+      const s = Array(8).fill(0).map(() => `
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line w-40"></div>
+            <div class="skeleton-line w-80"></div>
+            <div class="skeleton-line w-60"></div>
+          </div>
+        </div>
+      `).join('');
+      grid.innerHTML = `<div style="grid-column:1/-1;"><div class="products-skeleton">${s}</div></div>`;
+      grid.style.display = 'block';
+      grid.className = '';
+      // restore grid class after (hack to render skeleton full-width)
+      setTimeout(() => {
+        grid.className = 'products-grid';
+        grid.innerHTML = `<div style="grid-column:1/-1;"><div class="products-skeleton">${s}</div></div>`;
+      }, 0);
+      grid.style.display = '';
+    }
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
+    function renderStars(r) {
+      const n = Math.round(Number(r) || 0);
+      let h = '';
+      for (let i = 1; i <= 5; i++) h += i <= n ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+      return h;
+    }
 
     function getFilteredProducts() {
       let list = [...PRODUCTS];
-      if (state.category !== 'all') list = list.filter(p => p.cat === state.category);
+      if (state.category !== 'all') {
+        list = list.filter(p => p.category_id === state.category);
+      }
       if (state.search.trim()) {
         const q = state.search.toLowerCase();
-        list = list.filter(p => p.name.toLowerCase().includes(q) || CATEGORY_LABELS[p.cat].toLowerCase().includes(q));
+        list = list.filter(p =>
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q) ||
+          (p.long_description || '').toLowerCase().includes(q) ||
+          categoryName(p.category_id).toLowerCase().includes(q)
+        );
       }
       switch (state.sort) {
-        case 'price-low': list.sort((a,b) => a.price - b.price); break;
-        case 'price-high': list.sort((a,b) => b.price - a.price); break;
-        case 'name': list.sort((a,b) => a.name.localeCompare(b.name)); break;
-        case 'rating': list.sort((a,b) => b.rating - a.rating); break;
+        case 'price-low': list.sort((a,b) => Number(a.price) - Number(b.price)); break;
+        case 'price-high': list.sort((a,b) => Number(b.price) - Number(a.price)); break;
+        case 'name': list.sort((a,b) => (a.name||'').localeCompare(b.name||'')); break;
+        case 'rating': list.sort((a,b) => Number(b.rating||0) - Number(a.rating||0)); break;
+        default: list.sort((a,b) => (b.stock > 0 ? 1 : 0) - (a.stock > 0 ? 1 : 0));
       }
       return list;
     }
@@ -2106,44 +969,58 @@
     function renderProducts() {
       const list = getFilteredProducts();
       resultCount.textContent = list.length;
-      if (list.length === 0) { grid.innerHTML = ''; emptyState.classList.add('visible'); return; }
+
+      if (list.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.add('visible');
+        return;
+      }
       emptyState.classList.remove('visible');
 
       grid.innerHTML = list.map((p, idx) => {
-        const badges = p.tags.map(t => {
+        const tags = Array.isArray(p.tags) ? p.tags : [];
+        const badges = tags.map(t => {
           if (t === 'new') return '<span class="badge badge-new"><i class="fas fa-bolt"></i> New</span>';
           if (t === 'hot') return '<span class="badge badge-hot"><i class="fas fa-fire"></i> Best Seller</span>';
           if (t === 'sale') return '<span class="badge badge-sale"><i class="fas fa-tag"></i> Sale</span>';
           return '';
         }).join('');
-        const oldPrice = p.old ? `<span class="old-price">${formatPrice(p.old)}</span>` : '';
-        const packHint = p.packs.length > 1 ? `${p.packs.length} pack sizes` : p.packs[0].label;
+
+        const oldPrice = p.sale_price ? `<span class="old-price">${formatPrice(p.sale_price)}</span>` : '';
+        const packs = Array.isArray(p.packs) ? p.packs : [];
+        const packHint = packs.length > 1
+          ? `${packs.length} pack sizes`
+          : (packs[0]?.label || p.available_packaging || '');
+
+        const img = p.image_url || (Array.isArray(p.gallery) && p.gallery[0]) || '';
 
         return `
           <div class="product-card" style="animation-delay:${idx * 0.05}s">
             <div class="product-image-wrap">
-              <img src="${p.img}" alt="${p.name}" loading="lazy">
+              ${img
+                ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">`
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#cbd5e0;font-size:3rem;"><i class="fas fa-box"></i></div>`}
               <div class="product-badges">${badges}</div>
               <div class="read-more-overlay">
-                <button class="read-more-btn" onclick="event.stopPropagation(); openAtcModal('${p.id}')">
+                <button class="read-more-btn" onclick="event.stopPropagation(); openAtcModal('${escapeHtml(p.id)}')">
                   Add to Cart <i class="fas fa-arrow-right"></i>
                 </button>
               </div>
             </div>
             <div class="product-body">
-              <div class="product-cat">${CATEGORY_LABELS[p.cat]}</div>
-              <h3 class="product-title">${p.name}</h3>
+              <div class="product-cat">${escapeHtml(categoryName(p.category_id))}</div>
+              <h3 class="product-title">${escapeHtml(p.name)}</h3>
               <div class="product-rating">
                 <span class="stars">${renderStars(p.rating)}</span>
-                <small>(${p.reviews})</small>
+                <small>(${p.review_count || 0})</small>
               </div>
               <div class="product-footer">
                 <div class="product-price">
                   <span class="price">${formatPrice(p.price)}</span>
                   ${oldPrice}
-                  <span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;font-weight:600;">${packHint}</span>
+                  ${packHint ? `<span style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;font-weight:600;">${escapeHtml(packHint)}</span>` : ''}
                 </div>
-                <button class="btn-add" title="Add to Cart" onclick="event.stopPropagation(); openAtcModal('${p.id}')">
+                <button class="btn-add" title="Add to Cart" onclick="event.stopPropagation(); openAtcModal('${escapeHtml(p.id)}')">
                   <i class="fas fa-plus"></i>
                 </button>
               </div>
@@ -2154,35 +1031,75 @@
     }
 
     /* ============================================================
-       ADD-TO-CART MODAL LOGIC
+       FILTERS / SORT / SEARCH
        ============================================================ */
-    let atcState = { product: null, selectedPackId: null, qty: 1 };
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const slug = chip.dataset.cat;
+        state.category = slug === 'all' ? 'all' : (categoryIdFromSlug(slug) || 'all');
+        renderProducts();
+        document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
 
+    document.getElementById('heroSearchInput').addEventListener('input', e => {
+      state.search = e.target.value;
+      renderProducts();
+    });
+    document.getElementById('sortSelect').addEventListener('change', e => {
+      state.sort = e.target.value;
+      renderProducts();
+    });
+
+    function filterCategory(slug) {
+      const cid = categoryIdFromSlug(slug);
+      state.category = cid || 'all';
+      state.search = '';
+      const heroInput = document.getElementById('heroSearchInput');
+      if (heroInput) heroInput.value = '';
+      document.querySelectorAll('.chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.cat === slug);
+      });
+      renderProducts();
+      document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetFilters() {
+      state = { category: 'all', search: '', sort: 'featured' };
+      const heroInput = document.getElementById('heroSearchInput');
+      if (heroInput) heroInput.value = '';
+      document.getElementById('sortSelect').value = 'featured';
+      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
+      renderProducts();
+    }
+
+    /* ============================================================
+       ADD-TO-CART MODAL
+       ============================================================ */
     function openAtcModal(productId) {
-      const product = PRODUCTS.find(p => p.id === productId);
+      const product = PRODUCT_MAP_BY_ID[productId];
       if (!product) return;
 
       atcState.product = product;
-      atcState.selectedPackId = product.packs[0].id;
+      const packs = Array.isArray(product.packs) && product.packs.length
+        ? product.packs
+        : [{ id: 'standard', label: product.available_packaging || 'Standard', price: Number(product.price) }];
+      atcState.selectedPackId = packs[0].id;
       atcState.qty = 1;
 
       document.getElementById('atcProductName').textContent = product.name;
 
       const packWrap = document.getElementById('atcPackOptions');
-      packWrap.innerHTML = product.packs.map(pack => `
-        <button
-          type="button"
-          class="pack-btn ${pack.id === atcState.selectedPackId ? 'active' : ''}"
-          data-pack-id="${pack.id}"
-          onclick="selectPack('${pack.id}')">
-          ${pack.label}
+      packWrap.innerHTML = packs.map(pack => `
+        <button type="button" class="pack-btn ${pack.id === atcState.selectedPackId ? 'active' : ''}" data-pack-id="${escapeHtml(pack.id)}" onclick="selectPack('${escapeHtml(pack.id)}')">
+          ${escapeHtml(pack.label)}
           <span class="pack-price-hint">${formatPrice(pack.price)}</span>
         </button>
       `).join('');
 
-      const qtyInput = document.getElementById('atcQty');
-      qtyInput.value = 1;
-
+      document.getElementById('atcQty').value = 1;
       updateAtcSummary();
       document.getElementById('atcModal').classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -2205,13 +1122,15 @@
     function updateAtcSummary() {
       const product = atcState.product;
       if (!product) return;
-      const pack = product.packs.find(p => p.id === atcState.selectedPackId);
+      const packs = Array.isArray(product.packs) && product.packs.length
+        ? product.packs
+        : [{ id: 'standard', label: product.available_packaging || 'Standard', price: Number(product.price) }];
+      const pack = packs.find(p => p.id === atcState.selectedPackId) || packs[0];
       const qty = atcState.qty || 1;
-
       document.getElementById('atcUnitPrice').textContent = formatPrice(pack.price);
       document.getElementById('atcPackLabel').textContent = pack.label;
       document.getElementById('atcQtyLabel').textContent = qty;
-      document.getElementById('atcTotal').textContent = formatPrice(pack.price * qty);
+      document.getElementById('atcTotal').textContent = formatPrice(Number(pack.price) * qty);
     }
 
     document.getElementById('atcQty').addEventListener('input', e => {
@@ -2231,10 +1150,32 @@
     function submitAddToCart() {
       const product = atcState.product;
       if (!product) return;
-      const pack = product.packs.find(p => p.id === atcState.selectedPackId);
+      const packs = Array.isArray(product.packs) && product.packs.length
+        ? product.packs
+        : [{ id: 'standard', label: product.available_packaging || 'Standard', price: Number(product.price) }];
+      const pack = packs.find(p => p.id === atcState.selectedPackId) || packs[0];
       const qty = atcState.qty || 1;
 
-      addToCart(product, pack, qty);
+      const cart = getCart();
+      const existing = cart.find(i => i.productId === product.id && i.pack === pack.id);
+      if (existing) {
+        existing.quantity += qty;
+        existing.qty = existing.quantity;
+      } else {
+        cart.push({
+          productId: product.id,
+          name: product.name,
+          price: Number(pack.price),
+          image: product.image_url || '',
+          quantity: qty,
+          qty: qty,
+          category: categoryName(product.category_id),
+          pack: pack.id,
+          packLabel: pack.label,
+          addedAt: Date.now()
+        });
+      }
+      saveCart(cart);
       showToast(`"${product.name}" (${pack.label} × ${qty}) added to cart`);
       closeAtcModal();
     }
@@ -2247,35 +1188,219 @@
     });
 
     /* ============================================================
-       FILTERS / SORT / SEARCH (hero)
+       CART
        ============================================================ */
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.category = chip.dataset.cat;
+    function getCart() {
+      try { const raw = localStorage.getItem(CART_KEY); return raw ? JSON.parse(raw) : []; }
+      catch { return []; }
+    }
+    function saveCart(cart) {
+      try {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        updateCartBadges();
+      } catch {}
+    }
+    function getCartCount() {
+      return getCart().reduce((s, i) => s + (i.quantity || i.qty || 0), 0);
+    }
+    function updateCartBadges() {
+      const count = getCartCount();
+      ['navCartBadge', 'navCartBadgeMob', 'cartCount'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = count;
+      });
+    }
+
+    /* ============================================================
+       SEARCH OVERLAY
+       ============================================================ */
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+
+    function openSearch() {
+      searchOverlay.classList.add('open');
+      document.body.classList.add('search-open');
+      setTimeout(() => searchInput.focus(), 150);
+    }
+    function closeSearch() {
+      searchOverlay.classList.remove('open');
+      document.body.classList.remove('search-open');
+      searchInput.value = '';
+      searchResults.innerHTML = `<div class="search-hint"><i class="fas fa-search"></i><strong>Start typing to search</strong>Try "feed additives", "premixes", "contact".</div>`;
+    }
+    function runSearch(query) {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        searchResults.innerHTML = `<div class="search-hint"><i class="fas fa-search"></i><strong>Start typing to search</strong></div>`;
+        return;
+      }
+      const matches = PRODUCTS.filter(p =>
+        (p.name || '').toLowerCase().includes(q) ||
+        (p.description || '').toLowerCase().includes(q) ||
+        categoryName(p.category_id).toLowerCase().includes(q)
+      );
+      const pages = [
+        { type: 'page', name: 'Home', url: '../index.html', icon: 'fa-home', desc: 'Homepage' },
+        { type: 'page', name: 'About Us', url: 'aboutUs.html', icon: 'fa-users', desc: 'Our story' },
+        { type: 'page', name: 'Blog', url: 'blog.html', icon: 'fa-newspaper', desc: 'Insights' },
+        { type: 'page', name: 'Contact', url: 'contact.html', icon: 'fa-envelope', desc: 'Reach us' },
+        { type: 'page', name: 'Cart', url: 'cart.html', icon: 'fa-shopping-bag', desc: 'Your cart' }
+      ].filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+
+      if (!matches.length && !pages.length) {
+        searchResults.innerHTML = `<div class="search-no-results"><i class="fas fa-search-minus"></i><strong>No results for "${escapeHtml(query)}"</strong></div>`;
+        return;
+      }
+      let html = '';
+      if (matches.length) {
+        html += `<div class="search-group-title">Products · ${matches.length}</div>`;
+        html += matches.slice(0, 6).map(p => `
+          <a class="search-result" href="javascript:void(0)" onclick="openAtcModal('${escapeHtml(p.id)}'); closeSearch();">
+            ${p.image_url
+              ? `<img class="search-result-img" src="${escapeHtml(p.image_url)}" alt="" loading="lazy">`
+              : `<div class="search-result-icon"><i class="fas fa-box"></i></div>`}
+            <div class="search-result-info"><strong>${escapeHtml(p.name)}</strong><small>${escapeHtml(categoryName(p.category_id))}</small></div>
+            <div class="search-result-price">${formatPrice(p.price)}</div>
+            <i class="fas fa-chevron-right search-result-arrow"></i>
+          </a>
+        `).join('');
+      }
+      if (pages.length) {
+        html += `<div class="search-group-title">Pages · ${pages.length}</div>`;
+        html += pages.map(pg => `
+          <a class="search-result" href="${escapeHtml(pg.url)}">
+            <div class="search-result-icon"><i class="fas ${escapeHtml(pg.icon)}"></i></div>
+            <div class="search-result-info"><strong>${escapeHtml(pg.name)}</strong><small>${escapeHtml(pg.desc)}</small></div>
+            <i class="fas fa-chevron-right search-result-arrow"></i>
+          </a>
+        `).join('');
+      }
+      searchResults.innerHTML = html;
+    }
+
+    let searchDebounce = null;
+    searchInput?.addEventListener('input', e => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => runSearch(e.target.value), 120);
+    });
+    searchInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = searchInput.value.trim();
+        if (!q) return;
+        closeSearch();
+        state.search = q;
+        const heroInput = document.getElementById('heroSearchInput');
+        if (heroInput) heroInput.value = q;
         renderProducts();
-        document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (e.key === 'Escape') closeSearch();
+    });
+    searchOverlay?.addEventListener('click', e => { if (e.target === searchOverlay) closeSearch(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && searchOverlay.classList.contains('open')) closeSearch();
+    });
+
+    /* ============================================================
+       AUTH UI
+       ============================================================ */
+    function applyAuthUI(user, profile) {
+      const authLinks = document.getElementById('authLinks');
+      const userLinks = document.getElementById('userLinks');
+      const mobileAuth = document.getElementById('mobileAuthSection');
+      const mobileUser = document.getElementById('mobileUserSection');
+      const mobileUserBox = document.getElementById('mobileUserBox');
+
+      if (user) {
+        if (authLinks) authLinks.style.display = 'none';
+        if (userLinks) userLinks.style.display = 'inline-flex';
+        if (mobileAuth) mobileAuth.style.display = 'none';
+        if (mobileUser) mobileUser.style.display = 'flex';
+
+        const initials = ((profile?.first_name || user.email || 'U')[0] + (profile?.last_name || '')[0] || '').toUpperCase();
+        const name = profile?.first_name
+          ? `${profile.first_name}${profile.last_name ? ' ' + profile.last_name : ''}`
+          : (user.email || 'User').split('@')[0];
+
+        const initialsEl = document.getElementById('mobileUserInitials');
+        const nameEl = document.getElementById('mobileUserName');
+        const emailEl = document.getElementById('mobileUserEmail');
+        const menuNameEl = document.getElementById('userMenuName');
+
+        if (initialsEl) initialsEl.textContent = initials || '··';
+        if (nameEl) nameEl.textContent = name;
+        if (emailEl) emailEl.textContent = user.email;
+        if (menuNameEl) menuNameEl.textContent = name.length > 12 ? 'Account' : name;
+        if (mobileUserBox) mobileUserBox.style.display = 'flex';
+      } else {
+        if (authLinks) authLinks.style.display = 'inline-flex';
+        if (userLinks) userLinks.style.display = 'none';
+        if (mobileAuth) mobileAuth.style.display = 'flex';
+        if (mobileUser) mobileUser.style.display = 'none';
+        if (mobileUserBox) mobileUserBox.style.display = 'none';
+      }
+    }
+    async function fetchAndApplyAuth() {
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) { applyAuthUI(null); return; }
+        let profile = null;
+        try {
+          const { data } = await supabaseClient.from('profiles').select('first_name, last_name, role').eq('id', user.id).single();
+          profile = data;
+        } catch {}
+        applyAuthUI(user, profile);
+      } catch { applyAuthUI(null); }
+    }
+    fetchAndApplyAuth();
+    supabaseClient.auth.onAuthStateChange(() => { fetchAndApplyAuth(); });
+
+    async function doLogout(e) {
+      if (e) e.preventDefault();
+      if (!confirm('Sign out of your account?')) return;
+      await supabaseClient.auth.signOut();
+      window.location.reload();
+    }
+    document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
+    document.getElementById('mobileLogoutBtn')?.addEventListener('click', doLogout);
+
+    /* ============================================================
+       MOBILE MENU
+       ============================================================ */
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+    function openMobileMenu() {
+      mobileMenu.classList.add('open');
+      mobileMenuOverlay.classList.add('open');
+      hamburgerBtn.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu() {
+      mobileMenu.classList.remove('open');
+      mobileMenuOverlay.classList.remove('open');
+      hamburgerBtn.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    hamburgerBtn?.addEventListener('click', () => {
+      mobileMenu.classList.contains('open') ? closeMobileMenu() : openMobileMenu();
+    });
+    mobileMenuClose?.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
+    document.getElementById('mobileProductsToggle')?.addEventListener('click', function() {
+      const sub = document.getElementById('mobileProductsSubmenu');
+      const open = sub.classList.toggle('open');
+      this.classList.toggle('open', open);
+    });
+    mobileMenu?.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (link.id === 'mobileLogoutBtn') return;
+        closeMobileMenu();
       });
     });
-    document.getElementById('heroSearchInput').addEventListener('input', e => { state.search = e.target.value; renderProducts(); });
-    document.getElementById('sortSelect').addEventListener('change', e => { state.sort = e.target.value; renderProducts(); });
-    function filterCategory(cat) {
-      state.category = cat; state.search = '';
-      const heroInput = document.getElementById('heroSearchInput');
-      if (heroInput) heroInput.value = '';
-      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
-      renderProducts();
-      document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    function resetFilters() {
-      state = { category: 'all', search: '', sort: 'featured' };
-      const heroInput = document.getElementById('heroSearchInput');
-      if (heroInput) heroInput.value = '';
-      document.getElementById('sortSelect').value = 'featured';
-      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
-      renderProducts();
-    }
 
     /* ============================================================
        TOAST
@@ -2292,11 +1417,11 @@
     /* ============================================================
        INIT
        ============================================================ */
-    renderProducts();
+    loadData();
     updateCartBadges();
     window.addEventListener('storage', e => { if (e.key === CART_KEY) updateCartBadges(); });
 
-    console.log('%c RISE AXIS — Shop (updated) ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
+    console.log('%c RISE AXIS — Shop (DB-backed) ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
   </script>
 
 </body>

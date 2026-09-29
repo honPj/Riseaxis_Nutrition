@@ -107,6 +107,41 @@
       background: var(--red);
       border-color: var(--red);
     }
+        /* Admin nav links */
+    .admin-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .admin-nav {
+      display: flex;
+      gap: 6px;
+    }
+    .admin-nav a {
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .admin-nav a:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .admin-nav a.active {
+      background: rgba(255,255,255,0.22);
+      color: #fff;
+    }
+    .admin-nav a i {
+      font-size: 0.85rem;
+    }
 
     /* ============================================================
        MAIN LAYOUT
@@ -659,21 +694,43 @@
       .modal-footer { padding: 16px 20px 20px; flex-direction: column-reverse; }
       .modal-footer button { width: 100%; justify-content: center; }
     }
+        @media (max-width: 1024px) {
+      .admin-left {
+        width: 100%;
+      }
+      .admin-nav {
+        width: 100%;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- ========== ADMIN HEADER ========== -->
+   <!-- ========== ADMIN HEADER ========== -->
   <header class="admin-header">
     <div class="container">
-      <div class="admin-brand">
-        <div class="logo-mark">
-          <span class="rise">RISE</span><span class="axis">AXIS</span>
+      <div class="admin-left">
+        <div class="admin-brand">
+          <div class="logo-mark">
+            <span class="rise">RISE</span><span class="axis">AXIS</span>
+          </div>
+          <div class="label">
+            <strong>Admin Panel</strong>
+            <small>Orders Dashboard</small>
+          </div>
         </div>
-        <div class="label">
-          <strong>Admin Panel</strong>
-          <small>Orders Dashboard</small>
-        </div>
+
+        <nav class="admin-nav">
+          <a href="orders.html" class="active">
+            <i class="fas fa-boxes-packing"></i> Orders
+          </a>
+          <a href="products.html">
+            <i class="fas fa-box"></i> Products
+          </a>
+             <a href="posts.html" class="active"><i class="fas fa-newspaper"></i> Blog</a>
+        </nav>
       </div>
 
       <div class="admin-user">
@@ -687,7 +744,6 @@
       </div>
     </div>
   </header>
-
   <!-- ========== ACCESS DENIED (shown if not admin) ========== -->
   <div class="access-denied" id="accessDenied" style="display: none;">
     <div class="access-denied-card">

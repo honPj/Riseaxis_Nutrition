@@ -7,7 +7,7 @@
   <!-- ============ SEO META ============ -->
   <title>Blog Post | Rise Axis Solutions Ltd</title>
   <meta name="description" id="metaDescription" content="Expert agri-input insights, farming tips, and veterinary advice from Rise Axis Solutions.">
-  <meta name="keywords" content="agri-inputs Kenya, farming blog, veterinary products Kenya, Rise Axis Solutions">
+  <meta name="keywords" id="metaKeywords" content="agri-inputs Kenya, farming blog, veterinary products Kenya, Rise Axis Solutions">
   <meta name="robots" content="index, follow">
   <link rel="canonical" id="canonicalLink" href="https://www.riseaxissolutions.com/pages/blog-post.html">
 
@@ -26,6 +26,20 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- JSON-LD Article Schema (populated dynamically) -->
+  <script type="application/ld+json" id="articleJsonLd">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Blog Post",
+    "author": { "@type": "Person", "name": "Rise Axis Solutions" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Rise Axis Solutions Ltd"
+    }
+  }
+  </script>
 
   <style>
     /* ============================================================
@@ -299,9 +313,7 @@
       font-weight: 500; margin-top: 2px;
     }
 
-    /* ============================================================
-       SEARCH OVERLAY
-       ============================================================ */
+    /* SEARCH OVERLAY */
     .search-overlay {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -425,9 +437,7 @@
     .search-no-results i { font-size: 2rem; color: var(--border); margin-bottom: 12px; display: block; }
     .search-no-results strong { display: block; color: var(--navy); font-size: 1rem; margin-bottom: 4px; }
 
-    /* ============================================================
-       MOBILE NAV — hamburger + slide menu
-       ============================================================ */
+    /* MOBILE NAV */
     .mobile-nav-actions {
       display: none;
       align-items: center; gap: 10px;
@@ -632,9 +642,7 @@
     .mobile-menu-contact span { display: flex; align-items: center; gap: 8px; }
     .mobile-menu-contact i { color: var(--orange); width: 16px; }
 
-    /* ============================================================
-       POST HERO
-       ============================================================ */
+    /* POST HERO */
     .post-hero {
       position: relative;
       min-height: 540px;
@@ -642,6 +650,7 @@
       align-items: flex-end;
       overflow: hidden;
       color: #fff;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy) 60%, var(--red) 160%);
     }
     .post-hero-bg {
       position: absolute; inset: 0;
@@ -1072,19 +1081,6 @@
       background: linear-gradient(90deg, var(--orange), var(--red));
       border-radius: 2px;
     }
-    .toc-list { display: flex; flex-direction: column; gap: 4px; max-height: 400px; overflow-y: auto; }
-    .toc-link {
-      display: flex; align-items: flex-start;
-      gap: 10px; padding: 10px 12px;
-      border-radius: 10px; font-size: 0.85rem;
-      font-weight: 600; color: var(--text-muted);
-      cursor: pointer; transition: all 0.25s;
-      border-left: 3px solid transparent;
-    }
-    .toc-link:hover { background: var(--bg-light); color: var(--navy); border-left-color: var(--orange); }
-    .toc-link.active { background: rgba(30,83,180,0.06); color: var(--navy); border-left-color: var(--red); font-weight: 800; }
-    .toc-num { font-size: 0.72rem; font-weight: 900; color: var(--orange); flex-shrink: 0; min-width: 20px; padding-top: 2px; }
-
     .popular-list { display: flex; flex-direction: column; gap: 16px; }
     .popular-item {
       display: flex; gap: 14px; padding-bottom: 16px;
@@ -1237,6 +1233,66 @@
     }
     .related-card-meta i { color: var(--orange); }
 
+    /* Loading skeleton */
+    .post-skeleton {
+      padding: 60px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .skel-line {
+      height: 18px;
+      border-radius: 8px;
+      background: linear-gradient(90deg, #eef2f8 25%, #dfe6f0 50%, #eef2f8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      margin-bottom: 12px;
+    }
+    .skel-line.w40 { width: 40%; height: 32px; }
+    .skel-line.w70 { width: 70%; height: 44px; margin-bottom: 24px; }
+    .skel-line.w90 { width: 90%; }
+    .skel-line.w80 { width: 80%; }
+    .skel-line.w60 { width: 60%; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Not found */
+    .not-found {
+      padding: 100px 24px;
+      text-align: center;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+    .not-found i {
+      font-size: 4rem;
+      color: var(--border);
+      margin-bottom: 20px;
+    }
+    .not-found h2 {
+      font-size: 1.8rem;
+      color: var(--navy);
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .not-found p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .btn-home {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      padding: 14px 30px;
+      border-radius: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(30,83,180,0.3);
+      transition: all 0.25s;
+    }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(30,83,180,0.4); }
+
     /* Footer */
     .footer {
       background: var(--navy-deep);
@@ -1356,9 +1412,7 @@
     }
     .whatsapp-float:hover { transform: scale(1.1) rotate(-8deg); }
 
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
+    /* RESPONSIVE */
     @media (max-width: 1200px) {
       .nav-links { gap: 2px; font-size: 0.86rem; }
       .nav-links > li > a { padding: 8px 10px; }
@@ -1415,7 +1469,7 @@
 
   <div class="reading-progress" id="readingProgress"></div>
 
-  <!-- ========== TOP BAR ========== -->
+  <!-- TOP BAR -->
   <div class="top-bar">
     <div class="container">
       <div class="top-item">
@@ -1433,7 +1487,7 @@
     </div>
   </div>
 
-  <!-- ========== NAVIGATION ========== -->
+  <!-- NAVIGATION -->
   <nav class="main-nav" id="mainNav">
     <div class="container">
       <a href="../index.html" class="logo">
@@ -1540,7 +1594,7 @@
     </div>
   </nav>
 
-  <!-- ========== SEARCH OVERLAY ========== -->
+  <!-- SEARCH OVERLAY -->
   <div class="search-overlay" id="searchOverlay">
     <div class="search-panel">
       <div class="search-panel-header">
@@ -1567,7 +1621,7 @@
     </div>
   </div>
 
-  <!-- ========== MOBILE SLIDE MENU ========== -->
+  <!-- MOBILE MENU -->
   <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
   <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
@@ -1643,10 +1697,19 @@
     </div>
   </aside>
 
-  <!-- ========== POST CONTENT ========== -->
-  <article id="postRoot"></article>
+  <!-- POST CONTENT -->
+  <article id="postRoot">
+    <div class="post-skeleton">
+      <div class="skel-line w40"></div>
+      <div class="skel-line w70"></div>
+      <div class="skel-line w90"></div>
+      <div class="skel-line w80"></div>
+      <div class="skel-line w90"></div>
+      <div class="skel-line w60"></div>
+    </div>
+  </article>
 
-  <!-- ========== FOOTER ========== -->
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -1683,7 +1746,7 @@
           <ul class="footer-contact">
             <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</li>
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
-            <li><i class="fas fa-phone-alt"></i> +254700123456</li>
+            <li><i class="fas fa-phone-alt"></i> +254725538297</li>
           </ul>
         </div>
 
@@ -1703,7 +1766,7 @@
     </div>
   </footer>
 
-  <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank">
+  <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
@@ -1716,772 +1779,211 @@
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     /* ============================================================
-       BLOG POST DATA (unchanged from your version)
+       HELPERS
        ============================================================ */
-    const POSTS = [
-      {
-        id: 1,
-        title: '5 Sustainable Farming Practices Every Kenyan Farmer Should Know',
-        cat: 'sustainability',
-        catLabel: 'Sustainability',
-        author: 'James Mwangi',
-        authorInitials: 'JM',
-        authorRole: 'Senior Agronomist',
-        authorBio: 'James has over 12 years of experience supporting Kenyan farmers with soil health, crop nutrition, and sustainable farming practices. He leads Rise Axis Solutions\' field agronomy program across 20+ counties.',
-        date: 'Mar 14, 2026',
-        dateISO: '2026-03-14',
-        readTime: '6 min',
-        views: '1,240',
-        img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1600&q=80',
-        excerpt: 'From crop rotation to integrated pest management — discover the practical, proven practices that improve yields while protecting the land for future generations.',
-        tags: ['sustainability', 'soilhealth', 'cropmanagement', 'kenyafarming', 'agronomy'],
-        related: [2, 3, 5],
-        body: `
-          <p>Sustainable farming is no longer a niche concept — it is a necessity. With climate change affecting rainfall patterns, soil degradation reducing yields, and input costs rising, Kenyan farmers need practical, proven strategies that protect both their land and their bottom line.</p>
-          <p>In this article, we break down <strong>5 sustainable farming practices</strong> that are easy to adopt, affordable to maintain, and proven to work in East African conditions. These aren't theoretical — they're the same practices our agronomy team recommends to farmers every day.</p>
+    const escapeHtml = s => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-          <h2 id="section-1">1. Crop Rotation and Diversification</h2>
-          <p>Crop rotation is one of the oldest and most effective sustainable farming practices. By alternating different crops on the same land across seasons, farmers naturally break pest and disease cycles, replenish soil nutrients, and reduce dependence on chemical inputs.</p>
-          <p>For example, rotating a cereal crop like maize with a legume like beans or cowpeas helps fix nitrogen back into the soil — reducing the need for synthetic fertilizers the following season.</p>
+    const fmtDate = iso => {
+      if (!iso) return '—';
+      try {
+        return new Date(iso).toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch { return '—'; }
+    };
 
-          <div class="pull-quote">
-            "Farmers who rotate their crops consistently see up to <strong>30% higher yields</strong> over five years compared to continuous monocropping."
-            <cite>— Rise Axis Agronomy Team</cite>
-          </div>
+    const fmtViews = n => Number(n || 0).toLocaleString();
 
-          <h3>Best rotation pairings for Kenyan farms:</h3>
-          <ul>
-            <li><strong>Maize → Beans → Maize</strong> — legume fixes nitrogen for the next cereal</li>
-            <li><strong>Potatoes → Peas → Wheat</strong> — breaks soil-borne disease cycles</li>
-            <li><strong>Kale → Onions → Carrots</strong> — disrupts pest life cycles in vegetables</li>
-            <li><strong>Napier grass → Lucerne → Maize</strong> — builds soil organic matter in dairy systems</li>
-          </ul>
+    const titleCase = s => String(s || '').replace(/\b\w/g, c => c.toUpperCase());
 
-          <h2 id="section-2">2. Integrated Pest Management (IPM)</h2>
-          <p>Integrated Pest Management is a holistic approach that combines biological, cultural, physical, and chemical controls — using chemicals only as a last resort. This reduces input costs, protects beneficial insects, and prevents the development of pesticide-resistant pests.</p>
+    const initialsFromName = name => {
+      const parts = String(name || '').trim().split(/\s+/);
+      if (!parts.length || !parts[0]) return 'RA';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    };
 
-          <h3>Core IPM principles:</h3>
-          <ol>
-            <li><strong>Scout regularly</strong> — monitor fields weekly to identify pests early</li>
-            <li><strong>Encourage natural predators</strong> — ladybirds, parasitic wasps, and spiders help control pest populations</li>
-            <li><strong>Use resistant varieties</strong> — plant seeds bred for local pest and disease resistance</li>
-            <li><strong>Apply targeted treatments</strong> — only when pest thresholds are exceeded</li>
-          </ol>
-
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-lightbulb"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Sustainable practices improve yields <strong>and</strong> reduce long-term costs</li>
-              <li>Crop rotation and IPM are the two highest-impact changes a farmer can make</li>
-              <li>Healthy soil is the foundation of every productive farm</li>
-              <li>Water efficiency protects against unpredictable rainfall</li>
-              <li>Agroforestry adds income, shade, and soil health simultaneously</li>
-            </ul>
-          </div>
-
-          <h2 id="section-3">3. Building Healthy Soil with Organic Matter</h2>
-          <p>Healthy soil is alive. It contains billions of microorganisms that break down organic matter, cycle nutrients, and improve soil structure. Farmers can build soil health by:</p>
-          <ul>
-            <li>Adding compost or well-rotted manure regularly</li>
-            <li>Retaining crop residues instead of burning them</li>
-            <li>Minimising tillage to protect soil structure</li>
-            <li>Using cover crops during fallow periods</li>
-            <li>Applying biofertilizers that add beneficial microbes</li>
-          </ul>
-          <p>Biofertilizers — like the ones we supply at Rise Axis Solutions — contain living soil microbes that rehabilitate tired soils naturally. They enhance crop vitality, reduce chemical fertilizer dependence, and increase plant resistance to disease.</p>
-
-          <h2 id="section-4">4. Efficient Water Use and Irrigation</h2>
-          <p>Water is one of the most limiting factors in Kenyan agriculture. Efficient irrigation is not just about saving water — it's about delivering the right amount at the right time for maximum crop uptake.</p>
-          <p>Drip irrigation is one of the most efficient systems available, delivering water directly to plant roots. It reduces evaporation losses by up to <strong>60%</strong> compared to flood irrigation and can be paired with fertigation for precise nutrient delivery.</p>
-
-          <figure class="article-image">
-            <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80" alt="Modern drip irrigation system on a Kenyan farm" loading="lazy">
-            <figcaption>Modern drip irrigation dramatically reduces water waste on Kenyan farms.</figcaption>
-          </figure>
-
-          <h2 id="section-5">5. Agroforestry and Cover Cropping</h2>
-          <p>Agroforestry — integrating trees with crops or livestock — is one of the most powerful sustainable practices available to smallholder farmers. Trees provide shade, improve soil fertility, prevent erosion, and can produce additional income through fruit, timber, or fodder.</p>
-          <p>Cover crops such as clover, vetch, and lablab protect bare soil between harvests, suppress weeds, and add organic matter. When used together, agroforestry and cover cropping create a resilient, productive farming system that benefits generations.</p>
-
-          <h3>Recommended trees for Kenyan agroforestry:</h3>
-          <ul>
-            <li><strong>Grevillea</strong> — fast-growing, provides timber and shade</li>
-            <li><strong>Calliandra</strong> — excellent fodder for dairy cattle</li>
-            <li><strong>Moringa</strong> — nutritious leaves and drought-tolerant</li>
-            <li><strong>Faidherbia albida</strong> — fixes nitrogen and improves soil</li>
-          </ul>
-
-          <h2>The Bottom Line</h2>
-          <p>Sustainable farming is not a sacrifice — it's an investment. Every practice in this article pays back in higher yields, lower input costs, and healthier land within just a few seasons.</p>
-          <p>At Rise Axis Solutions, we work with farmers across Kenya to help them adopt these practices with confidence. From soil testing to product recommendations, our agronomy team is here to support every step of your journey toward more sustainable, more profitable farming.</p>
-          <p>Ready to make the switch? <a href="contact.html">Reach out to our team today</a> or browse our <a href="product.html">full range of agri-inputs</a> to get started.</p>
-        `
-      },
-      {
-        id: 2,
-        title: 'How to Choose the Right Crop Protection Products for Your Farm',
-        cat: 'agronomy',
-        catLabel: 'Agronomy',
-        author: 'Grace Wanjiku',
-        authorInitials: 'GW',
-        authorRole: 'Crop Protection Specialist',
-        authorBio: 'Grace is a certified crop protection specialist with 9 years of field experience. She advises farmers across Kenya on integrated pest management and safe agrochemical use.',
-        date: 'Mar 10, 2026',
-        dateISO: '2026-03-10',
-        readTime: '8 min',
-        views: '1,090',
-        img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80',
-        excerpt: 'A practical guide to understanding pesticide formulations, active ingredients, and safe application methods for healthier crops and higher yields.',
-        tags: ['cropprotection', 'pesticides', 'ipm', 'agronomy', 'safety'],
-        related: [1, 5, 8],
-        body: `
-          <p>Choosing the right crop protection product is one of the most important decisions a farmer makes each season. The wrong product wastes money, harms beneficial insects, and can leave residues that affect market access. The right one protects your crop, your investment, and your land.</p>
-          <p>This guide walks you through the essentials — from reading labels correctly to understanding active ingredients and applying products safely.</p>
-          <h2 id="section-1">1. Start With Correct Pest Identification</h2>
-          <p>Before you buy anything, you must know exactly what you're dealing with. Different pests require different active ingredients — a fungicide won't help with an insect infestation, and a broad-spectrum insecticide may kill the natural predators already working for you.</p>
-          <ul>
-            <li><strong>Scout your field weekly</strong> and record what you see</li>
-            <li><strong>Photograph affected plants</strong> for comparison and expert advice</li>
-            <li><strong>Consult an agronomist</strong> if you're unsure — accurate diagnosis saves money</li>
-            <li><strong>Check thresholds</strong> — not every pest sighting requires spraying</li>
-          </ul>
-          <h2 id="section-2">2. Understand Active Ingredients</h2>
-          <p>The active ingredient is the chemical that actually controls the pest. Two products with different brand names may contain the same active ingredient — check before you buy. Overusing the same active ingredient leads to resistance, which is a growing problem in Kenya.</p>
-          <div class="pull-quote">
-            "Rotating active ingredients with different modes of action is one of the most effective ways to prevent pesticide resistance."
-            <cite>— Grace Wanjiku, Crop Protection Specialist</cite>
-          </div>
-          <h3>Common active ingredient groups:</h3>
-          <ul>
-            <li><strong>Pyrethroids</strong> — fast-acting contact insecticides</li>
-            <li><strong>Neonicotinoids</strong> — systemic insecticides absorbed by plants</li>
-            <li><strong>Triazoles</strong> — broad-spectrum fungicides</li>
-            <li><strong>Strobilurins</strong> — preventative fungicides with long residual activity</li>
-            <li><strong>Glyphosate</strong> — non-selective systemic herbicide</li>
-          </ul>
-          <h2 id="section-3">3. Match the Formulation to Your Situation</h2>
-          <p>Crop protection products come in several formulations — each suited to specific conditions. Choosing the wrong formulation reduces effectiveness and can damage your crop.</p>
-          <h3>Formulation types:</h3>
-          <ol>
-            <li><strong>EC (Emulsifiable Concentrate)</strong> — mixes readily with water, good for foliar application</li>
-            <li><strong>WP (Wettable Powder)</strong> — good for dusty or humid conditions</li>
-            <li><strong>SC (Suspension Concentrate)</strong> — stable, easy to measure, low phytotoxicity</li>
-            <li><strong>WG (Water Dispersible Granules)</strong> — safer handling, longer shelf life</li>
-          </ol>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-shield-alt"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Always identify the pest <strong>before</strong> buying a product</li>
-              <li>Rotate active ingredients to prevent resistance</li>
-              <li>Match the formulation to your crop and conditions</li>
-              <li>Read the label — dosage, timing, and PHI matter</li>
-              <li>Wear protective gear and store products safely</li>
-            </ul>
-          </div>
-          <h2 id="section-4">4. Read the Label Carefully</h2>
-          <p>The label is your most important document. It tells you the correct dosage, timing, pre-harvest interval (PHI), and safety precautions. Ignoring it risks crop damage, human exposure, and rejection at market.</p>
-          <ul>
-            <li><strong>Dosage</strong> — more is not better; overdosing wastes money and harms crops</li>
-            <li><strong>Timing</strong> — apply at the right growth stage for best results</li>
-            <li><strong>PHI</strong> — pre-harvest interval ensures residues fall within legal limits</li>
-            <li><strong>Re-entry interval</strong> — how long to wait before entering the field</li>
-          </ul>
-          <h2 id="section-5">5. Apply Safely and Store Correctly</h2>
-          <p>Safe application protects you, your workers, and the environment. Never spray in high wind or extreme heat, and always wear appropriate protective equipment.</p>
-          <ul>
-            <li>Wear gloves, boots, goggles, and a mask when mixing and spraying</li>
-            <li>Never eat, drink, or smoke while handling crop protection products</li>
-            <li>Store products in their original containers, locked away from children and animals</li>
-            <li>Dispose of empty containers safely — never reuse them</li>
-            <li>Wash hands and clothing thoroughly after use</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>Choosing the right crop protection products doesn't have to be complicated. With careful pest identification, an understanding of active ingredients, and safe handling practices, you can protect your crops and your investment with confidence.</p>
-          <p>At Rise Axis Solutions, we supply a full range of quality crop protection products — supported by expert advice from our agronomy team. <a href="contact.html">Get in touch</a> for a personalised recommendation.</p>
-        `
-      },
-      {
-        id: 3,
-        title: 'Livestock Nutrition: The Role of Premixes and Feed Additives',
-        cat: 'veterinary',
-        catLabel: 'Veterinary',
-        author: 'Dr. Peter Ochieng',
-        authorInitials: 'PO',
-        authorRole: 'Veterinary Advisor',
-        authorBio: 'Dr. Ochieng is a licensed veterinarian with over 15 years of experience in livestock health. He advises commercial and smallholder farms on nutrition, disease prevention, and herd management.',
-        date: 'Mar 06, 2026',
-        dateISO: '2026-03-06',
-        readTime: '7 min',
-        views: '872',
-        img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&q=80',
-        excerpt: 'Understanding what goes into your animals\' feed and how the right premix can transform herd health, milk yield, and overall profitability.',
-        tags: ['livestock', 'premixes', 'feedadditives', 'dairy', 'poultry'],
-        related: [4, 7, 1],
-        body: `
-          <p>Feed is the single largest cost on most livestock farms — often accounting for 60–70% of total production expenses. Yet many farmers feed their animals without understanding what's actually inside the bag.</p>
-          <p>This article explores the critical role of premixes and feed additives — and how getting them right can transform your herd's health, productivity, and profitability.</p>
-          <h2 id="section-1">1. What Are Premixes?</h2>
-          <p>A premix is a carefully balanced blend of vitamins, minerals, amino acids, and other micronutrients designed to be mixed into animal feed at low inclusion rates. Premixes correct the nutritional gaps that grain-based feeds leave behind.</p>
-          <p>Without a properly formulated premix, animals can suffer from subclinical deficiencies — conditions that don't show obvious symptoms but quietly reduce growth, fertility, and milk yield.</p>
-          <div class="pull-quote">
-            "Subclinical nutritional deficiencies cost Kenyan livestock farmers more in lost productivity than clinical disease does."
-            <cite>— Dr. Peter Ochieng, Veterinary Advisor</cite>
-          </div>
-          <h2 id="section-2">2. Why Feed Additives Matter</h2>
-          <p>Feed additives go beyond basic nutrition. They support digestion, immunity, and overall animal performance. The most impactful categories include:</p>
-          <h3>Key additive categories:</h3>
-          <ul>
-            <li><strong>Probiotics</strong> — live beneficial bacteria that support gut health</li>
-            <li><strong>Prebiotics</strong> — feed for beneficial gut bacteria</li>
-            <li><strong>Enzymes</strong> — break down fibre and improve nutrient absorption</li>
-            <li><strong>Organic acids</strong> — reduce pathogen load in the gut</li>
-            <li><strong>Antioxidants</strong> — protect against oxidative stress</li>
-          </ul>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-flask"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Premixes correct the nutritional gaps in grain-based feeds</li>
-              <li>Feed additives support gut health, immunity, and productivity</li>
-              <li>Choose premixes formulated for your specific species and stage</li>
-              <li>Consistency matters more than occasional high doses</li>
-              <li>Work with a nutritionist to build the right program</li>
-            </ul>
-          </div>
-          <h2 id="section-3">3. Matching Premixes to Species and Stage</h2>
-          <p>Different animals — and even different stages of the same animal's life — have very different nutritional needs. A dairy cow in peak lactation requires dramatically more calcium and energy than a dry cow. A broiler chick needs a completely different premix than a layer hen.</p>
-          <h3>Examples of specialised premixes:</h3>
-          <ol>
-            <li><strong>Layer Premix</strong> — high calcium and vitamin D3 for eggshell quality</li>
-            <li><strong>Dairy Premix</strong> — balanced minerals for milk yield and fertility</li>
-            <li><strong>Broiler Premix</strong> — amino acids and antioxidants for rapid growth</li>
-            <li><strong>Starter Premix</strong> — for young animals with developing immune systems</li>
-          </ol>
-          <h2 id="section-4">4. The Economics of Good Nutrition</h2>
-          <p>Well-fed animals are more productive, healthier, and require fewer veterinary interventions. Studies consistently show that every shilling invested in proper nutrition returns <strong>3–5 shillings</strong> in improved productivity.</p>
-          <p>At the same time, poorly formulated feed wastes money. Animals that can't digest their feed properly excrete nutrients that should have been converted into meat, milk, or eggs.</p>
-          <h2 id="section-5">5. Practical Advice for Kenyan Farmers</h2>
-          <p>Here's how to get started with a proper nutrition program:</p>
-          <ul>
-            <li><strong>Analyse your feed ingredients</strong> — know what you're starting with</li>
-            <li><strong>Choose the right premix</strong> for your species and production stage</li>
-            <li><strong>Mix accurately</strong> — small errors in premix inclusion can cause big problems</li>
-            <li><strong>Store properly</strong> — vitamins degrade with heat, light, and moisture</li>
-            <li><strong>Consult a nutritionist</strong> — professional advice pays for itself</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>Proper nutrition is the foundation of every successful livestock operation. Premixes and feed additives are not optional extras — they're essential tools for maximising productivity and protecting your investment.</p>
-          <p>Rise Axis Solutions supplies a complete range of premixes and feed additives — formulated for Kenyan conditions and backed by expert technical support. <a href="product.html">Browse our range</a> or <a href="contact.html">talk to our team</a> for a personalised recommendation.</p>
-        `
-      },
-      {
-        id: 4,
-        title: 'Floriculture in Kenya: Trends, Opportunities, and Challenges',
-        cat: 'industry',
-        catLabel: 'Industry News',
-        author: 'Sarah Njeri',
-        authorInitials: 'SN',
-        authorRole: 'Industry Analyst',
-        authorBio: 'Sarah covers East African agribusiness and trade for Rise Axis Solutions. She has written extensively on floriculture, horticulture exports, and market access.',
-        date: 'Mar 02, 2026',
-        dateISO: '2026-03-02',
-        readTime: '5 min',
-        views: '980',
-        img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1600&q=80',
-        excerpt: 'Kenya\'s floriculture sector is one of the largest in the world. We look at what\'s driving growth and what farmers need to stay competitive.',
-        tags: ['floriculture', 'exports', 'industry', 'cutflowers', 'kenya'],
-        related: [1, 5, 8],
-        body: `
-          <p>Kenya is the third-largest exporter of cut flowers in the world, behind only the Netherlands and Colombia. The sector employs over 500,000 people directly and supports countless more through the supply chain. It's a genuine economic powerhouse — and it's still growing.</p>
-          <h2 id="section-1">1. The Current State of Kenyan Floriculture</h2>
-          <p>Kenya's floriculture sector generates over <strong>$1 billion annually</strong> in export revenue. Roses dominate — accounting for around 70% of exports — followed by summer flowers, cuttings, and potted plants.</p>
-          <p>The sector is concentrated around Lake Naivasha, with smaller clusters near Nairobi and Mount Kenya. This geographic concentration has driven the development of specialised infrastructure: cold chains, cargo hubs, and dedicated freight routes to Europe and the Middle East.</p>
-          <div class="pull-quote">
-            "Kenya's floriculture sector represents one of the most successful agricultural value chains in Africa — built on quality, reliability, and innovation."
-            <cite>— Sarah Njeri, Industry Analyst</cite>
-          </div>
-          <h2 id="section-2">2. Key Trends Shaping the Industry</h2>
-          <p>Several trends are reshaping floriculture in Kenya — some representing opportunity, others posing real challenges.</p>
-          <h3>Growth drivers:</h3>
-          <ul>
-            <li><strong>Rising global demand</strong> — especially from Europe and the Middle East</li>
-            <li><strong>New markets</strong> — Asia and North America are opening up</li>
-            <li><strong>Direct trade</strong> — more farms selling directly to retailers</li>
-            <li><strong>Value addition</strong> — bouquets, arrangements, and processed products</li>
-            <li><strong>Sustainable certifications</strong> — premium pricing for certified farms</li>
-          </ul>
-          <h3>Challenges:</h3>
-          <ul>
-            <li><strong>Climate variability</strong> — unpredictable rainfall and temperature</li>
-            <li><strong>Rising input costs</strong> — fertilizer, fuel, and labour</li>
-            <li><strong>Water scarcity</strong> — especially around Lake Naivasha</li>
-            <li><strong>Market volatility</strong> — auctions and pricing pressures</li>
-            <li><strong>Regulatory compliance</strong> — tightening EU residue limits</li>
-          </ul>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-chart-line"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Kenya is a top-3 global flower exporter</li>
-              <li>Sector generates over $1 billion annually</li>
-              <li>Roses dominate, but summer flowers are growing</li>
-              <li>Sustainability certification is increasingly important</li>
-              <li>Water management is a critical long-term challenge</li>
-            </ul>
-          </div>
-          <h2 id="section-3">3. What This Means for Farmers and Suppliers</h2>
-          <p>For Kenyan farmers — whether in floriculture or supplying it — the message is clear: quality and reliability are non-negotiable. Buyers increasingly demand traceability, sustainability certification, and consistent year-round supply.</p>
-          <p>Agri-input suppliers play a critical supporting role: providing the right crop protection products, fertilisers, and irrigation solutions that keep Kenyan flowers competitive on the world stage.</p>
-          <h2 id="section-4">4. The Future of Kenyan Floriculture</h2>
-          <p>Looking ahead, Kenya's floriculture sector is well-positioned for continued growth. Emerging trends — from regenerative farming practices to direct-to-consumer models — are creating new opportunities for innovative farms.</p>
-          <p>At the same time, the sector must navigate real challenges: climate change, water scarcity, and evolving market demands. Farms that invest in quality, sustainability, and efficiency will continue to thrive.</p>
-          <h2>The Bottom Line</h2>
-          <p>Kenya's floriculture sector is a remarkable success story — one built on quality, reliability, and constant innovation. With the right inputs, technical support, and market access, Kenyan farmers will continue to lead the world in flower production.</p>
-          <p>Rise Axis Solutions is proud to support Kenya's floriculture industry with a comprehensive range of agri-inputs. <a href="contact.html">Talk to our team</a> about how we can support your farm.</p>
-        `
-      },
-      {
-        id: 5,
-        title: 'Building Healthy Soil: A Foundation for Higher Yields',
-        cat: 'agronomy',
-        catLabel: 'Agronomy',
-        author: 'James Mwangi',
-        authorInitials: 'JM',
-        authorRole: 'Senior Agronomist',
-        authorBio: 'James has over 12 years of experience supporting Kenyan farmers with soil health, crop nutrition, and sustainable farming practices.',
-        date: 'Feb 26, 2026',
-        dateISO: '2026-02-26',
-        readTime: '9 min',
-        views: '756',
-        img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1600&q=80',
-        excerpt: 'Soil health is the cornerstone of productive farming. Learn how to test, improve, and maintain soil fertility for long-term success.',
-        tags: ['soilhealth', 'fertility', 'agronomy', 'compost', 'biofertilizers'],
-        related: [1, 2, 8],
-        body: `
-          <p>Healthy soil is the foundation of every productive farm. It's not just dirt — it's a living ecosystem containing billions of microorganisms, organic matter, minerals, and air. When soil is healthy, crops thrive with less input. When it's degraded, no amount of fertilizer can fully compensate.</p>
-          <h2 id="section-1">1. What Makes Soil Healthy?</h2>
-          <p>Soil health is measured across several dimensions — each of which can be managed and improved.</p>
-          <h3>The five pillars of soil health:</h3>
-          <ul>
-            <li><strong>Organic matter</strong> — the foundation of soil fertility</li>
-            <li><strong>Microbial activity</strong> — the living engine of nutrient cycling</li>
-            <li><strong>Structure</strong> — how soil particles clump together</li>
-            <li><strong>Nutrient balance</strong> — the right mix of macro and micronutrients</li>
-            <li><strong>pH level</strong> — determining nutrient availability</li>
-          </ul>
-          <div class="pull-quote">
-            "A single teaspoon of healthy soil contains more microorganisms than there are people on Earth."
-            <cite>— James Mwangi, Senior Agronomist</cite>
-          </div>
-          <h2 id="section-2">2. Testing Your Soil</h2>
-          <p>You can't manage what you don't measure. Soil testing is the starting point for any soil health program. A comprehensive soil test reveals nutrient levels, pH, organic matter content, and potential problems like salinity or compaction.</p>
-          <h3>What a soil test tells you:</h3>
-          <ol>
-            <li><strong>pH level</strong> — determines which crops will thrive and which nutrients are available</li>
-            <li><strong>Macronutrients</strong> — nitrogen, phosphorus, potassium (NPK)</li>
-            <li><strong>Micronutrients</strong> — zinc, boron, iron, manganese</li>
-            <li><strong>Organic matter</strong> — the percentage of decomposed plant and animal material</li>
-            <li><strong>Cation exchange capacity</strong> — the soil's ability to hold nutrients</li>
-          </ol>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-seedling"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Healthy soil is a living ecosystem, not just dirt</li>
-              <li>Test your soil before applying any amendments</li>
-              <li>Organic matter is the foundation of soil fertility</li>
-              <li>Biofertilizers rebuild microbial life naturally</li>
-              <li>Soil health is a long-term investment, not a quick fix</li>
-            </ul>
-          </div>
-          <h2 id="section-3">3. Building Organic Matter</h2>
-          <p>Organic matter is the single most important indicator of soil health. It improves water retention, feeds soil microbes, and slowly releases nutrients as it decomposes. Farmers can build organic matter by:</p>
-          <ul>
-            <li><strong>Adding compost</strong> — well-decomposed organic material</li>
-            <li><strong>Applying manure</strong> — aged and properly treated</li>
-            <li><strong>Retaining crop residues</strong> — instead of burning them</li>
-            <li><strong>Using cover crops</strong> — during fallow periods</li>
-            <li><strong>Reducing tillage</strong> — to protect soil structure</li>
-          </ul>
-          <h2 id="section-4">4. The Role of Biofertilizers</h2>
-          <p>Biofertilizers contain living microorganisms — bacteria, fungi, and other beneficial microbes — that enhance soil fertility naturally. They work by fixing atmospheric nitrogen, solubilising phosphorus, and decomposing organic matter.</p>
-          <p>Unlike synthetic fertilizers, biofertilizers improve soil health over the long term. They're particularly valuable for rehabilitating tired, overworked soils.</p>
-          <h2 id="section-5">5. Managing pH and Nutrients</h2>
-          <p>Soil pH determines nutrient availability. Most crops prefer slightly acidic to neutral soil (pH 6.0–7.0). Outside this range, nutrients become locked up — meaning you can apply fertilizer and still see no response.</p>
-          <ul>
-            <li><strong>Acidic soil (pH below 6)</strong> — apply agricultural lime</li>
-            <li><strong>Alkaline soil (pH above 7.5)</strong> — apply gypsum or elemental sulphur</li>
-            <li><strong>Balanced nutrients</strong> — apply fertilizers based on test results, not guesswork</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>Healthy soil is the foundation of every productive farm. By testing regularly, building organic matter, and using biofertilizers, farmers can create soil that produces higher yields with fewer inputs — season after season.</p>
-          <p>Rise Axis Solutions supplies soil amendments, biofertilizers, and offers soil testing services for Kenyan farmers. <a href="contact.html">Get in touch</a> to learn more.</p>
-        `
-      },
-      {
-        id: 6,
-        title: 'A Practical Guide to Modern Irrigation Systems',
-        cat: 'products',
-        catLabel: 'Product Guides',
-        author: 'David Kamau',
-        authorInitials: 'DK',
-        authorRole: 'Irrigation Specialist',
-        authorBio: 'David specialises in irrigation design and water management. He has designed irrigation systems for farms ranging from smallholder plots to large commercial operations.',
-        date: 'Feb 20, 2026',
-        dateISO: '2026-02-20',
-        readTime: '6 min',
-        views: '645',
-        img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80',
-        excerpt: 'From drip irrigation to sprinklers — comparing the most common irrigation systems and helping you choose the right one for your farm.',
-        tags: ['irrigation', 'watermanagement', 'drip', 'sprinkler', 'products'],
-        related: [1, 5, 8],
-        body: `
-          <p>Water is one of the most limiting factors in Kenyan agriculture. With rainfall becoming less predictable and droughts more frequent, irrigation has shifted from a luxury to a necessity for many farms.</p>
-          <p>This guide compares the most common irrigation systems — helping you choose the one that matches your crops, terrain, and budget.</p>
-          <h2 id="section-1">1. Drip Irrigation</h2>
-          <p>Drip irrigation delivers water directly to plant roots through a network of tubes and emitters. It's the most water-efficient system available — reducing evaporation losses by up to <strong>60%</strong> compared to flood irrigation.</p>
-          <h3>Best for:</h3>
-          <ul>
-            <li>High-value crops like vegetables, fruits, and flowers</li>
-            <li>Water-scarce areas</li>
-            <li>Farms with uneven terrain</li>
-            <li>Greenhouse production</li>
-          </ul>
-          <div class="pull-quote">
-            "Drip irrigation is not just about saving water — it's about delivering the right amount at the right time for maximum crop uptake."
-            <cite>— David Kamau, Irrigation Specialist</cite>
-          </div>
-          <h2 id="section-2">2. Sprinkler Irrigation</h2>
-          <p>Sprinkler systems spray water over crops, mimicking natural rainfall. They're more affordable than drip systems and easier to install — but less water-efficient.</p>
-          <h3>Best for:</h3>
-          <ul>
-            <li>Cereals and field crops</li>
-            <li>Pasture and fodder production</li>
-            <li>Large, flat fields</li>
-            <li>Frost protection</li>
-          </ul>
-          <h2 id="section-3">3. Furrow and Flood Irrigation</h2>
-          <p>Traditional flood and furrow irrigation relies on gravity to move water across fields. It's the cheapest option but by far the least efficient — losing significant water to evaporation and runoff.</p>
-          <p>For most farms, investing in drip or sprinkler systems pays back within a few seasons through water savings and improved yields.</p>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-tint"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Drip irrigation is the most water-efficient option</li>
-              <li>Sprinklers suit field crops and pasture</li>
-              <li>Furrow and flood irrigation waste significant water</li>
-              <li>System choice depends on crops, terrain, and budget</li>
-              <li>Fertigation (fertilizer + irrigation) maximises efficiency</li>
-            </ul>
-          </div>
-          <h2 id="section-4">4. Fertigation — Combining Irrigation and Nutrition</h2>
-          <p>Fertigation is the practice of injecting soluble fertilizers into irrigation water. It delivers nutrients directly to the root zone, improving uptake efficiency and reducing waste.</p>
-          <p>Fertigation works best with drip irrigation. It's widely used in greenhouse production and high-value field crops.</p>
-          <h2 id="section-5">5. Choosing the Right System for Your Farm</h2>
-          <p>Consider these factors when selecting an irrigation system:</p>
-          <ul>
-            <li><strong>Crop type</strong> — different crops suit different systems</li>
-            <li><strong>Water source</strong> — flow rate, reliability, and quality</li>
-            <li><strong>Terrain</strong> — flat or sloped land</li>
-            <li><strong>Budget</strong> — upfront cost and ongoing maintenance</li>
-            <li><strong>Labour</strong> — how much time you can dedicate to operation</li>
-            <li><strong>Energy</strong> — gravity, solar, or electric pumping</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>The right irrigation system can transform a farm — increasing yields, reducing water use, and enabling year-round production. The wrong one wastes money and creates frustration.</p>
-          <p>Rise Axis Solutions supplies a full range of irrigation equipment — drip lines, sprinklers, pumps, and fittings — and offers design consultation for Kenyan farmers. <a href="contact.html">Talk to us</a> about your irrigation needs.</p>
-        `
-      },
-      {
-        id: 7,
-        title: 'Understanding Veterinary Injectables: A Farmer\'s Handbook',
-        cat: 'veterinary',
-        catLabel: 'Veterinary',
-        author: 'Dr. Peter Ochieng',
-        authorInitials: 'PO',
-        authorRole: 'Veterinary Advisor',
-        authorBio: 'Dr. Ochieng is a licensed veterinarian with over 15 years of experience in livestock health.',
-        date: 'Feb 15, 2026',
-        dateISO: '2026-02-15',
-        readTime: '7 min',
-        views: '534',
-        img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&q=80',
-        excerpt: 'A clear, practical guide to the most common veterinary injectables — what they treat, how to administer them, and safety precautions.',
-        tags: ['veterinary', 'injectables', 'livestock', 'health', 'antibiotics'],
-        related: [3, 4, 6],
-        body: `
-          <p>Veterinary injectables are among the most powerful tools available to livestock farmers. Used correctly, they quickly treat infections, control parasites, and save animals that would otherwise be lost. Used incorrectly, they can cause residues, resistance, and even harm the animals they're meant to help.</p>
-          <p>This handbook covers the essentials — what injectables do, how to administer them safely, and how to store them properly.</p>
-          <h2 id="section-1">1. Common Types of Veterinary Injectables</h2>
-          <p>Veterinary injectables fall into several categories, each targeting specific health issues.</p>
-          <h3>Main categories:</h3>
-          <ul>
-            <li><strong>Antibiotics</strong> — treat bacterial infections (oxytetracycline, penicillin, amoxicillin)</li>
-            <li><strong>Antiparasitics</strong> — control internal and external parasites (ivermectin)</li>
-            <li><strong>Vitamins</strong> — support recovery and vitality (B-complex)</li>
-            <li><strong>Vaccines</strong> — prevent specific diseases</li>
-            <li><strong>Anti-inflammatories</strong> — reduce pain and swelling</li>
-          </ul>
-          <div class="pull-quote">
-            "The right injectable, given at the right dose, at the right time, can save an animal. The wrong one can do more harm than good."
-            <cite>— Dr. Peter Ochieng, Veterinary Advisor</cite>
-          </div>
-          <h2 id="section-2">2. Routes of Administration</h2>
-          <p>Different injectables require different routes. Using the wrong route reduces effectiveness and can cause tissue damage.</p>
-          <h3>Common routes:</h3>
-          <ol>
-            <li><strong>Intramuscular (IM)</strong> — into the muscle, fast absorption</li>
-            <li><strong>Subcutaneous (SC)</strong> — under the skin, slower release</li>
-            <li><strong>Intravenous (IV)</strong> — directly into the vein, immediate effect</li>
-            <li><strong>Intraperitoneal (IP)</strong> — into the abdominal cavity (rare, requires expertise)</li>
-          </ol>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-syringe"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Match the injectable to the specific condition</li>
-              <li>Use the correct route — IM, SC, or IV</li>
-              <li>Follow dosage instructions carefully</li>
-              <li>Observe withdrawal periods before slaughter or milk sale</li>
-              <li>Store injectables correctly — cold chain matters</li>
-            </ul>
-          </div>
-          <h2 id="section-3">3. Safe Administration Practices</h2>
-          <p>Safe injection protects both your animals and yourself.</p>
-          <ul>
-            <li>Use clean, sterile needles — never reuse</li>
-            <li>Restrain animals properly to avoid injury</li>
-            <li>Choose the correct needle size for the species</li>
-            <li>Inject at the recommended site (usually the neck)</li>
-            <li>Dispose of used needles safely</li>
-          </ul>
-          <h2 id="section-4">4. Withdrawal Periods</h2>
-          <p>Withdrawal periods are the legally mandated time between the last treatment and the sale of meat, milk, or eggs. They exist to protect consumers from drug residues.</p>
-          <p>Always check the label — withdrawal periods vary by product and species. Selling products before the withdrawal period ends can result in rejected shipments, fines, and reputational damage.</p>
-          <h2 id="section-5">5. Storage and Handling</h2>
-          <p>Injectables must be stored correctly to maintain potency.</p>
-          <ul>
-            <li><strong>Refrigeration</strong> — most injectables require cool storage (2–8°C)</li>
-            <li><strong>Protection from light</strong> — many degrade in sunlight</li>
-            <li><strong>Original containers</strong> — never transfer to unlabelled bottles</li>
-            <li><strong>Expiry dates</strong> — check and discard expired stock</li>
-            <li><strong>Cold chain</strong> — maintain temperature from purchase to use</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>Veterinary injectables are powerful tools — but they must be used with care. Always follow label instructions, administer via the correct route, and observe withdrawal periods.</p>
-          <p>Rise Axis Solutions supplies a full range of veterinary injectables and offers technical support to Kenyan farmers. <a href="product.html">Browse our range</a> or <a href="contact.html">contact our team</a> for advice.</p>
-        `
-      },
-      {
-        id: 8,
-        title: 'Seed Selection: Matching Varieties to Your Climate and Soil',
-        cat: 'agronomy',
-        catLabel: 'Agronomy',
-        author: 'Grace Wanjiku',
-        authorInitials: 'GW',
-        authorRole: 'Crop Protection Specialist',
-        authorBio: 'Grace is a certified crop protection specialist with 9 years of field experience.',
-        date: 'Feb 10, 2026',
-        dateISO: '2026-02-10',
-        readTime: '5 min',
-        views: '489',
-        img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1600&q=80',
-        excerpt: 'Choosing the right seed variety is one of the highest-impact decisions a farmer can make. Here\'s how to get it right.',
-        tags: ['seeds', 'cropvarieties', 'agronomy', 'climate', 'soil'],
-        related: [1, 2, 5],
-        body: `
-          <p>Seed selection is one of the highest-impact decisions a farmer can make. The right variety can mean the difference between a bumper harvest and a failed season. The wrong one wastes time, money, and hope.</p>
-          <p>This guide walks through the key factors to consider when selecting seed varieties for your farm.</p>
-          <h2 id="section-1">1. Match Varieties to Your Climate</h2>
-          <p>Different varieties have different climate requirements — rainfall, temperature, altitude, and day length all matter.</p>
-          <h3>Climate factors to consider:</h3>
-          <ul>
-            <li><strong>Rainfall</strong> — does the variety need consistent moisture?</li>
-            <li><strong>Temperature</strong> — some varieties tolerate heat, others prefer cool</li>
-            <li><strong>Altitude</strong> — varieties are bred for specific altitude ranges</li>
-            <li><strong>Day length</strong> — photoperiod-sensitive varieties need specific daylight hours</li>
-          </ul>
-          <div class="pull-quote">
-            "The best variety in the wrong environment will still fail. Match the seed to your farm, not the other way around."
-            <cite>— Grace Wanjiku, Crop Protection Specialist</cite>
-          </div>
-          <h2 id="section-2">2. Consider Soil Type</h2>
-          <p>Soil type affects drainage, nutrient availability, and root development. Some varieties tolerate poor soils better than others.</p>
-          <ul>
-            <li><strong>Sandy soils</strong> — fast-draining, need drought-tolerant varieties</li>
-            <li><strong>Clay soils</strong> — water-retentive, need varieties that resist waterlogging</li>
-            <li><strong>Loamy soils</strong> — ideal for most crops</li>
-            <li><strong>Acidic or alkaline soils</strong> — choose varieties that tolerate your pH</li>
-          </ul>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-leaf"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Match varieties to your climate and soil type</li>
-              <li>Choose certified seed from reputable sources</li>
-              <li>Consider disease resistance and yield potential</li>
-              <li>Buy fresh, viable seed — never use old or damaged stock</li>
-              <li>Record results to refine your choices each season</li>
-            </ul>
-          </div>
-          <h2 id="section-3">3. Disease and Pest Resistance</h2>
-          <p>Varieties bred for resistance to common diseases reduce your reliance on crop protection products and improve yield stability.</p>
-          <p>Look for varieties resistant to:</p>
-          <ul>
-            <li>Rust, blight, and wilt diseases</li>
-            <li>Common viral infections</li>
-            <li>Major local pests</li>
-          </ul>
-          <h2 id="section-4">4. Yield Potential and Maturity</h2>
-          <p>Consider both the yield potential and the maturity time of the variety. Early-maturing varieties suit short rainy seasons, while longer-maturing varieties may produce higher yields given enough time.</p>
-          <ul>
-            <li><strong>Short season</strong> — 90–120 days for cereals</li>
-            <li><strong>Medium season</strong> — 120–150 days</li>
-            <li><strong>Long season</strong> — 150+ days</li>
-          </ul>
-          <h2 id="section-5">5. Source Your Seed from Reputable Suppliers</h2>
-          <p>Always buy seed from certified, reputable suppliers. Counterfeit or poor-quality seed is a serious problem — it wastes money and can cost you an entire season.</p>
-          <ul>
-            <li>Buy certified seed — look for the certification label</li>
-            <li>Check the expiry date on the package</li>
-            <li>Buy from established, trusted suppliers</li>
-            <li>Keep records of what you planted and how it performed</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>Seed selection is a decision that pays dividends all season long. Match your varieties to your climate, soil, and goals — and buy from sources you trust.</p>
-          <p>Rise Axis Solutions supplies certified seed varieties suited to Kenyan conditions, backed by expert agronomy advice. <a href="product.html">Browse our range</a> or <a href="contact.html">talk to our team</a>.</p>
-        `
-      },
-      {
-        id: 9,
-        title: 'The Rise of Precision Agriculture in East Africa',
-        cat: 'industry',
-        catLabel: 'Industry News',
-        author: 'Sarah Njeri',
-        authorInitials: 'SN',
-        authorRole: 'Industry Analyst',
-        authorBio: 'Sarah covers East African agribusiness and trade for Rise Axis Solutions.',
-        date: 'Feb 04, 2026',
-        dateISO: '2026-02-04',
-        readTime: '8 min',
-        views: '412',
-        img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1600&q=80',
-        excerpt: 'Drones, sensors, and data are transforming how farmers manage their fields. Here\'s what precision agriculture means for small and large farms alike.',
-        tags: ['precisionagriculture', 'technology', 'drones', 'industry', 'data'],
-        related: [1, 4, 5],
-        body: `
-          <p>Precision agriculture — using data, sensors, and technology to optimise farming decisions — is transforming agriculture globally. And it's no longer just for large commercial farms. Across East Africa, smallholder and medium-scale farmers are beginning to benefit from tools that were once out of reach.</p>
-          <h2 id="section-1">1. What Is Precision Agriculture?</h2>
-          <p>Precision agriculture is a management approach that uses technology to observe, measure, and respond to variability within a field. Instead of treating an entire farm as one uniform block, farmers can target inputs to specific areas — reducing waste and improving results.</p>
-          <h3>Core technologies:</h3>
-          <ul>
-            <li><strong>GPS and GIS</strong> — mapping fields with high accuracy</li>
-            <li><strong>Drones</strong> — aerial imaging and crop monitoring</li>
-            <li><strong>Soil sensors</strong> — real-time data on moisture, nutrients, and pH</li>
-            <li><strong>Weather stations</strong> — localised forecasting and alerts</li>
-            <li><strong>Farm management software</strong> — record-keeping and analytics</li>
-          </ul>
-          <div class="pull-quote">
-            "Precision agriculture is not about replacing the farmer's knowledge — it's about amplifying it with better data."
-            <cite>— Sarah Njeri, Industry Analyst</cite>
-          </div>
-          <h2 id="section-2">2. Why It Matters for East Africa</h2>
-          <p>East African agriculture faces unique challenges: climate variability, small landholdings, and limited access to capital. Precision agriculture helps address all three.</p>
-          <h3>Key benefits:</h3>
-          <ul>
-            <li><strong>Better water management</strong> — sensors guide irrigation timing and amounts</li>
-            <li><strong>Reduced input costs</strong> — precision application of fertilizer and pesticides</li>
-            <li><strong>Higher yields</strong> — data-driven decisions about planting, spacing, and timing</li>
-            <li><strong>Early problem detection</strong> — drones catch disease and pests before they spread</li>
-            <li><strong>Improved traceability</strong> — data supports certification and market access</li>
-          </ul>
-          <div class="takeaways">
-            <div class="takeaways-header">
-              <div class="takeaways-icon"><i class="fas fa-microchip"></i></div>
-              <h3>Key Takeaways</h3>
-            </div>
-            <ul>
-              <li>Precision agriculture uses data to optimise farming decisions</li>
-              <li>Technologies include drones, sensors, GPS, and farm software</li>
-              <li>It's increasingly accessible to small and medium farms</li>
-              <li>Benefits include water savings, cost reduction, and higher yields</li>
-              <li>Adoption starts small — one tool at a time</li>
-            </ul>
-          </div>
-          <h2 id="section-3">3. Accessible Technologies for Smallholder Farmers</h2>
-          <p>You don't need a fleet of drones to start with precision agriculture. Many useful tools are already available on the smartphones most Kenyan farmers carry.</p>
-          <h3>Practical starting points:</h3>
-          <ol>
-            <li><strong>Weather apps</strong> — use reliable local forecasts to plan planting and spraying</li>
-            <li><strong>Soil testing services</strong> — get precise data on your soil's nutrient profile</li>
-            <li><strong>SMS advisories</strong> — subscribe to agronomy advisory services</li>
-            <li><strong>Simple farm records</strong> — track inputs, yields, and costs per field</li>
-            <li><strong>Mobile money</strong> — access inputs and sell produce through digital platforms</li>
-          </ol>
-          <h2 id="section-4">4. The Role of Agri-Input Suppliers</h2>
-          <p>Agri-input suppliers play a key role in the shift toward precision agriculture — not just by supplying products, but by supplying data, advice, and technical support. Farmers increasingly expect their suppliers to help them make better decisions, not just sell them inputs.</p>
-          <h2 id="section-5">5. The Future of Precision Agriculture in Kenya</h2>
-          <p>Looking ahead, precision agriculture will become more accessible and more integrated. Expect to see:</p>
-          <ul>
-            <li>Cheaper drones and sensors tailored to African conditions</li>
-            <li>More local weather stations and data services</li>
-            <li>AI-powered advisory tools that give field-specific recommendations</li>
-            <li>Stronger integration between farm data and market access</li>
-          </ul>
-          <h2>The Bottom Line</h2>
-          <p>Precision agriculture is not a distant future — it's happening now, in Kenya, across farms of all sizes. Starting small with simple tools and gradually adopting more advanced technologies is the surest path forward.</p>
-          <p>Rise Axis Solutions supports Kenyan farmers with agronomy advice, soil testing, and product recommendations — helping you farm smarter, not harder. <a href="contact.html">Get in touch</a> to learn more.</p>
-        `
-      }
-    ];
+    const slugOrId = p => p.slug || p.id;
 
     /* ============================================================
-       GET POST ID FROM URL
+       GET POST ID/SLUG FROM URL
        ============================================================ */
-    function getPostFromUrl() {
+    function getPostParam() {
       const params = new URLSearchParams(window.location.search);
-      const id = parseInt(params.get('id'));
-      return POSTS.find(p => p.id === id) || POSTS[0];
+      return params.get('id') || params.get('slug') || null;
+    }
+
+    /* ============================================================
+       LOAD POST + RELATED FROM SUPABASE
+       ============================================================ */
+    async function loadPost() {
+      const param = getPostParam();
+      if (!param) {
+        renderNotFound();
+        return;
+      }
+
+      try {
+        // 1. Fetch the main post by slug OR id
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(param);
+
+        let query = supabaseClient.from('posts').select('*');
+        query = isUuid ? query.eq('id', param) : query.eq('slug', param);
+        const { data: post, error: postErr } = await query.maybeSingle();
+
+        if (postErr) throw postErr;
+        if (!post) {
+          renderNotFound();
+          return;
+        }
+
+        // 2. Fetch related posts
+        let related = [];
+        const relatedIds = Array.isArray(post.related_ids) ? post.related_ids.filter(Boolean) : [];
+
+        if (relatedIds.length) {
+          // Fetch by explicit related_ids (preserving order)
+          const { data: relData, error: relErr } = await supabaseClient
+            .from('posts')
+            .select('id, title, slug, category, category_label, excerpt, cover_image, read_time, published_at')
+            .in('id', relatedIds)
+            .eq('is_published', true);
+          if (!relErr && relData) {
+            // Preserve order of related_ids
+            const map = new Map(relData.map(r => [r.id, r]));
+            related = relatedIds.map(id => map.get(id)).filter(Boolean).slice(0, 3);
+          }
+        }
+
+        // 3. If we don't have enough related, fill with same-category posts
+        if (related.length < 3) {
+          const { data: sameCat } = await supabaseClient
+            .from('posts')
+            .select('id, title, slug, category, category_label, excerpt, cover_image, read_time, published_at')
+            .eq('is_published', true)
+            .eq('category', post.category)
+            .neq('id', post.id)
+            .order('published_at', { ascending: false })
+            .limit(3 - related.length);
+
+          if (sameCat) related = related.concat(sameCat);
+        }
+
+        // 4. Still not enough? Fill with latest posts
+        if (related.length < 3) {
+          const excludeIds = new Set([post.id, ...related.map(r => r.id)]);
+          const { data: latest } = await supabaseClient
+            .from('posts')
+            .select('id, title, slug, category, category_label, excerpt, cover_image, read_time, published_at')
+            .eq('is_published', true)
+            .order('published_at', { ascending: false })
+            .limit(6);
+
+          if (latest) {
+            const fill = latest.filter(p => !excludeIds.has(p.id)).slice(0, 3 - related.length);
+            related = related.concat(fill);
+          }
+        }
+
+        // 5. Fetch popular posts for the sidebar (top 4 by views)
+        const { data: popular } = await supabaseClient
+          .from('posts')
+          .select('id, title, slug, cover_image, views')
+          .eq('is_published', true)
+          .order('views', { ascending: false })
+          .limit(4);
+
+        renderPost(post, related, popular || []);
+
+        // 6. Increment view count (fire-and-forget)
+        supabaseClient
+          .from('posts')
+          .update({ views: (Number(post.views) || 0) + 1 })
+          .eq('id', post.id)
+          .then(() => {});
+
+      } catch (err) {
+        console.error('Load post failed:', err);
+        renderNotFound(err.message);
+      }
+    }
+
+    /* ============================================================
+       APPLY SEO META
+       ============================================================ */
+    function applyPostSeo(post) {
+      const title = `${post.title} | Rise Axis Solutions`;
+      const desc = (post.excerpt || '').slice(0, 160) || 'Expert agri-input insights from Rise Axis Solutions.';
+      const img = post.cover_image || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80';
+      const url = `https://www.riseaxissolutions.com/pages/blog-post.html?id=${encodeURIComponent(slugOrId(post))}`;
+
+      document.title = title;
+      document.getElementById('metaDescription').setAttribute('content', desc);
+      if (post.tags && post.tags.length) {
+        document.getElementById('metaKeywords').setAttribute('content', post.tags.join(', '));
+      }
+      document.getElementById('canonicalLink').setAttribute('href', url);
+
+      document.getElementById('ogTitle').setAttribute('content', title);
+      document.getElementById('ogDescription').setAttribute('content', desc);
+      document.getElementById('ogImage').setAttribute('content', img);
+      document.getElementById('ogUrl').setAttribute('content', url);
+
+      document.getElementById('twTitle').setAttribute('content', title);
+      document.getElementById('twDescription').setAttribute('content', desc);
+      document.getElementById('twImage').setAttribute('content', img);
+
+      // JSON-LD Article schema
+      const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": desc,
+        "image": img,
+        "datePublished": post.published_at || post.created_at,
+        "dateModified": post.updated_at || post.published_at || post.created_at,
+        "author": {
+          "@type": "Person",
+          "name": post.author_name || "Rise Axis Solutions"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Rise Axis Solutions Ltd",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.riseaxissolutions.com/images/logo.png"
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": url
+        }
+      };
+      if (post.tags && post.tags.length) jsonLd.keywords = post.tags.join(', ');
+      document.getElementById('articleJsonLd').textContent = JSON.stringify(jsonLd);
     }
 
     /* ============================================================
        RENDER POST
        ============================================================ */
-    function renderPost() {
-      const post = getPostFromUrl();
+    function renderPost(post, relatedPosts, popularPosts) {
+      applyPostSeo(post);
 
-      document.title = post.title + ' | Rise Axis Solutions';
-      document.getElementById('metaDescription').setAttribute('content', post.excerpt);
-      document.getElementById('ogTitle').setAttribute('content', post.title);
-      document.getElementById('ogDescription').setAttribute('content', post.excerpt);
-      document.getElementById('ogImage').setAttribute('content', post.img);
-      document.getElementById('twTitle').setAttribute('content', post.title);
-      document.getElementById('twDescription').setAttribute('content', post.excerpt);
-      document.getElementById('twImage').setAttribute('content', post.img);
-
-      const relatedPosts = post.related.map(id => POSTS.find(p => p.id === id)).filter(Boolean);
+      const catLabel = post.category_label || titleCase(post.category || 'General');
+      const authorInitials = post.author_initials || initialsFromName(post.author_name);
+      const authorName = post.author_name || 'Rise Axis Team';
+      const authorRole = post.author_role || 'Agri-Input Specialist';
+      const authorBio = post.author_bio || '';
+      const readTime = post.read_time || '5 min';
+      const coverImg = post.cover_image || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1600&q=80';
+      const tags = Array.isArray(post.tags) ? post.tags : [];
+      const publishedDate = fmtDate(post.published_at || post.created_at);
+      const publishedISO = post.published_at || post.created_at || '';
+      const bodyHtml = post.body || '<p>No content available for this post.</p>';
 
       document.getElementById('postRoot').innerHTML = `
         <header class="post-hero">
-          <div class="post-hero-bg" style="background-image: url('${post.img}');"></div>
+          <div class="post-hero-bg" style="background-image: url('${escapeHtml(coverImg)}');"></div>
           <div class="post-hero-content">
             <div class="container">
               <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -2489,29 +1991,29 @@
                 <i class="fas fa-chevron-right"></i>
                 <a href="blog.html">Blog</a>
                 <i class="fas fa-chevron-right"></i>
-                <span>${post.catLabel}</span>
+                <span>${escapeHtml(catLabel)}</span>
               </nav>
-              <span class="post-cat-badge">${post.catLabel}</span>
-              <h1>${post.title}</h1>
+              <span class="post-cat-badge">${escapeHtml(catLabel)}</span>
+              <h1>${escapeHtml(post.title)}</h1>
               <div class="post-meta-strip">
                 <div class="post-meta-item post-meta-author">
-                  <div class="post-meta-avatar">${post.authorInitials}</div>
+                  <div class="post-meta-avatar">${escapeHtml(authorInitials)}</div>
                   <div>
                     <div style="font-size:0.72rem; color:rgba(255,255,255,0.7); letter-spacing:1px; text-transform:uppercase; font-weight:700;">Written by</div>
-                    <strong>${post.author}</strong>
+                    <strong>${escapeHtml(authorName)}</strong>
                   </div>
                 </div>
                 <div class="post-meta-item">
                   <i class="fas fa-calendar-alt"></i>
-                  <time datetime="${post.dateISO}">${post.date}</time>
+                  <time datetime="${escapeHtml(publishedISO)}">${escapeHtml(publishedDate)}</time>
                 </div>
                 <div class="post-meta-item">
                   <i class="fas fa-clock"></i>
-                  <span>${post.readTime} read</span>
+                  <span>${escapeHtml(readTime)} read</span>
                 </div>
                 <div class="post-meta-item">
                   <i class="fas fa-eye"></i>
-                  <span>${post.views} views</span>
+                  <span>${fmtViews(post.views)} views</span>
                 </div>
               </div>
             </div>
@@ -2523,7 +2025,7 @@
             <div class="post-layout-grid">
               <div>
                 <div class="article">
-                  <div class="article-body">${post.body}</div>
+                  <div class="article-body">${bodyHtml}</div>
 
                   <div class="share-row">
                     <span class="share-label"><i class="fas fa-share-alt"></i> Share this article</span>
@@ -2536,17 +2038,19 @@
                     </div>
                   </div>
 
-                  <div class="post-tags">
-                    ${post.tags.map(t => `<a href="blog.html" class="post-tag">#${t}</a>`).join('')}
-                  </div>
+                  ${tags.length ? `
+                    <div class="post-tags">
+                      ${tags.map(t => `<a href="blog.html" class="post-tag">#${escapeHtml(t)}</a>`).join('')}
+                    </div>
+                  ` : ''}
                 </div>
 
                 <div class="author-box">
-                  <div class="author-box-avatar">${post.authorInitials}</div>
+                  <div class="author-box-avatar">${escapeHtml(authorInitials)}</div>
                   <div class="author-box-info">
-                    <h4>${post.author}</h4>
-                    <div class="author-box-role">${post.authorRole}</div>
-                    <p>${post.authorBio}</p>
+                    <h4>${escapeHtml(authorName)}</h4>
+                    <div class="author-box-role">${escapeHtml(authorRole)}</div>
+                    <p>${escapeHtml(authorBio)}</p>
                     <div class="author-socials">
                       <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                       <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
@@ -2617,15 +2121,15 @@
                 <div class="widget">
                   <h3 class="widget-title">Popular Posts</h3>
                   <div class="popular-list">
-                    ${POSTS.slice(0, 4).map(p => `
-                      <div class="popular-item" onclick="window.location.href='blog-post.html?id=${p.id}'">
-                        <img class="popular-thumb" src="${p.img}" alt="${p.title}" loading="lazy">
+                    ${popularPosts.length ? popularPosts.map(p => `
+                      <div class="popular-item" onclick="window.location.href='blog-post.html?id=${encodeURIComponent(slugOrId(p))}'">
+                        <img class="popular-thumb" src="${escapeHtml(p.cover_image || '')}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">
                         <div class="popular-info">
-                          <h4>${p.title}</h4>
-                          <small><i class="fas fa-eye"></i> ${p.views} views</small>
+                          <h4>${escapeHtml(p.title)}</h4>
+                          <small><i class="fas fa-eye"></i> ${fmtViews(p.views)} views</small>
                         </div>
                       </div>
-                    `).join('')}
+                    `).join('') : '<p style="color:var(--text-muted);font-size:0.85rem;">No posts yet.</p>'}
                   </div>
                 </div>
 
@@ -2643,36 +2147,66 @@
           </div>
         </section>
 
-        <section class="related-section">
-          <div class="container">
-            <div class="related-head">
-              <div class="related-tag">Related Reading</div>
-              <h2>You Might Also <span>Like</span></h2>
-            </div>
-            <div class="related-grid">
-              ${relatedPosts.map(p => `
-                <article class="related-card" onclick="window.location.href='blog-post.html?id=${p.id}'">
-                  <div class="related-card-img">
-                    <span class="related-card-cat">${p.catLabel}</span>
-                    <img src="${p.img}" alt="${p.title}" loading="lazy">
-                  </div>
-                  <div class="related-card-body">
-                    <h3>${p.title}</h3>
-                    <p>${p.excerpt}</p>
-                    <div class="related-card-meta">
-                      <span><i class="fas fa-calendar-alt"></i> ${p.date}</span>
-                      <span><i class="fas fa-clock"></i> ${p.readTime}</span>
+        ${relatedPosts.length ? `
+          <section class="related-section">
+            <div class="container">
+              <div class="related-head">
+                <div class="related-tag">Related Reading</div>
+                <h2>You Might Also <span>Like</span></h2>
+              </div>
+              <div class="related-grid">
+                ${relatedPosts.map(p => `
+                  <article class="related-card" onclick="window.location.href='blog-post.html?id=${encodeURIComponent(slugOrId(p))}'">
+                    <div class="related-card-img">
+                      <span class="related-card-cat">${escapeHtml(p.category_label || titleCase(p.category))}</span>
+                      <img src="${escapeHtml(p.cover_image || '')}" alt="${escapeHtml(p.title)}" loading="lazy" decoding="async">
                     </div>
-                  </div>
-                </article>
-              `).join('')}
+                    <div class="related-card-body">
+                      <h3>${escapeHtml(p.title)}</h3>
+                      <p>${escapeHtml(p.excerpt || '')}</p>
+                      <div class="related-card-meta">
+                        <span><i class="fas fa-calendar-alt"></i> ${fmtDate(p.published_at)}</span>
+                        <span><i class="fas fa-clock"></i> ${escapeHtml(p.read_time || '5 min')}</span>
+                      </div>
+                    </div>
+                  </article>
+                `).join('')}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ` : ''}
       `;
 
       setupReadingProgress();
       setupShareFunctions();
+      setupLazyIframes();
+    }
+
+    /* ============================================================
+       LAZY LOAD for iframes inside article body (if any)
+       ============================================================ */
+    function setupLazyIframes() {
+      document.querySelectorAll('.article-body iframe:not([loading])').forEach(f => {
+        f.setAttribute('loading', 'lazy');
+      });
+      document.querySelectorAll('.article-body img:not([loading])').forEach(img => {
+        img.setAttribute('loading', 'lazy');
+        img.setAttribute('decoding', 'async');
+      });
+    }
+
+    /* ============================================================
+       NOT FOUND
+       ============================================================ */
+    function renderNotFound(msg) {
+      document.getElementById('postRoot').innerHTML = `
+        <div class="not-found">
+          <i class="fas fa-file-alt"></i>
+          <h2>Post not found</h2>
+          <p>${escapeHtml(msg || 'The article you are looking for does not exist or has been removed.')}</p>
+          <a href="blog.html" class="btn-home"><i class="fas fa-arrow-left"></i> Back to Blog</a>
+        </div>
+      `;
     }
 
     /* ============================================================
@@ -2689,7 +2223,7 @@
 
         if (window.scrollY > 30) nav.classList.add('scrolled');
         else nav.classList.remove('scrolled');
-      });
+      }, { passive: true });
     }
 
     /* ============================================================
@@ -2780,12 +2314,6 @@
     }
 
     function formatPrice(n) { return 'KES ' + Number(n).toLocaleString(); }
-    function escapeHtml(s) {
-      return String(s ?? '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
 
     function runSearch(query) {
       const q = query.trim().toLowerCase();
@@ -2820,7 +2348,7 @@
         html += `<div class="search-group-title">Products · ${products.length}</div>`;
         html += products.slice(0, 6).map(p => `
           <a class="search-result" href="shop.html?search=${encodeURIComponent(p.name)}">
-            <img class="search-result-img" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy">
+            <img class="search-result-img" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
             <div class="search-result-info">
               <strong>${escapeHtml(p.name)}</strong>
               <small>${escapeHtml(p.cat)}</small>
@@ -3020,9 +2548,9 @@
     /* ============================================================
        INIT
        ============================================================ */
-    renderPost();
+    loadPost();
 
-    console.log('%c RISE AXIS — Blog Post ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
+    console.log('%c RISE AXIS — Blog Post (Supabase) ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
     console.log('%c Clarity · Direction · Results ', 'background: #E85D26; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
   </script>
 
