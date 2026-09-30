@@ -648,7 +648,7 @@
     .mobile-menu-contact i { color: var(--orange); width: 16px; }
 
     /* ============================================================
-       PAGE HERO — simplified to match About Us
+       PAGE HERO
        ============================================================ */
     .page-hero {
       position: relative;
@@ -855,13 +855,14 @@
       margin-top: 10px;
       box-shadow: 0 10px 25px rgba(200,16,46,0.25);
     }
-    .form-submit:hover {
+    .form-submit:hover:not(:disabled) {
       background: var(--red-dark);
       transform: translateY(-2px);
       box-shadow: 0 15px 35px rgba(200,16,46,0.4);
     }
+    .form-submit:disabled { cursor: not-allowed; opacity: 0.85; }
     .form-submit i { transition: transform 0.3s; }
-    .form-submit:hover i { transform: translateX(4px); }
+    .form-submit:hover:not(:disabled) i { transform: translateX(4px); }
 
     .map-side { position: sticky; top: 100px; }
     .map-card {
@@ -1446,38 +1447,38 @@
           <h3>Tell Us About Your Needs</h3>
           <p class="form-intro">The more detail you share, the faster we can help.</p>
 
-          <form onsubmit="handleFormSubmit(event)">
+          <form id="contactForm" onsubmit="handleFormSubmit(event)">
             <div class="form-row">
               <div class="form-group">
-                <input type="text" id="firstName" placeholder=" " required>
+                <input type="text" id="firstName" name="firstName" placeholder=" " required>
                 <label for="firstName">First Name</label>
               </div>
               <div class="form-group">
-                <input type="text" id="lastName" placeholder=" " required>
+                <input type="text" id="lastName" name="lastName" placeholder=" ">
                 <label for="lastName">Last Name</label>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <input type="email" id="email" placeholder=" " required>
+                <input type="email" id="email" name="email" placeholder=" " required>
                 <label for="email">Email Address</label>
               </div>
               <div class="form-group">
-                <input type="tel" id="phone" placeholder=" " required>
+                <input type="tel" id="phone" name="phone" placeholder=" " required>
                 <label for="phone">Phone Number</label>
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group full">
-                <select id="subject" required>
+                <select id="subject" name="subject" required>
                   <option value="" disabled selected hidden></option>
-                  <option value="product">Product Enquiry</option>
-                  <option value="order">Order & Supply</option>
-                  <option value="partnership">Partnership</option>
-                  <option value="support">Technical Support</option>
-                  <option value="other">Other</option>
+                  <option value="Product Enquiry">Product Enquiry</option>
+                  <option value="Order & Supply">Order & Supply</option>
+                  <option value="Partnership">Partnership</option>
+                  <option value="Technical Support">Technical Support</option>
+                  <option value="Other">Other</option>
                 </select>
                 <label for="subject">I'm reaching out about</label>
                 <i class="fas fa-chevron-down select-arrow"></i>
@@ -1486,10 +1487,13 @@
 
             <div class="form-row">
               <div class="form-group full">
-                <textarea id="message" placeholder=" " required></textarea>
+                <textarea id="message" name="message" placeholder=" " required></textarea>
                 <label for="message">Your Message</label>
               </div>
             </div>
+
+            <!-- Honeypot spam trap (hidden from users, bots fill it in) -->
+            <input type="checkbox" name="botcheck" style="display:none !important" tabindex="-1" autocomplete="off">
 
             <button type="submit" class="form-submit">
               Send Message <i class="fas fa-arrow-right"></i>
@@ -1709,6 +1713,12 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    /* ============================================================
+       WEB3FORMS ACCESS KEY
+       👉 REPLACE THE STRING BELOW WITH YOUR OWN KEY FROM web3forms.com
+       ============================================================ */
+    const WEB3FORMS_ACCESS_KEY = '6a5676f9-a5a7-417a-a3de-1e65798c4b3e';
+
     /* ---------- STICKY NAV ---------- */
     const nav = document.getElementById('mainNav');
     window.addEventListener('scroll', () => {
@@ -1741,25 +1751,13 @@
        SEARCH
        ============================================================ */
     const SEARCH_INDEX = [
-      { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
-      { type: 'product', name: 'VitaMin Plus Supplement', cat: 'Feed Additives', price: 1890, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Complete vitamin and mineral blend for livestock.' },
-      { type: 'product', name: 'EnzymeMax Digestive Aid', cat: 'Feed Additives', price: 3200, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Powerful enzyme complex for digestion and nutrient absorption.' },
-      { type: 'product', name: 'VetCare Antibiotic Powder', cat: 'Veterinary Products', price: 1750, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', desc: 'Broad-spectrum antibiotic for common infections.' },
-      { type: 'product', name: 'Dewormer Oral Suspension', cat: 'Veterinary Products', price: 980, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Effective oral dewormer against internal parasites.' },
-      { type: 'product', name: 'Skin Heal Topical Spray', cat: 'Veterinary Products', price: 1250, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Fast-acting spray for wounds and skin conditions.' },
-      { type: 'product', name: 'Oxytetracycline Injection', cat: 'Injectables', price: 1450, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Broad-spectrum injectable antibiotic.' },
-      { type: 'product', name: 'Ivermectin Injectable 1%', cat: 'Injectables', price: 2100, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Antiparasitic injectable for internal and external parasites.' },
-      { type: 'product', name: 'Vitamin B-Complex Injection', cat: 'Injectables', price: 1350, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', desc: 'Supports energy, appetite, and recovery.' },
-      { type: 'product', name: 'Layer Premix Pro', cat: 'Premixes', price: 3450, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Complete premix for laying hens.' },
-      { type: 'product', name: 'Dairy Premix Gold', cat: 'Premixes', price: 4200, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium dairy premix for milk yield and fertility.' },
-      { type: 'product', name: 'Broiler Premix Elite', cat: 'Premixes', price: 3800, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Specialised premix for rapid broiler growth.' },
       { type: 'page', name: 'Home', url: '../index.html', icon: 'fa-home', desc: 'Rise Axis Solutions homepage' },
       { type: 'page', name: 'About Us', url: 'aboutUs.html', icon: 'fa-users', desc: 'Our story, mission, and values' },
       { type: 'page', name: 'Products', url: 'product.html', icon: 'fa-box', desc: 'Browse our full product range' },
       { type: 'page', name: 'Blog', url: 'blog.html', icon: 'fa-newspaper', desc: 'Agri-input insights and farming tips' },
       { type: 'page', name: 'Contact', url: 'contact.html', icon: 'fa-envelope', desc: 'Get in touch with our team' },
       { type: 'page', name: 'Shop', url: 'shop.html', icon: 'fa-store', desc: 'Order agri-inputs online' },
-      { type: 'page', name: 'Cart', url: 'cart.html', icon: 'fa-shopping-bag', desc: 'View your shopping cart' },
+      { type: 'page', name: 'My Account', url: 'account.html', icon: 'fa-user-circle', desc: 'Track your orders' },
       { type: 'page', name: 'Login', url: 'login.html', icon: 'fa-sign-in-alt', desc: 'Sign in to your account' },
       { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' },
       { type: 'category', name: 'Feed Additives', url: 'shop.html', icon: 'fa-flask', desc: 'Nutritional supplements and feed enhancers' },
@@ -1897,7 +1895,7 @@
     });
 
     /* ============================================================
-       AUTH UI — toggle Sign In ↔ My Account/Logout
+       AUTH UI
        ============================================================ */
     function applyAuthUI(user, profile) {
       const authLinks = document.getElementById('authLinks');
@@ -2057,52 +2055,97 @@
     }
 
     /* ============================================================
-       FORM SUBMIT
+       CONTACT FORM → WEB3FORMS
        ============================================================ */
-    function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
       e.preventDefault();
-      const btn = e.target.querySelector('.form-submit');
+      const form = e.target;
+      const btn = form.querySelector('.form-submit');
       const originalHTML = btn.innerHTML;
+
+      // Gather values
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+      const subject   = document.getElementById('subject').value;
+      const message   = document.getElementById('message').value.trim();
+
+      // Guard
+      if (!firstName || !email || !phone || !subject || !message) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      // Lock button
       btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending...';
       btn.disabled = true;
 
-      setTimeout(() => {
+      // Build payload for Web3Forms
+      const payload = {
+        access_key: WEB3FORMS_ACCESS_KEY,
+        subject: `New Contact Message — ${subject}`,
+        from_name: 'Rise Axis Website',
+        replyto: email,
+        // Email body fields
+        'First Name': firstName,
+        'Last Name': lastName || '—',
+        'Email': email,
+        'Phone': phone,
+        'Topic': subject,
+        'Message': message,
+        // Built-in fields
+        botcheck: false
+      };
+
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || 'Submission failed');
+        }
+
+        // Success feedback
         btn.innerHTML = '<i class="fas fa-check-circle"></i> Message Sent!';
         btn.style.background = '#0E7A3C';
         setTimeout(() => {
           btn.innerHTML = originalHTML;
           btn.style.background = '';
           btn.disabled = false;
-          e.target.reset();
+          form.reset();
         }, 2200);
-      }, 1400);
+      } catch (err) {
+        console.error('Contact form error:', err);
+        btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed — Try Again';
+        btn.style.background = '#C8102E';
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 2600);
+      }
     }
 
     /* ============================================================
-       LAZY LOADING — native for iframes, IntersectionObserver fallback for imgs
+       LAZY LOADING
        ============================================================ */
-    // Ensure all images without loading attribute get lazy loading
     document.querySelectorAll('img:not([loading])').forEach(img => {
       img.setAttribute('loading', 'lazy');
       img.setAttribute('decoding', 'async');
     });
 
-    // Native lazy loading for iframes where supported
     document.querySelectorAll('iframe:not([loading])').forEach(iframe => {
       iframe.setAttribute('loading', 'lazy');
     });
-
-    // Background images: defer with IntersectionObserver
-    const bgEls = document.querySelectorAll('[data-bg]');
-    const bgObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.backgroundImage = `url('${entry.target.dataset.bg}')`;
-          bgObserver.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: '200px' });
-    bgEls.forEach(el => bgObserver.observe(el));
 
     console.log('%c RISE AXIS SOLUTIONS — Contact Us ', 'background: #1e53b4; color: #fff; font-size: 14px; padding: 6px 12px; border-radius: 4px;');
   </script>
