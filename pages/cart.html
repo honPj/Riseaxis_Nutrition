@@ -504,23 +504,24 @@
         <li><a href="aboutUs.html">About Us</a></li>
         <li class="dropdown">
           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
-          <ul class="dropdown-menu">
-            <li><a href="shop.html?category=feed-additives"><i class="fas fa-flask"></i> Feed Additives</a></li>
-            <li><a href="shop.html?category=veterinary"><i class="fas fa-syringe"></i> Veterinary Products</a></li>
-            <li><a href="shop.html?category=injectables"><i class="fas fa-prescription-bottle"></i> Injectables</a></li>
-            <li><a href="shop.html?category=premixes"><i class="fas fa-capsules"></i> Premixes</a></li>
-          </ul>
+           <ul class="dropdown-menu">
+             <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
+          <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
+          <li><a href="product.html?category=injectables">Injectables</a></li>
+          <li><a href="product.html?category=premixes">Premixes</a></li>
+        </ul>
         </li>
         <li><a href="blog.html">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
         <li><a href="shop.html">Shop</a></li>
       </ul>
 
+
       <div class="nav-actions">
         <button class="search-icon" aria-label="Search" onclick="openSearch()">
           <i class="fas fa-search"></i>
         </button>
-        <a href="cart.html" class="cart-icon-btn" aria-label="View cart">
+        <a href="cart.html" class="cart-icon-btn" aria-label="View cart"  class="active">
           <i class="fas fa-shopping-bag"></i>
           <span class="cart-badge-nav" id="navCartBadge">0</span>
         </a>
@@ -611,11 +612,11 @@
     </div>
 
     <ul class="mobile-menu-links">
-      <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
-      <li><a href="aboutUs.html"><i class="fas fa-users"></i> About Us</a></li>
+      <li><a href="../index.html"> Home</a></li>
+      <li><a href="aboutUs.html"> About Us</a></li>
       <li class="mobile-dropdown">
         <button class="mobile-dropdown-toggle" id="mobileProductsToggle" aria-expanded="false">
-          <span><i class="fas fa-box"></i> Products</span>
+          <span> Products</span>
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
@@ -625,11 +626,11 @@
           <li><a href="product.html?category=premixes">Premixes</a></li>
         </ul>
       </li>
-      <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog</a></li>
-      <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
-      <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
-      <li><a href="cart.html" class="active"><i class="fas fa-shopping-bag"></i> Cart</a></li>
-      <li><a href="#" onclick="event.preventDefault(); closeMobileMenu(); openSearch();"><i class="fas fa-search"></i> Search</a></li>
+      <li><a href="blog.html"> Blog</a></li>
+      <li><a href="contact.html"> Contact</a></li>
+      <li><a href="shop.html"> Shop</a></li>
+      <li><a href="cart.html" class="active"> Cart</a></li>
+      <li><a href="#" onclick="event.preventDefault(); closeMobileMenu(); openSearch();"> Search</a></li>
     </ul>
 
     <div class="mobile-menu-auth" id="mobileAuthSection">

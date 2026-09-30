@@ -102,28 +102,57 @@
       opacity: 0.7;
     }
 
-    /* ---------- NAV LINKS ---------- */
-    .nav-links {
-      display: flex; align-items: center; gap: 4px;
-      font-weight: 600; font-size: 0.9rem;
-      flex: 1;
-      justify-content: center;
+      /* ---------- NAVIGATION ---------- */
+    .main-nav {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 1px 0 rgba(31, 58, 110, 0.06);
+      transition: box-shadow 0.3s;
     }
-    .nav-links > li > a {
-      padding: 9px 14px;
-      border-radius: 8px;
-      color: var(--navy);
-      transition: all 0.25s;
-      position: relative;
-      display: inline-flex; align-items: center; gap: 4px;
-      white-space: nowrap;
+    .main-nav.scrolled {
+      box-shadow: 0 8px 30px rgba(31, 58, 110, 0.1);
     }
-    .nav-links > li > a:hover,
-    .nav-links > li > a.active {
-      background: rgba(30, 83, 180, 0.06);
-      color: var(--red);
+    .main-nav .container {
+      display: flex; align-items: center;
+      justify-content: space-between; min-height: 82px;
+      gap: 24px;
     }
 
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 900; font-size: 1.4rem;
+      letter-spacing: 0.5px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .logo-mark {
+      display: flex; align-items: center; gap: 2px;
+      font-size: 1.55rem; font-weight: 900;
+    }
+    .logo-mark .rise { color: var(--navy); }
+    .logo-mark .axis { color: var(--red); }
+    .logo-sub {
+      display: block; font-size: 0.52rem;
+      letter-spacing: 3px; color: var(--bronze);
+      font-weight: 700; margin-top: -3px;
+    }
+    .logo::after {
+      content: '';
+      position: absolute;
+      right: -8px; top: 4px; bottom: 4px;
+      width: 3px;
+      background: linear-gradient(180deg, var(--red), var(--orange), var(--green));
+      border-radius: 3px;
+      opacity: 0.7;
+    }
+
+    /* ---------- NAV LINKS ---------- */
+    .nav-links { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 0.9rem; flex: 1; justify-content: center; }
+    .nav-links > li > a { padding: 9px 14px; border-radius: 8px; color: var(--navy); transition: all 0.25s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .nav-links > li > a:hover, .nav-links > li > a.active { background: rgba(30,83,180,0.06); color: var(--red); }
+   
     .dropdown { position: relative; }
     .dropdown > a i {
       font-size: 0.6rem; transition: transform 0.3s;
@@ -1064,14 +1093,14 @@
         <li><a href="../index.html">Home</a></li>
         <li><a href="aboutUs.html" class="active">About Us</a></li>
         <li class="dropdown">
-          <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
+          <a href="product.html">Products   ></a>
           <ul class="dropdown-menu">
              <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
           <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
           <li><a href="product.html?category=injectables">Injectables</a></li>
           <li><a href="product.html?category=premixes">Premixes</a></li>
         </ul>
-          </ul>
+      
         </li>
         <li><a href="blog.html">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
