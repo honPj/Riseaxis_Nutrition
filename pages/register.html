@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Account | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -72,33 +73,27 @@
       gap: 24px;
     }
 
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 900; font-size: 1.4rem;
-      letter-spacing: 0.5px;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .logo-mark {
-      display: flex; align-items: center; gap: 2px;
-      font-size: 1.55rem; font-weight: 900;
-    }
-    .logo-mark .rise { color: var(--navy); }
-    .logo-mark .axis { color: var(--red); }
-    .logo-sub {
-      display: block; font-size: 0.52rem;
-      letter-spacing: 3px; color: var(--bronze);
-      font-weight: 700; margin-top: -3px;
-    }
-    .logo::after {
-      content: '';
-      position: absolute;
-      right: -8px; top: 4px; bottom: 4px;
-      width: 3px;
-      background: linear-gradient(180deg, var(--red), var(--orange), var(--green));
-      border-radius: 3px;
-      opacity: 0.7;
-    }
+    /* ---------- LOGO (image based) ---------- */
+.logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+  line-height: 0; /* removes extra inline-image gap */
+}
+
+.logo-img {
+  height: 56px;          /* fixed height keeps nav height unchanged */
+  width: auto;           /* preserves aspect ratio */
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.logo:hover .logo-img {
+  transform: scale(1.04);
+}
 
     .nav-links {
       display: flex; align-items: center; gap: 4px;
@@ -876,6 +871,18 @@
       .mobile-menu { width: 100%; max-width: 100%; }
       .cart-icon-btn, .hamburger { width: 40px; height: 40px; }
     }
+    @media (max-width: 1024px) {
+  /* ... existing rules ... */
+  .logo-img { height: 48px; }
+}
+@media (max-width: 768px) {
+  /* ... existing rules ... */
+  .logo-img { height: 42px; }
+}
+@media (max-width: 480px) {
+  /* ... existing rules ... */
+  .logo-img { height: 36px; }
+}
   </style>
 </head>
 <body>
@@ -902,15 +909,17 @@
   <nav class="main-nav" id="mainNav">
     <div class="container">
 
-      <a href="../index.html" class="logo">
-        <div>
-          <span class="logo-mark">
-            <span class="rise">RISE</span>
-            <span class="axis">AXIS</span>
-          </span>
-          <span class="logo-sub">SOLUTIONS LTD</span>
-        </div>
-      </a>
+        <a href="../index.html" class="logo">
+  <img
+    src="../image/RISE AXIS LOGO FILE.png"
+    alt="Rise Axis Solutions Ltd"
+    class="logo-img"
+    width="180"
+    height="56"
+    fetchpriority="high"
+    decoding="async"
+  >
+</a>
 
       <ul class="nav-links">
         <li><a href="../index.html">Home</a></li>
@@ -1040,15 +1049,17 @@
   <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
 
     <div class="mobile-menu-header">
-      <a href="../index.html" class="logo">
-        <div>
-          <span class="logo-mark">
-            <span class="rise">RISE</span>
-            <span class="axis">AXIS</span>
-          </span>
-          <span class="logo-sub">SOLUTIONS LTD</span>
-        </div>
-      </a>
+         <a href="../index.html" class="logo">
+  <img
+    src="../image/RISE AXIS LOGO FILE.png"
+    alt="Rise Axis Solutions Ltd"
+    class="logo-img"
+    width="180"
+    height="56"
+    loading="lazy"
+    decoding="async"
+  >
+</a>
       <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
         <i class="fas fa-times"></i>
       </button>
@@ -1063,25 +1074,25 @@
     </div>
 
     <ul class="mobile-menu-links">
-      <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
-      <li><a href="aboutUs.html"><i class="fas fa-users"></i> About Us</a></li>
+      <li><a href="../index.html"> Home</a></li>
+      <li><a href="aboutUs.html"> About Us</a></li>
 
       <li class="mobile-dropdown">
         <button class="mobile-dropdown-toggle" id="mobileProductsToggle" aria-expanded="false">
-          <span><i class="fas fa-box"></i> Products</span>
+          <span> Products</span>
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
-          <li><a href="product.html">Feed Additives</a></li>
-          <li><a href="product.html">Veterinary Products</a></li>
-          <li><a href="product.html">Injectables</a></li>
-          <li><a href="product.html">Premixes</a></li>
+          <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
+          <li><a href="product.html?category=veterinary">Veterinary Products</a></li>
+          <li><a href="product.html?category=injectables">Injectables</a></li>
+          <li><a href="product.html?category=premixes">Premixes</a></li>
         </ul>
       </li>
 
-      <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog</a></li>
-      <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
-      <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+      <li><a href="blog.html"> Blog</a></li>
+      <li><a href="contact.html"> Contact</a></li>
+      <li><a href="shop.html"> Shop</a></li>
       <li><a href="#" onclick="event.preventDefault(); closeMobileMenu(); openSearch();"><i class="fas fa-search"></i> Search</a></li>
     </ul>
 
@@ -1123,7 +1134,7 @@
           Join Rise Axis
         </div>
         <h1>Create Your <span>Account</span></h1>
-        <p>Sign up once — then check out faster, track every order, and access member-only offers.</p>
+        <p>Sign up once then check out faster, track every order, and access member-only offers.</p>
         <div class="benefits">
           <div class="benefit"><i class="fas fa-bolt"></i> One-click checkout with saved details</div>
           <div class="benefit"><i class="fas fa-history"></i> Full order history at your fingertips</div>
