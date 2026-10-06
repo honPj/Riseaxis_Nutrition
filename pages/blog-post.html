@@ -6,7 +6,7 @@
 
   <!-- ============ SEO META ============ -->
   <title>Blog Post | Rise Axis Solutions Ltd</title>
-  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="icon" type="image/x-icon" href="../image/rise axis (1).jpg">
   <meta name="description" id="metaDescription" content="Expert agri-input insights, farming tips, and veterinary advice from Rise Axis Solutions.">
   <meta name="keywords" id="metaKeywords" content="agri-inputs Kenya, farming blog, veterinary products Kenya, Rise Axis Solutions">
   <meta name="robots" content="index, follow">
@@ -16,16 +16,16 @@
   <meta property="og:type" content="article">
   <meta property="og:title" id="ogTitle" content="Blog Post | Rise Axis Solutions">
   <meta property="og:description" id="ogDescription" content="Expert agri-input insights from Rise Axis Solutions.">
-  <meta property="og:image" id="ogImage" content="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80">
+  <meta property="og:image" id="ogImage" content="https://www.riseaxissolutions.com/image/og-default.jpg">
   <meta property="og:url" id="ogUrl" content="https://www.riseaxissolutions.com/pages/blog-post.html">
   <meta property="og:site_name" content="Rise Axis Solutions Ltd">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" id="twTitle" content="Blog Post | Rise Axis Solutions">
   <meta name="twitter:description" id="twDescription" content="Expert agri-input insights from Rise Axis Solutions.">
-  <meta name="twitter:image" id="twImage" content="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80">
+  <meta name="twitter:image" id="twImage" content="https://www.riseaxissolutions.com/image/og-default.jpg">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- JSON-LD Article Schema (populated dynamically) -->
@@ -47,30 +47,32 @@
        RISE AXIS SOLUTIONS — BRAND PALETTE
        ============================================================ */
     :root {
-      --navy: #1e53b4;
-      --navy-deep: #12326e;
-      --navy-dark: #1b50b1;
-      --red: #C8102E;
-      --red-dark: #a30d25;
-      --green: #0E7A3C;
-      --orange: #E85D26;
-      --bronze: #7A5A2B;
-      --bg-light: #F7F8FA;
-      --bg-white: #FFFFFF;
+      --navy: #1D3B73;
+      --navy-deep: #0f2557;
+      --navy-soft: #e8eef8;
+      --red: #C81E27;
+      --red-deep: #a30d25;
+      --red-soft: #fdecee;
+      --green: #17B052;
+      --green-deep: #0d7a38;
+      --green-soft: #e6f7ee;
+      --bg-light: #f7f8fa;
+      --bg-white: #ffffff;
       --text-dark: #0f1729;
       --text-muted: #4a5568;
       --border: #e2e8f0;
-      --gold: #F2A73B;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
       background: var(--bg-light);
       color: var(--text-dark);
       line-height: 1.6;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     body.search-open { overflow: hidden; }
     a { text-decoration: none; color: inherit; }
@@ -84,10 +86,11 @@
       position: fixed;
       top: 0; left: 0;
       height: 3px;
-      background: linear-gradient(90deg, var(--navy), var(--red), var(--orange));
+      background: linear-gradient(90deg, var(--navy), var(--red), var(--green));
       z-index: 1001;
       width: 0%;
       transition: width 0.1s linear;
+      will-change: width;
     }
 
     /* ---------- TOP BAR ---------- */
@@ -103,52 +106,40 @@
       gap: 12px;
     }
     .top-item { display: flex; align-items: center; gap: 8px; }
-    .top-item i { color: var(--orange); font-size: 0.9rem; }
+    .top-item i { color: var(--green); font-size: 0.9rem; }
     .top-item strong { color: #fff; font-weight: 600; }
 
     /* ---------- NAVIGATION ---------- */
     .main-nav {
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.94);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       position: sticky; top: 0; z-index: 1000;
-      box-shadow: 0 1px 0 rgba(31,58,110,0.06);
+      box-shadow: 0 1px 0 rgba(29,59,115,0.06);
       transition: box-shadow 0.3s;
     }
-    .main-nav.scrolled { box-shadow: 0 8px 30px rgba(31,58,110,0.1); }
+    .main-nav.scrolled { box-shadow: 0 8px 30px rgba(29,59,115,0.1); }
     .main-nav .container {
       display: flex; align-items: center;
       justify-content: space-between; min-height: 82px;
       gap: 24px;
     }
 
-   
-   /* ---------- LOGO (image based) ---------- */
-.logo {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  text-decoration: none;
-  line-height: 0; /* removes extra inline-image gap */
-}
+    .logo {
+      display: flex; align-items: center;
+      flex-shrink: 0; text-decoration: none; line-height: 0;
+    }
+    .logo-img {
+      height: 56px; width: auto; max-width: 100%;
+      object-fit: contain; display: block;
+      transition: transform 0.3s ease;
+    }
+    .logo:hover .logo-img { transform: scale(1.04); }
 
-.logo-img {
-  height: 56px;          /* fixed height keeps nav height unchanged */
-  width: auto;           /* preserves aspect ratio */
-  max-width: 100%;
-  object-fit: contain;
-  display: block;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.logo:hover .logo-img {
-  transform: scale(1.04);
-}
     .nav-links {
       display: flex; align-items: center; gap: 4px;
       font-weight: 600; font-size: 0.9rem;
-      flex: 1;
-      justify-content: center;
+      flex: 1; justify-content: center;
     }
     .nav-links > li > a {
       padding: 9px 14px;
@@ -161,26 +152,27 @@
     }
     .nav-links > li > a:hover,
     .nav-links > li > a.active {
-      background: rgba(30, 83, 180, 0.06);
+      background: var(--navy-soft);
       color: var(--red);
     }
 
     .dropdown { position: relative; }
-    .dropdown > a i {
-      font-size: 0.6rem; transition: transform 0.3s;
-    }
-    .dropdown:hover > a i { transform: rotate(180deg); }
+    .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
+    .dropdown:hover > a i,
+    .dropdown:focus-within > a i { transform: rotate(180deg); }
     .dropdown-menu {
       position: absolute; top: calc(100% + 8px); left: 0;
       background: var(--bg-white); min-width: 230px;
       border-radius: 14px; padding: 10px;
-      box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15);
+      box-shadow: 0 20px 50px rgba(29,59,115,0.15);
       border: 1px solid var(--border);
       opacity: 0; visibility: hidden;
       transform: translateY(10px);
       transition: all 0.25s;
+      z-index: 100;
     }
-    .dropdown:hover .dropdown-menu {
+    .dropdown:hover .dropdown-menu,
+    .dropdown:focus-within .dropdown-menu {
       opacity: 1; visibility: visible; transform: translateY(0);
     }
     .dropdown-menu a {
@@ -190,25 +182,13 @@
       border-radius: 10px;
       transition: all 0.2s;
     }
-    .dropdown-menu a i {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: var(--bg-light);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem;
-      color: var(--red);
-      transition: all 0.2s;
-    }
     .dropdown-menu a:hover {
       background: var(--bg-light);
       color: var(--red);
       transform: translateX(4px);
     }
-    .dropdown-menu a:hover i { background: var(--red); color: #fff; }
 
-    .nav-actions {
-      display: flex; align-items: center; gap: 10px;
-      flex-shrink: 0;
-    }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .search-icon {
       color: var(--navy); font-size: 0.95rem;
       width: 42px; height: 42px;
@@ -228,17 +208,16 @@
       position: relative;
       width: 42px; height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--green), #0a5f2e);
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
       color: #fff;
       font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
-      text-decoration: none;
       transition: all 0.25s;
-      box-shadow: 0 4px 14px rgba(14,122,60,0.25);
+      box-shadow: 0 4px 14px rgba(23,176,82,0.25);
     }
     .cart-icon-btn:hover {
       transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 10px 25px rgba(14,122,60,0.4);
+      box-shadow: 0 10px 25px rgba(23,176,82,0.4);
     }
     .cart-badge-nav {
       position: absolute;
@@ -262,11 +241,11 @@
       color: #fff; border: none;
       font-weight: 700; font-size: 0.88rem;
       cursor: pointer; transition: all 0.3s;
-      box-shadow: 0 4px 14px rgba(30,83,180,0.25);
+      box-shadow: 0 4px 14px rgba(29,59,115,0.25);
     }
     .btn-signin:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(30,83,180,0.4);
+      box-shadow: 0 10px 24px rgba(29,59,115,0.4);
     }
     .signin-menu {
       position: absolute; top: calc(100% + 10px); right: 0;
@@ -274,7 +253,7 @@
       background: #fff;
       border-radius: 14px;
       border: 1px solid var(--border);
-      box-shadow: 0 20px 50px rgba(31,58,110,0.15);
+      box-shadow: 0 20px 50px rgba(29,59,115,0.15);
       padding: 8px;
       opacity: 0; visibility: hidden;
       transform: translateY(8px);
@@ -291,10 +270,10 @@
       color: var(--navy);
       transition: all 0.2s;
     }
-    .signin-menu a:hover { background: #f5f9ff; color: var(--red); }
+    .signin-menu a:hover { background: var(--navy-soft); color: var(--red); }
     .signin-menu a i {
       width: 36px; height: 36px; border-radius: 10px;
-      background: #f0f4fa;
+      background: var(--navy-soft);
       color: var(--navy);
       display: flex; align-items: center; justify-content: center;
       font-size: 0.85rem; flex-shrink: 0;
@@ -312,7 +291,7 @@
     .search-overlay {
       position: fixed;
       top: 0; left: 0; right: 0;
-      background: rgba(15, 23, 41, 0.55);
+      background: rgba(15, 37, 87, 0.6);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       z-index: 1500;
@@ -339,7 +318,7 @@
       padding: 20px 24px;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; gap: 14px;
-      background: #fafbff;
+      background: var(--bg-light);
     }
     .search-panel-header > i { color: var(--navy); font-size: 1.1rem; }
     .search-input-wrap { flex: 1; position: relative; }
@@ -356,7 +335,7 @@
     }
     .search-input-wrap input:focus {
       border-color: var(--navy);
-      box-shadow: 0 0 0 3px rgba(30,83,180,0.1);
+      box-shadow: 0 0 0 3px rgba(29,59,115,0.1);
     }
     .search-close {
       width: 40px; height: 40px;
@@ -401,14 +380,14 @@
       cursor: pointer; transition: background 0.15s;
       text-decoration: none; color: inherit;
     }
-    .search-result:hover { background: #f5f9ff; }
+    .search-result:hover { background: var(--navy-soft); }
     .search-result-img {
       width: 48px; height: 48px; border-radius: 10px;
       object-fit: cover; background: var(--bg-light); flex-shrink: 0;
     }
     .search-result-icon {
       width: 48px; height: 48px; border-radius: 10px;
-      background: #f0f4fa; color: var(--navy);
+      background: var(--navy-soft); color: var(--navy);
       display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem; flex-shrink: 0;
     }
@@ -462,7 +441,7 @@
 
     .mobile-menu-overlay {
       position: fixed; inset: 0;
-      background: rgba(15, 23, 41, 0.55);
+      background: rgba(15, 37, 87, 0.6);
       backdrop-filter: blur(4px);
       z-index: 1500;
       opacity: 0; visibility: hidden;
@@ -490,7 +469,7 @@
       justify-content: space-between;
       padding: 20px 22px;
       border-bottom: 1px solid var(--border);
-      background: #fafbff;
+      background: var(--bg-light);
       flex-shrink: 0;
     }
     .mobile-menu-close {
@@ -510,7 +489,7 @@
     .mobile-user {
       display: flex; align-items: center; gap: 14px;
       padding: 18px 22px;
-      background: linear-gradient(135deg, #f7fafd, #eef4fb);
+      background: var(--navy-soft);
       border-bottom: 1px solid var(--border);
     }
     .mobile-user-avatar {
@@ -548,12 +527,12 @@
     .mobile-menu-links > li > a:hover,
     .mobile-menu-links > li > a.active,
     .mobile-dropdown-toggle:hover {
-      background: #f5f9ff; color: var(--red);
+      background: var(--navy-soft); color: var(--red);
     }
     .mobile-menu-links > li > a i,
     .mobile-dropdown-toggle i:first-child {
       width: 34px; height: 34px; border-radius: 10px;
-      background: #f0f4fa; color: var(--navy);
+      background: var(--navy-soft); color: var(--navy);
       display: flex; align-items: center; justify-content: center;
       font-size: 0.88rem; flex-shrink: 0;
       transition: all 0.2s;
@@ -584,7 +563,7 @@
       transition: all 0.2s;
     }
     .mobile-submenu a:hover {
-      background: #f5f9ff; color: var(--navy);
+      background: var(--navy-soft); color: var(--navy);
       border-left-color: var(--red);
     }
     .mobile-menu-auth {
@@ -609,24 +588,24 @@
     .mobile-auth-primary {
       background: linear-gradient(135deg, var(--navy), var(--navy-deep));
       color: #fff;
-      box-shadow: 0 6px 16px rgba(30,83,180,0.25);
+      box-shadow: 0 6px 16px rgba(29,59,115,0.25);
     }
     .mobile-auth-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(30,83,180,0.4);
+      box-shadow: 0 10px 24px rgba(29,59,115,0.4);
     }
     .mobile-auth-danger {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      background: linear-gradient(135deg, var(--red), var(--red-deep));
       color: #fff;
-      box-shadow: 0 6px 16px rgba(200,16,46,0.25);
+      box-shadow: 0 6px 16px rgba(200,30,39,0.25);
     }
     .mobile-auth-danger:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(200,16,46,0.4);
+      box-shadow: 0 10px 24px rgba(200,30,39,0.4);
     }
     .mobile-menu-footer {
       padding: 16px 22px 24px;
-      background: #fafbff;
+      background: var(--bg-light);
       border-top: 1px solid var(--border);
       flex-shrink: 0;
     }
@@ -635,7 +614,7 @@
       font-size: 0.8rem; color: var(--text-muted);
     }
     .mobile-menu-contact span { display: flex; align-items: center; gap: 8px; }
-    .mobile-menu-contact i { color: var(--orange); width: 16px; }
+    .mobile-menu-contact i { color: var(--green); width: 16px; }
 
     /* POST HERO */
     .post-hero {
@@ -653,6 +632,7 @@
       background-position: center;
       transform: scale(1.05);
       animation: slowZoom 20s ease-in-out infinite alternate;
+      will-change: transform;
     }
     @keyframes slowZoom {
       0% { transform: scale(1.05) translate(0, 0); }
@@ -660,7 +640,7 @@
     }
     .post-hero-bg::after {
       content: ''; position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(18,50,110,0.35) 0%, rgba(18,50,110,0.75) 60%, rgba(15,23,41,0.95) 100%);
+      background: linear-gradient(180deg, rgba(15,37,87,0.35) 0%, rgba(15,37,87,0.75) 60%, rgba(15,37,87,0.95) 100%);
     }
     .post-hero-content {
       position: relative; z-index: 3;
@@ -672,19 +652,20 @@
       color: rgba(255,255,255,0.75);
       margin-bottom: 20px;
       display: flex; gap: 8px; flex-wrap: wrap;
+      align-items: center;
     }
-    .breadcrumb a { color: var(--orange); transition: opacity 0.2s; }
+    .breadcrumb a { color: var(--green); transition: opacity 0.2s; }
     .breadcrumb a:hover { opacity: 0.7; }
     .breadcrumb i { font-size: 0.65rem; opacity: 0.5; }
 
     .post-cat-badge {
       display: inline-flex; align-items: center; gap: 8px;
-      background: var(--orange); color: #fff;
+      background: var(--green); color: #fff;
       padding: 7px 18px; border-radius: 30px;
       font-size: 0.72rem; font-weight: 800;
       letter-spacing: 2px; text-transform: uppercase;
       margin-bottom: 22px;
-      box-shadow: 0 8px 20px rgba(232,93,38,0.4);
+      box-shadow: 0 8px 20px rgba(23,176,82,0.4);
     }
     .post-cat-badge::before {
       content: ''; width: 6px; height: 6px;
@@ -713,12 +694,12 @@
       gap: 10px; font-size: 0.88rem;
       color: rgba(255,255,255,0.9);
     }
-    .post-meta-item i { color: var(--orange); font-size: 0.9rem; }
+    .post-meta-item i { color: var(--green); font-size: 0.9rem; }
     .post-meta-item strong { color: #fff; font-weight: 700; }
     .post-meta-author { display: flex; align-items: center; gap: 10px; }
     .post-meta-avatar {
       width: 38px; height: 38px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--orange), #d44a15);
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
       display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 0.85rem; color: #fff;
       border: 2px solid rgba(255,255,255,0.3);
@@ -736,7 +717,7 @@
       border-radius: 22px;
       padding: 50px 55px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(31,58,110,0.05);
+      box-shadow: 0 10px 30px rgba(29,59,115,0.05);
     }
     .article-body { font-size: 1.02rem; line-height: 1.85; color: #2d3748; }
     .article-body p { margin-bottom: 22px; }
@@ -750,7 +731,7 @@
     .article-body h2::before {
       content: ''; position: absolute;
       left: 0; top: 6px; width: 6px; height: 28px;
-      background: linear-gradient(180deg, var(--orange), var(--red));
+      background: linear-gradient(180deg, var(--green), var(--red));
       border-radius: 4px;
     }
     .article-body h3 {
@@ -769,7 +750,7 @@
     .article-body ul li::before {
       content: '\f00c'; font-family: 'Font Awesome 6 Free';
       font-weight: 900; color: var(--green);
-      background: rgba(14,122,60,0.1);
+      background: var(--green-soft);
       width: 26px; height: 26px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 0.7rem; flex-shrink: 0; margin-top: 3px;
@@ -787,18 +768,18 @@
     .article-body strong { color: var(--navy); font-weight: 800; }
     .article-body a {
       color: var(--navy); font-weight: 700;
-      border-bottom: 2px solid rgba(232,93,38,0.4);
+      border-bottom: 2px solid rgba(23,176,82,0.4);
       transition: all 0.2s;
     }
     .article-body a:hover {
-      color: var(--orange);
-      border-bottom-color: var(--orange);
+      color: var(--green);
+      border-bottom-color: var(--green);
     }
     .pull-quote {
       position: relative; margin: 40px 0;
       padding: 32px 40px 32px 60px;
-      background: linear-gradient(135deg, rgba(30,83,180,0.06), rgba(200,16,46,0.05));
-      border-left: 5px solid var(--orange);
+      background: linear-gradient(135deg, rgba(29,59,115,0.06), rgba(200,30,39,0.05));
+      border-left: 5px solid var(--green);
       border-radius: 14px; font-size: 1.15rem;
       font-weight: 600; color: var(--navy);
       line-height: 1.6; font-style: italic;
@@ -807,7 +788,7 @@
       content: '\f10d'; font-family: 'Font Awesome 6 Free';
       font-weight: 900; position: absolute;
       top: 20px; left: 22px;
-      font-size: 1.3rem; color: var(--orange); opacity: 0.7;
+      font-size: 1.3rem; color: var(--green); opacity: 0.7;
     }
     .pull-quote cite {
       display: block; margin-top: 14px;
@@ -817,14 +798,14 @@
     }
     .takeaways {
       background: linear-gradient(135deg, #f0f4fa, #eaf1fb);
-      border: 1px solid rgba(30,83,180,0.15);
+      border: 1px solid rgba(29,59,115,0.15);
       border-radius: 18px; padding: 32px 34px;
       margin: 36px 0; position: relative; overflow: hidden;
     }
     .takeaways::before {
       content: ''; position: absolute;
       top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, var(--navy), var(--red), var(--orange));
+      background: linear-gradient(90deg, var(--navy), var(--red), var(--green));
     }
     .takeaways-header {
       display: flex; align-items: center;
@@ -835,7 +816,7 @@
       background: linear-gradient(135deg, var(--navy), var(--navy-deep));
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: 1.1rem;
-      box-shadow: 0 8px 20px rgba(30,83,180,0.3);
+      box-shadow: 0 8px 20px rgba(29,59,115,0.3);
     }
     .takeaways h3 {
       font-size: 1.15rem; color: var(--navy);
@@ -845,7 +826,7 @@
     .article-image {
       margin: 40px 0; border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 20px 40px rgba(31,58,110,0.15);
+      box-shadow: 0 20px 40px rgba(29,59,115,0.15);
     }
     .article-image img { width: 100%; display: block; }
     .article-image figcaption {
@@ -868,7 +849,7 @@
       text-transform: uppercase;
       display: inline-flex; align-items: center; gap: 10px;
     }
-    .share-label i { color: var(--orange); }
+    .share-label i { color: var(--green); }
     .share-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
     .share-btn {
       width: 42px; height: 42px; border-radius: 12px;
@@ -886,7 +867,7 @@
     .share-btn.tw:hover { background: #000; border-color: #000; }
     .share-btn.li:hover { background: #0077b5; border-color: #0077b5; }
     .share-btn.wa:hover { background: #25d366; border-color: #25d366; }
-    .share-btn.copy:hover { background: var(--orange); border-color: var(--orange); }
+    .share-btn.copy:hover { background: var(--green); border-color: var(--green); }
 
     .post-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
     .post-tag {
@@ -908,27 +889,27 @@
       display: grid; grid-template-columns: auto 1fr;
       gap: 24px; align-items: center;
       position: relative; overflow: hidden;
-      box-shadow: 0 20px 45px rgba(30,83,180,0.25);
+      box-shadow: 0 20px 45px rgba(29,59,115,0.25);
     }
     .author-box::before {
       content: ''; position: absolute; inset: 0;
       background-image:
-        radial-gradient(circle at 15% 20%, rgba(232,93,38,0.4), transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(200,16,46,0.4), transparent 45%);
+        radial-gradient(circle at 15% 20%, rgba(23,176,82,0.4), transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(200,30,39,0.4), transparent 45%);
     }
     .author-box > * { position: relative; z-index: 2; }
     .author-box-avatar {
       width: 88px; height: 88px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--orange), #d44a15);
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
       display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 1.8rem; color: #fff;
       border: 4px solid rgba(255,255,255,0.2);
-      box-shadow: 0 10px 30px rgba(232,93,38,0.4);
+      box-shadow: 0 10px 30px rgba(23,176,82,0.4);
       flex-shrink: 0;
     }
     .author-box-info h4 { font-size: 1.2rem; font-weight: 900; margin-bottom: 4px; }
     .author-box-role {
-      font-size: 0.8rem; color: var(--orange);
+      font-size: 0.8rem; color: var(--green);
       font-weight: 800; letter-spacing: 1.5px;
       text-transform: uppercase; margin-bottom: 12px;
     }
@@ -945,7 +926,7 @@
       transition: all 0.25s;
     }
     .author-socials a:hover {
-      background: var(--orange); transform: translateY(-2px);
+      background: var(--green); transform: translateY(-2px);
     }
 
     /* Comments */
@@ -954,7 +935,7 @@
       border-radius: 22px;
       padding: 44px 48px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(31,58,110,0.05);
+      box-shadow: 0 10px 30px rgba(29,59,115,0.05);
       margin-top: 30px;
     }
     .comments-header {
@@ -984,8 +965,8 @@
       color: #fff; font-weight: 800; font-size: 0.95rem;
       flex-shrink: 0;
     }
-    .comment-item:nth-child(3) .comment-avatar { background: linear-gradient(135deg, var(--green), #0a5f2e); }
-    .comment-item:nth-child(4) .comment-avatar { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
+    .comment-item:nth-child(3) .comment-avatar { background: linear-gradient(135deg, var(--green), var(--green-deep)); }
+    .comment-item:nth-child(4) .comment-avatar { background: linear-gradient(135deg, var(--red), var(--red-deep)); }
     .comment-body h5 {
       font-size: 0.95rem; color: var(--navy);
       font-weight: 800; margin-bottom: 4px;
@@ -995,7 +976,7 @@
       margin-bottom: 10px;
       display: inline-flex; align-items: center; gap: 6px;
     }
-    .comment-time i { color: var(--orange); }
+    .comment-time i { color: var(--green); }
     .comment-body p {
       font-size: 0.92rem; color: var(--text-muted);
       line-height: 1.7; margin-bottom: 10px;
@@ -1016,7 +997,7 @@
       font-weight: 900; margin-bottom: 20px;
       display: flex; align-items: center; gap: 10px;
     }
-    .comment-form h4 i { color: var(--orange); }
+    .comment-form h4 i { color: var(--green); }
     .form-row {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 16px; margin-bottom: 16px;
@@ -1033,10 +1014,10 @@
     .form-field textarea { min-height: 130px; resize: vertical; }
     .form-field input:focus, .form-field textarea:focus {
       border-color: var(--red); background: #fff;
-      box-shadow: 0 0 0 3px rgba(200,16,46,0.1);
+      box-shadow: 0 0 0 3px rgba(200,30,39,0.1);
     }
     .btn-submit {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      background: linear-gradient(135deg, var(--red), var(--red-deep));
       color: #fff; padding: 15px 32px;
       border-radius: 12px; border: none;
       font-weight: 800; cursor: pointer;
@@ -1044,11 +1025,11 @@
       text-transform: uppercase;
       display: inline-flex; align-items: center; gap: 12px;
       transition: all 0.3s;
-      box-shadow: 0 10px 25px rgba(200,16,46,0.3);
+      box-shadow: 0 10px 25px rgba(200,30,39,0.3);
     }
     .btn-submit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 35px rgba(200,16,46,0.45);
+      box-shadow: 0 15px 35px rgba(200,30,39,0.45);
     }
     .btn-submit i { transition: transform 0.3s; }
     .btn-submit:hover i { transform: translateX(4px); }
@@ -1062,7 +1043,7 @@
       background: var(--bg-white);
       border-radius: 18px; padding: 26px 24px;
       border: 1px solid var(--border);
-      box-shadow: 0 6px 20px rgba(31, 58, 110, 0.04);
+      box-shadow: 0 6px 20px rgba(29, 59, 115, 0.04);
     }
     .widget-title {
       font-size: 1rem; color: var(--navy);
@@ -1073,7 +1054,7 @@
     .widget-title::after {
       content: ''; position: absolute;
       bottom: 0; left: 0; width: 42px; height: 3px;
-      background: linear-gradient(90deg, var(--orange), var(--red));
+      background: linear-gradient(90deg, var(--green), var(--red));
       border-radius: 2px;
     }
     .popular-list { display: flex; flex-direction: column; gap: 16px; }
@@ -1087,6 +1068,7 @@
     .popular-thumb {
       width: 66px; height: 66px; border-radius: 12px;
       object-fit: cover; flex-shrink: 0;
+      background: var(--bg-light);
     }
     .popular-info { flex: 1; min-width: 0; }
     .popular-info h4 {
@@ -1101,27 +1083,27 @@
       font-size: 0.7rem; color: var(--text-muted);
       display: inline-flex; align-items: center; gap: 5px;
     }
-    .popular-info small i { color: var(--orange); }
+    .popular-info small i { color: var(--green); }
 
     .newsletter-widget {
       background: linear-gradient(135deg, var(--navy-deep), var(--navy) 60%, var(--red) 160%);
       color: #fff; border-radius: 18px;
       padding: 32px 26px; position: relative;
       overflow: hidden; border: none;
-      box-shadow: 0 20px 40px rgba(30,83,180,0.25);
+      box-shadow: 0 20px 40px rgba(29,59,115,0.25);
     }
     .newsletter-widget::before {
       content: ''; position: absolute; inset: 0;
       background-image:
-        radial-gradient(circle at 20% 20%, rgba(232,93,38,0.4), transparent 45%),
-        radial-gradient(circle at 80% 80%, rgba(200,16,46,0.4), transparent 45%);
+        radial-gradient(circle at 20% 20%, rgba(23,176,82,0.4), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(200,30,39,0.4), transparent 45%);
     }
     .newsletter-widget > * { position: relative; z-index: 2; }
     .newsletter-icon {
       width: 52px; height: 52px; border-radius: 14px;
       background: rgba(255,255,255,0.15);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.35rem; color: var(--orange);
+      font-size: 1.35rem; color: var(--green);
       margin-bottom: 16px;
     }
     .newsletter-widget h3 {
@@ -1138,19 +1120,21 @@
       border: 1px solid rgba(255,255,255,0.2);
       background: rgba(255,255,255,0.1);
       color: #fff; font-size: 0.88rem; outline: none;
+      font-family: inherit;
     }
     .newsletter-widget input::placeholder { color: rgba(255,255,255,0.6); }
-    .newsletter-widget input:focus { border-color: var(--orange); }
+    .newsletter-widget input:focus { border-color: var(--green); }
     .newsletter-widget button {
-      background: var(--orange); color: #fff;
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
+      color: #fff;
       border: none; padding: 13px; border-radius: 10px;
       font-weight: 800; cursor: pointer;
       transition: all 0.25s; font-size: 0.85rem;
       letter-spacing: 0.5px; text-transform: uppercase;
     }
     .newsletter-widget button:hover {
-      background: #d44a15; transform: translateY(-2px);
-      box-shadow: 0 12px 25px rgba(232,93,38,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(23,176,82,0.5);
     }
 
     /* Related posts */
@@ -1158,7 +1142,7 @@
     .related-head { text-align: center; margin-bottom: 50px; }
     .related-tag {
       display: inline-flex; align-items: center;
-      gap: 8px; background: rgba(200,16,46,0.08);
+      gap: 8px; background: var(--red-soft);
       color: var(--red); padding: 7px 16px;
       border-radius: 30px; font-size: 0.72rem;
       font-weight: 800; letter-spacing: 2px;
@@ -1185,10 +1169,10 @@
     }
     .related-card:hover {
       transform: translateY(-8px);
-      box-shadow: 0 30px 60px rgba(31,58,110,0.15);
+      box-shadow: 0 30px 60px rgba(29,59,115,0.15);
       border-color: transparent;
     }
-    .related-card-img { position: relative; height: 200px; overflow: hidden; }
+    .related-card-img { position: relative; height: 200px; overflow: hidden; background: var(--bg-light); }
     .related-card-img img {
       width: 100%; height: 100%; object-fit: cover;
       transition: transform 0.7s;
@@ -1226,7 +1210,7 @@
       font-size: 0.75rem; color: var(--text-muted);
       font-weight: 600;
     }
-    .related-card-meta i { color: var(--orange); }
+    .related-card-meta i { color: var(--green); }
 
     /* Loading skeleton */
     .post-skeleton {
@@ -1283,10 +1267,10 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 10px 25px rgba(30,83,180,0.3);
+      box-shadow: 0 10px 25px rgba(29,59,115,0.3);
       transition: all 0.25s;
     }
-    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(30,83,180,0.4); }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(29,59,115,0.4); }
 
     /* Footer */
     .footer {
@@ -1300,12 +1284,12 @@
     .footer::before {
       content: ''; position: absolute;
       top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, var(--navy), var(--red), var(--orange), var(--green));
+      background: linear-gradient(90deg, var(--navy), var(--red), var(--green));
     }
     .footer::after {
       content: ''; position: absolute;
       top: 0; right: -100px; width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(232,93,38,0.08), transparent 70%);
+      background: radial-gradient(circle, rgba(23,176,82,0.1), transparent 70%);
       border-radius: 50%;
     }
     .footer-grid {
@@ -1315,12 +1299,13 @@
       position: relative; z-index: 2;
     }
     .footer-brand .logo {
-      font-size: 1.5rem; margin-bottom: 18px;
-      display: inline-flex; color: #fff;
+      margin-bottom: 20px;
+      display: inline-flex; color: #fff; line-height: 1;
     }
-    .footer-brand .logo-mark .rise { color: #fff; }
-    .footer-brand .logo-mark .axis { color: var(--orange); }
-    .footer-brand .logo-sub { color: var(--orange); }
+    .footer-brand .logo span {
+      color: #fff; font-weight: 800;
+      letter-spacing: 1px; font-size: 1.1rem;
+    }
     .footer-brand p { margin-bottom: 24px; color: #a8b4cc; line-height: 1.7; }
     .footer-social { display: flex; gap: 10px; }
     .footer-social a {
@@ -1333,7 +1318,7 @@
     .footer-social a:hover {
       background: var(--red);
       transform: translateY(-4px) rotate(-6deg);
-      box-shadow: 0 12px 25px rgba(200,16,46,0.4);
+      box-shadow: 0 12px 25px rgba(200,30,39,0.4);
     }
     .footer h4 {
       color: #fff; font-size: 1rem;
@@ -1343,7 +1328,7 @@
     .footer h4::after {
       content: ''; position: absolute;
       bottom: 0; left: 0; width: 40px; height: 3px;
-      background: linear-gradient(90deg, var(--orange), var(--red));
+      background: linear-gradient(90deg, var(--green), var(--red));
       border-radius: 2px;
     }
     .footer ul li { margin-bottom: 12px; }
@@ -1351,17 +1336,27 @@
       color: #a8b4cc; transition: all 0.25s;
       display: inline-flex; align-items: center; gap: 8px;
     }
-    .footer ul a:hover { color: var(--orange); transform: translateX(4px); }
+    .footer ul a::before {
+      content: ''; width: 0; height: 1px;
+      background: var(--green); transition: width 0.25s;
+    }
+    .footer ul a:hover { color: var(--green); transform: translateX(4px); }
+    .footer ul a:hover::before { width: 12px; }
     .footer-contact li {
       display: flex; gap: 12px;
       margin-bottom: 16px; color: #a8b4cc; line-height: 1.55;
     }
-    .footer-contact i { color: var(--orange); margin-top: 4px; width: 18px; }
+    .footer-contact i { color: var(--green); margin-top: 4px; width: 18px; flex-shrink: 0; }
     .newsletter-form {
       display: flex; margin-top: 18px;
       background: rgba(255,255,255,0.06);
       border-radius: 12px; overflow: hidden;
       border: 1px solid rgba(255,255,255,0.1);
+      transition: border-color 0.3s;
+    }
+    .newsletter-form:focus-within {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(23,176,82,0.15);
     }
     .newsletter-form input {
       flex: 1; padding: 14px 16px;
@@ -1370,35 +1365,36 @@
     }
     .newsletter-form input::placeholder { color: #7a88a8; }
     .newsletter-form button {
-      background: linear-gradient(135deg, var(--red), var(--red-dark));
+      background: linear-gradient(135deg, var(--red), var(--red-deep));
       color: #fff; border: none; padding: 0 22px;
       cursor: pointer; font-weight: 700; transition: all 0.3s;
+      font-size: 0.9rem;
     }
     .newsletter-form button:hover {
-      background: linear-gradient(135deg, var(--orange), #d44a15);
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
     }
     .footer-bottom {
       padding: 26px 0; text-align: center;
       color: #7a88a8; font-size: 0.82rem;
       position: relative; z-index: 2;
     }
-    .footer-bottom strong { color: var(--orange); }
+    .footer-bottom strong { color: var(--green); }
 
     /* WhatsApp */
     .whatsapp-float {
       position: fixed; bottom: 25px; right: 25px;
-      background: linear-gradient(135deg, var(--green), #0a5f2e);
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
       color: #fff; width: 62px; height: 62px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.9rem;
-      box-shadow: 0 10px 30px rgba(14, 122, 60, 0.5);
+      box-shadow: 0 10px 30px rgba(23,176,82,0.5);
       z-index: 999; transition: all 0.3s;
     }
     .whatsapp-float::before {
       content: ''; position: absolute;
       inset: -6px; border-radius: 50%;
-      border: 2px solid rgba(14, 122, 60, 0.4);
+      border: 2px solid rgba(23,176,82,0.4);
       animation: ripple 2s infinite;
     }
     @keyframes ripple {
@@ -1417,6 +1413,7 @@
       .nav-links, .nav-actions { display: none !important; }
       .mobile-nav-actions { display: flex; }
       .main-nav .container { min-height: 72px; }
+      .logo-img { height: 48px; }
     }
     @media (max-width: 1100px) {
       .post-hero h1 { font-size: 2.4rem; }
@@ -1449,6 +1446,7 @@
       .search-panel-header { padding: 14px 16px; }
       .search-input-wrap input { font-size: 0.92rem; padding: 11px 14px; }
       .search-close { width: 36px; height: 36px; }
+      .logo-img { height: 42px; }
     }
     @media (max-width: 480px) {
       .post-hero h1 { font-size: 1.5rem; }
@@ -1457,69 +1455,50 @@
       .share-label { width: 100%; justify-content: center; }
       .mobile-menu { width: 100%; max-width: 100%; }
       .cart-icon-btn, .hamburger { width: 40px; height: 40px; }
+      .logo-img { height: 36px; }
     }
-    @media (max-width: 1024px) {
-  /* ... existing rules ... */
-  .logo-img { height: 48px; }
-}
-@media (max-width: 768px) {
-  /* ... existing rules ... */
-  .logo-img { height: 42px; }
-}
-@media (max-width: 480px) {
-  /* ... existing rules ... */
-  .logo-img { height: 36px; }
-}
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .post-hero-bg, .whatsapp-float::before { animation: none !important; }
+    }
   </style>
 </head>
 <body>
 
   <div class="reading-progress" id="readingProgress"></div>
 
-  <!-- TOP BAR -->
-  <div class="top-bar">
-    <div class="container">
-      <div class="top-item">
-        <i class="fas fa-phone-alt"></i>
-        <span><strong>Phone:</strong> +254 725 538 297</span>
-      </div>
-      <div class="top-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <span><strong>Office:</strong> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</span>
-      </div>
-      <div class="top-item">
-        <i class="fas fa-envelope"></i>
-        <span><strong>Email:</strong> contact@riseaxissolutions.com</span>
-      </div>
-    </div>
-  </div>
-
   <!-- NAVIGATION -->
   <nav class="main-nav" id="mainNav">
     <div class="container">
-         <a href="../index.html" class="logo">
-  <img
-    src="../image/RISE AXIS LOGO FILE.png"
-    alt="Rise Axis Solutions Ltd"
-    class="logo-img"
-    width="180"
-    height="56"
-    fetchpriority="high"
-    decoding="async"
-  >
-</a>
+      <a href="../index.html" class="logo">
+        <img
+          src="../image/RISE AXIS LOGO FILE.png"
+          alt="Rise Axis Solutions Ltd"
+          class="logo-img"
+          width="180"
+          height="56"
+          fetchpriority="high"
+          decoding="async"
+        >
+      </a>
 
       <ul class="nav-links">
         <li><a href="../index.html">Home</a></li>
         <li><a href="aboutUs.html">About Us</a></li>
         <li class="dropdown">
           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
-           <ul class="dropdown-menu">
-             <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
-          <li><a href="product.html?category=injectables">Injectables</a></li>
-          <li><a href="product.html?category=premixes">Premixes</a></li>
-        </ul>
+          <ul class="dropdown-menu">
+            <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
+            <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
+            <li><a href="product.html?category=injectables">Injectables</a></li>
+            <li><a href="product.html?category=premixes">Premixes</a></li>
+          </ul>
         </li>
         <li><a href="blog.html" class="active">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -1609,6 +1588,7 @@
       <div class="search-panel-header">
         <i class="fas fa-search"></i>
         <div class="search-input-wrap">
+          <label for="searchInput" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Search</label>
           <input
             type="text"
             id="searchInput"
@@ -1631,20 +1611,20 @@
   </div>
 
   <!-- MOBILE MENU -->
-   <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
   <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <div class="mobile-menu-header">
-          <a href="../index.html" class="logo">
-  <img
-    src="../image/RISE AXIS LOGO FILE.png"
-    alt="Rise Axis Solutions Ltd"
-    class="logo-img"
-    width="180"
-    height="56"
-    loading="lazy"
-    decoding="async"
-  >
-</a>
+      <a href="../index.html" class="logo">
+        <img
+          src="../image/RISE AXIS LOGO FILE.png"
+          alt="Rise Axis Solutions Ltd"
+          class="logo-img"
+          width="180"
+          height="56"
+          loading="lazy"
+          decoding="async"
+        >
+      </a>
       <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fas fa-times"></i></button>
     </div>
     <div class="mobile-user" id="mobileUserBox" style="display:none;">
@@ -1655,23 +1635,23 @@
       </div>
     </div>
     <ul class="mobile-menu-links">
-      <li><a href="../index.html"> Home</a></li>
-      <li><a href="aboutUs.html"> About Us</a></li>
+      <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="aboutUs.html"><i class="fas fa-users"></i> About Us</a></li>
       <li class="mobile-dropdown">
         <button class="mobile-dropdown-toggle" id="mobileProductsToggle" aria-expanded="false">
-          <span> Products</span>
+          <span><i class="fas fa-box"></i> Products</span>
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
           <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary">Veterinary Products</a></li>
+          <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
           <li><a href="product.html?category=injectables">Injectables</a></li>
           <li><a href="product.html?category=premixes">Premixes</a></li>
         </ul>
       </li>
-      <li><a href="blog.html" class="active"> Blog</a></li>
-      <li><a href="contact.html"> Contact</a></li>
-      <li><a href="shop.html"> Shop</a></li>
+      <li><a href="blog.html" class="active"><i class="fas fa-newspaper"></i> Blog</a></li>
+      <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+      <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
       <li><a href="#" onclick="event.preventDefault(); closeMobileMenu(); openSearch();"><i class="fas fa-search"></i> Search</a></li>
     </ul>
     <div class="mobile-menu-auth" id="mobileAuthSection">
@@ -1702,25 +1682,19 @@
     </div>
   </article>
 
-  <!-- FOOTER -->
+  <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="../index.html" class="logo">
-            <div>
-              <span class="logo-mark">
-                <span class="rise">RISE</span>
-                <span class="axis">AXIS</span>
-              </span>
-              <span class="logo-sub">SOLUTIONS LTD</span>
-            </div>
+            <span>RISE AXIS SOLUTIONS LTD</span>
           </a>
           <p>Clarity, Direction, Results. We supply agri-inputs and advisory services that help East African farmers grow better, sustainably.</p>
           <div class="footer-social">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
           </div>
         </div>
 
@@ -1739,7 +1713,7 @@
           <ul class="footer-contact">
             <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</li>
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
-            <li><i class="fas fa-phone-alt"></i> +254725538297</li>
+            <li><i class="fas fa-phone-alt"></i> +254 725 538 297</li>
           </ul>
         </div>
 
@@ -1747,23 +1721,26 @@
           <h4>Newsletter</h4>
           <p style="color: #a8b4cc; margin-bottom: 0;">Subscribe for agri-tips, product updates, and offers.</p>
           <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to Rise Axis Solutions!');">
-            <input type="email" placeholder="Enter your email" required>
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            <input type="email" placeholder="Enter your email" required aria-label="Email address">
+            <button type="submit" aria-label="Subscribe"><i class="fas fa-paper-plane"></i></button>
           </form>
         </div>
       </div>
 
       <div class="footer-bottom">
-        Copyright © 2026 <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
+        Copyright © <span id="year"></span> <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
       </div>
     </div>
   </footer>
 
-  <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+  <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
   <script>
+    /* ---------- FOOTER YEAR ---------- */
+    document.getElementById('year').textContent = new Date().getFullYear();
+
     /* ============================================================
        SUPABASE CLIENT
        ============================================================ */
@@ -1835,20 +1812,18 @@
         const relatedIds = Array.isArray(post.related_ids) ? post.related_ids.filter(Boolean) : [];
 
         if (relatedIds.length) {
-          // Fetch by explicit related_ids (preserving order)
           const { data: relData, error: relErr } = await supabaseClient
             .from('posts')
             .select('id, title, slug, category, category_label, excerpt, cover_image, read_time, published_at')
             .in('id', relatedIds)
             .eq('is_published', true);
           if (!relErr && relData) {
-            // Preserve order of related_ids
             const map = new Map(relData.map(r => [r.id, r]));
             related = relatedIds.map(id => map.get(id)).filter(Boolean).slice(0, 3);
           }
         }
 
-        // 3. If we don't have enough related, fill with same-category posts
+        // 3. Fill with same-category posts
         if (related.length < 3) {
           const { data: sameCat } = await supabaseClient
             .from('posts')
@@ -1862,7 +1837,7 @@
           if (sameCat) related = related.concat(sameCat);
         }
 
-        // 4. Still not enough? Fill with latest posts
+        // 4. Fill with latest posts
         if (related.length < 3) {
           const excludeIds = new Set([post.id, ...related.map(r => r.id)]);
           const { data: latest } = await supabaseClient
@@ -1878,7 +1853,7 @@
           }
         }
 
-        // 5. Fetch popular posts for the sidebar (top 4 by views)
+        // 5. Fetch popular posts for the sidebar
         const { data: popular } = await supabaseClient
           .from('posts')
           .select('id, title, slug, cover_image, views')
@@ -1907,7 +1882,7 @@
     function applyPostSeo(post) {
       const title = `${post.title} | Rise Axis Solutions`;
       const desc = (post.excerpt || '').slice(0, 160) || 'Expert agri-input insights from Rise Axis Solutions.';
-      const img = post.cover_image || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&q=80';
+      const img = post.cover_image || 'https://www.riseaxissolutions.com/image/blog-fallback.jpg';
       const url = `https://www.riseaxissolutions.com/pages/blog-post.html?id=${encodeURIComponent(slugOrId(post))}`;
 
       document.title = title;
@@ -1926,7 +1901,6 @@
       document.getElementById('twDescription').setAttribute('content', desc);
       document.getElementById('twImage').setAttribute('content', img);
 
-      // JSON-LD Article schema
       const jsonLd = {
         "@context": "https://schema.org",
         "@type": "Article",
@@ -1944,7 +1918,7 @@
           "name": "Rise Axis Solutions Ltd",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://www.riseaxissolutions.com/images/logo.png"
+            "url": "https://www.riseaxissolutions.com/image/RISE AXIS LOGO FILE.png"
           }
         },
         "mainEntityOfPage": {
@@ -1968,7 +1942,7 @@
       const authorRole = post.author_role || 'Agri-Input Specialist';
       const authorBio = post.author_bio || '';
       const readTime = post.read_time || '5 min';
-      const coverImg = post.cover_image || 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1600&q=80';
+      const coverImg = post.cover_image || 'https://www.riseaxissolutions.com/image/blog-fallback.jpg';
       const tags = Array.isArray(post.tags) ? post.tags : [];
       const publishedDate = fmtDate(post.published_at || post.created_at);
       const publishedISO = post.published_at || post.created_at || '';
@@ -2093,14 +2067,14 @@
                     <form onsubmit="event.preventDefault(); alert('Thank you! Your comment is awaiting moderation.'); this.reset();">
                       <div class="form-row">
                         <div class="form-field">
-                          <input type="text" placeholder="Your name" required>
+                          <input type="text" placeholder="Your name" required aria-label="Your name">
                         </div>
                         <div class="form-field">
-                          <input type="email" placeholder="Your email" required>
+                          <input type="email" placeholder="Your email" required aria-label="Your email">
                         </div>
                       </div>
                       <div class="form-field" style="margin-bottom:16px;">
-                        <textarea placeholder="Share your thoughts..." required></textarea>
+                        <textarea placeholder="Share your thoughts..." required aria-label="Your comment"></textarea>
                       </div>
                       <button class="btn-submit" type="submit">
                         Post Comment <i class="fas fa-arrow-right"></i>
@@ -2131,7 +2105,7 @@
                   <h3>Never Miss a Post</h3>
                   <p>Get weekly agri-tips, product updates, and expert advice delivered to your inbox.</p>
                   <form onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
-                    <input type="email" placeholder="Enter your email" required>
+                    <input type="email" placeholder="Enter your email" required aria-label="Your email">
                     <button type="submit">Subscribe Now</button>
                   </form>
                 </div>
@@ -2176,7 +2150,7 @@
     }
 
     /* ============================================================
-       LAZY LOAD for iframes inside article body (if any)
+       LAZY LOAD for iframes inside article body
        ============================================================ */
     function setupLazyIframes() {
       document.querySelectorAll('.article-body iframe:not([loading])').forEach(f => {
@@ -2240,9 +2214,9 @@
         navigator.clipboard.writeText(window.location.href).then(() => {
           const original = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-check"></i>';
-          btn.style.background = '#0E7A3C';
+          btn.style.background = 'var(--green)';
           btn.style.color = '#fff';
-          btn.style.borderColor = '#0E7A3C';
+          btn.style.borderColor = 'var(--green)';
           setTimeout(() => {
             btn.innerHTML = original;
             btn.style.background = '';
@@ -2257,18 +2231,18 @@
        SEARCH
        ============================================================ */
     const SEARCH_INDEX = [
-      { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
-      { type: 'product', name: 'VitaMin Plus Supplement', cat: 'Feed Additives', price: 1890, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Complete vitamin and mineral blend for livestock.' },
-      { type: 'product', name: 'EnzymeMax Digestive Aid', cat: 'Feed Additives', price: 3200, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Powerful enzyme complex for digestion and nutrient absorption.' },
-      { type: 'product', name: 'VetCare Antibiotic Powder', cat: 'Veterinary Products', price: 1750, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', desc: 'Broad-spectrum antibiotic for common infections.' },
-      { type: 'product', name: 'Dewormer Oral Suspension', cat: 'Veterinary Products', price: 980, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Effective oral dewormer against internal parasites.' },
-      { type: 'product', name: 'Skin Heal Topical Spray', cat: 'Veterinary Products', price: 1250, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Fast-acting spray for wounds and skin conditions.' },
-      { type: 'product', name: 'Oxytetracycline Injection', cat: 'Injectables', price: 1450, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Broad-spectrum injectable antibiotic.' },
-      { type: 'product', name: 'Ivermectin Injectable 1%', cat: 'Injectables', price: 2100, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Antiparasitic injectable for internal and external parasites.' },
-      { type: 'product', name: 'Vitamin B-Complex Injection', cat: 'Injectables', price: 1350, img: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&q=80', desc: 'Supports energy, appetite, and recovery.' },
-      { type: 'product', name: 'Layer Premix Pro', cat: 'Premixes', price: 3450, img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80', desc: 'Complete premix for laying hens.' },
-      { type: 'product', name: 'Dairy Premix Gold', cat: 'Premixes', price: 4200, img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&q=80', desc: 'Premium dairy premix for milk yield and fertility.' },
-      { type: 'product', name: 'Broiler Premix Elite', cat: 'Premixes', price: 3800, img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&q=80', desc: 'Specialised premix for rapid broiler growth.' },
+      { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: '../image/card-supply.jpg', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
+      { type: 'product', name: 'VitaMin Plus Supplement', cat: 'Feed Additives', price: 1890, img: '../image/card-supplier.jpg', desc: 'Complete vitamin and mineral blend for livestock.' },
+      { type: 'product', name: 'EnzymeMax Digestive Aid', cat: 'Feed Additives', price: 3200, img: '../image/card-supply.jpg', desc: 'Powerful enzyme complex for digestion and nutrient absorption.' },
+      { type: 'product', name: 'VetCare Antibiotic Powder', cat: 'Veterinary Products', price: 1750, img: '../image/card-quality.jpg', desc: 'Broad-spectrum antibiotic for common infections.' },
+      { type: 'product', name: 'Dewormer Oral Suspension', cat: 'Veterinary Products', price: 980, img: '../image/card-service.jpg', desc: 'Effective oral dewormer against internal parasites.' },
+      { type: 'product', name: 'Skin Heal Topical Spray', cat: 'Veterinary Products', price: 1250, img: '../image/card-supplier.jpg', desc: 'Fast-acting spray for wounds and skin conditions.' },
+      { type: 'product', name: 'Oxytetracycline Injection', cat: 'Injectables', price: 1450, img: '../image/card-supply.jpg', desc: 'Broad-spectrum injectable antibiotic.' },
+      { type: 'product', name: 'Ivermectin Injectable 1%', cat: 'Injectables', price: 2100, img: '../image/card-service.jpg', desc: 'Antiparasitic injectable for internal and external parasites.' },
+      { type: 'product', name: 'Vitamin B-Complex Injection', cat: 'Injectables', price: 1350, img: '../image/card-quality.jpg', desc: 'Supports energy, appetite, and recovery.' },
+      { type: 'product', name: 'Layer Premix Pro', cat: 'Premixes', price: 3450, img: '../image/card-supplier.jpg', desc: 'Complete premix for laying hens.' },
+      { type: 'product', name: 'Dairy Premix Gold', cat: 'Premixes', price: 4200, img: '../image/card-supply.jpg', desc: 'Premium dairy premix for milk yield and fertility.' },
+      { type: 'product', name: 'Broiler Premix Elite', cat: 'Premixes', price: 3800, img: '../image/card-experience.jpg', desc: 'Specialised premix for rapid broiler growth.' },
       { type: 'page', name: 'Home', url: '../index.html', icon: 'fa-home', desc: 'Rise Axis Solutions homepage' },
       { type: 'page', name: 'About Us', url: 'aboutUs.html', icon: 'fa-users', desc: 'Our story, mission, and values' },
       { type: 'page', name: 'Products', url: 'product.html', icon: 'fa-box', desc: 'Browse our full product range' },
@@ -2380,7 +2354,11 @@
       searchResults.innerHTML = html;
     }
 
-    searchInput?.addEventListener('input', e => runSearch(e.target.value));
+    let searchDebounce = null;
+    searchInput?.addEventListener('input', e => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => runSearch(e.target.value), 120);
+    });
     searchInput?.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -2495,6 +2473,8 @@
       mobileMenu.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
     }
+    window.closeMobileMenu = closeMobileMenu;
+
     hamburgerBtn?.addEventListener('click', () => {
       if (mobileMenu.classList.contains('open')) closeMobileMenu();
       else openMobileMenu();
@@ -2543,8 +2523,8 @@
        ============================================================ */
     loadPost();
 
-    console.log('%c RISE AXIS — Blog Post (Supabase) ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
-    console.log('%c Clarity · Direction · Results ', 'background: #E85D26; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
+    console.log('%c RISE AXIS — Blog Post (Supabase) ', 'background: linear-gradient(90deg, #1D3B73, #C81E27); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
+    console.log('%c Clarity · Direction · Results ', 'background: #17B052; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');
   </script>
 
 </body>
