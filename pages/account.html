@@ -2006,53 +2006,64 @@
       if (e.key === 'Escape' && document.getElementById('orderModal').classList.contains('open')) closeModal();
     });
 
-    /* ============================================================
-       REORDER
-       ============================================================ */
-    async function reorderById(orderId, ev) {
-      if (ev) ev.stopPropagation();
-      try {
-        const { data } = await supabaseClient
-          .from('order_items')
-          .select('*')
-          .eq('order_id', orderId);
-        if (!data || !data.length) {
-          showToast('No items to reorder', 'error');
-          return;
-        }
-        const cart = JSON.parse(localStorage.getItem('riseAxisCart') || '[]');
-        let added = 0;
-        data.forEach(item => {
-          const key = (item.product_name || '') + '__' + (item.quality || 'standard');
-          const existing = cart.find(c => ((c.name || '') + '__' + (c.pack || 'standard')) === key);
-          if (existing) {
-            existing.quantity = (existing.quantity || 0) + item.quantity;
-            existing.qty = existing.quantity;
-          } else {
-            cart.push({
-              productId: item.product_id || null,
-              name: item.product_name,
-              price: Number(item.price_per_unit),
-              image: item.product_image,
-              quantity: item.quantity,
-              qty: item.quantity,
-              category: '',
-              pack: item.quality || 'standard',
-              packLabel: item.quality || 'standard',
-              addedAt: Date.now()
-            });
-          }
-          added++;
-        });
-        localStorage.setItem('riseAxisCart', JSON.stringify(cart));
-        updateNavCartBadge();
-        showToast(`Added ${added} item(s) to your cart`);
-      } catch (err) {
-        console.error('Reorder failed:', err);
-        showToast('Could not reorder: ' + (err.message || 'Unknown error'), 'error');
-      }
+   /* ============================================================
+   REORDER
+   ============================================================ */
+async function reorderById(orderId, ev) {
+  if (ev) ev.stopPropagation();
+  try {
+    const { data } = await supabaseClient
+      .from('order_items')
+      .select('*')
+      .eq('order_id', orderId);
+    if (!data || !data.length) {
+      showToast('No items to reorder', 'error');
+      return;
     }
+    const cart = JSON.parse(localStorage.getItem('riseAxisCart') || '[]');
+    let added = 0;
 
+    data.forEach(item => {
+      const label = item.quality || 'standard';
+
+      // Strip the trailing "(label)" from the stored name so it doesn't double up
+      let cleanName = item.product_name || '';
+      const suffix = ` (${label})`;
+      if (label && cleanName.endsWith(suffix)) {
+        cleanName = cleanName.slice(0, -suffix.length).trim();
+      }
+
+      const key = cleanName + '__' + label;
+      const existing = cart.find(c => ((c.name || '') + '__' + (c.pack || 'standard')) === key);
+
+      if (existing) {
+        existing.quantity = (existing.quantity || 0) + item.quantity;
+        existing.qty = existing.quantity;
+      } else {
+        cart.push({
+          productId: item.product_id || null,
+          name: cleanName,
+          price: Number(item.price_per_unit),
+          image: item.product_image,
+          quantity: item.quantity,
+          qty: item.quantity,
+          category: '',
+          pack: label,
+          packLabel: label,
+          addedAt: Date.now()
+        });
+      }
+      added++;
+    });
+
+    localStorage.setItem('riseAxisCart', JSON.stringify(cart));
+    updateNavCartBadge();
+    showToast(`Added ${added} item(s) to your cart`);
+  } catch (err) {
+    console.error('Reorder failed:', err);
+    showToast('Could not reorder: ' + (err.message || 'Unknown error'), 'error');
+  }
+}
     /* ============================================================
        SAVE PROFILE
        ============================================================ */
