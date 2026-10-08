@@ -136,12 +136,78 @@
     .dropdown { position: relative; }
     .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
     .dropdown:hover > a i { transform: rotate(180deg); }
-    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; background: var(--bg-white); min-width: 230px; border-radius: 14px; padding: 10px; box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15); border: 1px solid var(--border); opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.25s; z-index: 100; }
-    .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-    .dropdown-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; color: var(--navy); font-weight: 500; font-size: 0.88rem; border-radius: 10px; transition: all 0.2s; }
-    .dropdown-menu a i { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--red); transition: all 0.2s; }
-    .dropdown-menu a:hover { background: var(--bg-light); color: var(--red); transform: translateX(4px); }
-    .dropdown-menu a:hover i { background: var(--red); color: #fff; }
+
+    /* ============ 3-LEVEL CASCADING DROPDOWN ============ */
+    .dropdown-menu,
+    .submenu {
+      position: absolute;
+      background: var(--bg-white);
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15);
+      border: 1px solid var(--border);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+      z-index: 100;
+      list-style: none;
+      min-width: 230px;
+    }
+    .dropdown-menu {
+      top: calc(100% + 8px);
+      left: 0;
+    }
+    .submenu {
+      top: -10px;
+      left: calc(100% + 6px);
+      min-width: 220px;
+    }
+    .submenu .submenu {
+      top: -10px;
+      left: calc(100% + 6px);
+    }
+    .dropdown:hover > .dropdown-menu,
+    .dropdown:focus-within > .dropdown-menu,
+    .has-children:hover > .submenu,
+    .has-children:focus-within > .submenu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-menu li,
+    .submenu li { position: relative; }
+    .dropdown-menu a,
+    .submenu a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 14px;
+      color: var(--navy);
+      font-weight: 500;
+      font-size: 0.88rem;
+      border-radius: 10px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .dropdown-menu a:hover,
+    .submenu a:hover { background: var(--bg-light); color: var(--red); transform: translateX(4px); }
+    .dropdown-menu a .caret,
+    .submenu a .caret { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.2s; }
+    .has-children:hover > a .caret { transform: translateX(3px); color: var(--red); }
+    .dropdown-menu .cat-count,
+    .submenu .cat-count {
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: #e8eef8;
+      color: var(--navy);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+    .nav-loading { color: var(--text-muted); font-size: 0.85rem; padding: 9px 14px; }
 
     .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .search-icon { color: var(--navy); font-size: 0.95rem; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); border-radius: 50%; cursor: pointer; transition: all 0.25s; background: var(--bg-white); padding: 0; }
@@ -225,9 +291,21 @@
     .mobile-dropdown-toggle > i:last-child { font-size: 0.7rem; color: var(--text-muted); transition: transform 0.3s; }
     .mobile-dropdown-toggle.open > i:last-child { transform: rotate(180deg); }
     .mobile-submenu { max-height: 0; overflow: hidden; transition: max-height 0.35s, padding 0.25s; padding-left: 16px; }
-    .mobile-submenu.open { max-height: 400px; padding: 6px 0 6px 16px; }
+    .mobile-submenu.open { max-height: 2000px; padding: 6px 0 6px 16px; }
     .mobile-submenu a { display: block; padding: 11px 14px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; border-radius: 10px; border-left: 3px solid transparent; transition: all 0.2s; }
     .mobile-submenu a:hover { background: #f5f9ff; color: var(--navy); border-left-color: var(--red); }
+    .mobile-submenu .mobile-submenu { padding-left: 14px; }
+    .mobile-submenu .mobile-submenu a { font-size: 0.85rem; padding-left: 12px; }
+    .mobile-sub-sub-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 11px 14px; border: none; background: none;
+      color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+      border-radius: 10px; border-left: 3px solid transparent;
+      cursor: pointer; transition: all 0.2s; text-align: left;
+    }
+    .mobile-sub-sub-toggle:hover { background: #f5f9ff; color: var(--navy); }
+    .mobile-sub-sub-toggle .mcaret { font-size: 0.65rem; transition: transform 0.25s; }
+    .mobile-sub-sub-toggle.open .mcaret { transform: rotate(180deg); }
     .mobile-menu-auth { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border); }
     .mobile-auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 18px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; transition: all 0.25s; cursor: pointer; border: none; }
     .mobile-auth-outline { background: #fff; color: var(--navy); border: 1.5px solid var(--border); }
@@ -475,23 +553,17 @@
       .cart-icon-btn, .hamburger { width: 40px; height: 40px; }
     }
     @media (max-width: 1024px) {
-  /* ... existing rules ... */
   .logo-img { height: 48px; }
 }
 @media (max-width: 768px) {
-  /* ... existing rules ... */
   .logo-img { height: 42px; }
 }
 @media (max-width: 480px) {
-  /* ... existing rules ... */
   .logo-img { height: 36px; }
 }
   </style>
 </head>
 <body>
-
-  <!-- TOP BAR -->
-  
 
   <!-- NAVIGATION -->
   <nav class="main-nav" id="mainNav">
@@ -511,14 +583,11 @@
       <ul class="nav-links">
         <li><a href="../index.html">Home</a></li>
         <li><a href="aboutUs.html">About Us</a></li>
-        <li class="dropdown">
-           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
-          <ul class="dropdown-menu">
-             <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
-          <li><a href="product.html?category=injectables">Injectables</a></li>
-          <li><a href="product.html?category=premixes">Premixes</a></li>
-        </ul>
+        <li class="dropdown" id="productsDropdown">
+          <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
+          <ul class="dropdown-menu" id="productsMenu">
+            <li class="nav-loading"><i class="fas fa-spinner fa-spin"></i> Loading categories…</li>
+          </ul>
         </li>
         <li><a href="blog.html">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -600,8 +669,7 @@
   <aside class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <div class="mobile-menu-header">
       <a href="../index.html" class="logo">
-  <img
-    src="../image/RISE AXIS LOGO FILE.png"
+  <img    src="../image/RISE AXIS LOGO FILE.png"
     alt="Rise Axis Solutions Ltd"
     class="logo-img"
     width="180"
@@ -632,10 +700,9 @@
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
-          <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary">Veterinary Products</a></li>
-          <li><a href="product.html?category=injectables">Injectables</a></li>
-          <li><a href="product.html?category=premixes">Premixes</a></li>
+          <li class="nav-loading" style="padding:11px 14px;color:var(--text-muted);font-size:0.85rem;">
+            <i class="fas fa-spinner fa-spin"></i> Loading categories…
+          </li>
         </ul>
       </li>
       <li><a href="blog.html"> Blog</a></li>
@@ -686,25 +753,9 @@
         <h3>Shop by Category</h3>
         <p>Jump straight to what you need.</p>
         <div class="hero-cat-list" id="heroCatList">
-          <div class="hero-cat-item" onclick="filterCategory('feed-additives')">
-            <div class="cat-icon"><i class="fas fa-flask"></i></div>
-            <div class="cat-text">Feed Additives<small>Boost nutrition & growth</small></div>
-            <i class="fas fa-arrow-right arrow"></i>
-          </div>
-          <div class="hero-cat-item" onclick="filterCategory('veterinary')">
-            <div class="cat-icon"><i class="fas fa-syringe"></i></div>
-            <div class="cat-text">Veterinary Products<small>Health & wellness</small></div>
-            <i class="fas fa-arrow-right arrow"></i>
-          </div>
-          <div class="hero-cat-item" onclick="filterCategory('injectables')">
-            <div class="cat-icon"><i class="fas fa-prescription-bottle"></i></div>
-            <div class="cat-text">Injectables<small>Fast-acting treatment</small></div>
-            <i class="fas fa-arrow-right arrow"></i>
-          </div>
-          <div class="hero-cat-item" onclick="filterCategory('premixes')">
-            <div class="cat-icon"><i class="fas fa-capsules"></i></div>
-            <div class="cat-text">Premixes<small>Complete nutrition blend</small></div>
-            <i class="fas fa-arrow-right arrow"></i>
+          <!-- Rendered dynamically from DB -->
+          <div style="padding:14px;color:rgba(255,255,255,0.6);font-size:0.85rem;text-align:center;">
+            <i class="fas fa-spinner fa-spin"></i> Loading categories…
           </div>
         </div>
       </div>
@@ -716,10 +767,10 @@
     <div class="container">
       <div class="filter-chips" id="filterChips">
         <div class="chip active" data-cat="all"><i class="fas fa-th-large"></i> All Products</div>
-        <div class="chip" data-cat="feed-additives"><i class="fas fa-flask"></i> Feed Additives</div>
-        <div class="chip" data-cat="veterinary"><i class="fas fa-syringe"></i> Veterinary Products</div>
-        <div class="chip" data-cat="injectables"><i class="fas fa-prescription-bottle"></i> Injectables</div>
-        <div class="chip" data-cat="premixes"><i class="fas fa-capsules"></i> Premixes</div>
+        <!-- Dynamic chips injected by JS -->
+        <div style="padding:10px 14px;color:var(--text-muted);font-size:0.85rem;">
+          <i class="fas fa-spinner fa-spin"></i> Loading…
+        </div>
       </div>
 
       <div class="filter-right">
@@ -785,19 +836,13 @@
     <span id="toastText">Item added</span>
   </div>
 
-  <!-- ========== FOOTER ========== -->
+   <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="../index.html" class="logo">
-            <div>
-              <span class="logo-mark">
-                <span class="rise">RISE AXIS SOLUTIONS LTD</span>
-                
-              </span>
-              <!-- <span class="logo-sub">SOLUTIONS LTD</span> -->
-            </div>
+            <span>RISE AXIS SOLUTIONS LTD</span>
           </a>
           <p>Clarity, Direction, Results. We supply agri-inputs and advisory services that help East African farmers grow better, sustainably.</p>
           <div class="footer-social">
@@ -813,16 +858,16 @@
             <li><a href="aboutUs.html">About Us</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="product.html">Shop Now</a></li>
+            <li><a href="shop.html">Shop Now</a></li>
           </ul>
         </div>
 
         <div>
           <h4>Get In Touch</h4>
           <ul class="footer-contact">
-            <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5 </li>
+            <li><i class="fas fa-map-marker-alt"></i> New Horizon Industrial Park, Ruiru, Kenya</li>
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
-            <li><i class="fas fa-phone-alt"></i> +254700123456</li>
+            <li><i class="fas fa-phone-alt icon-phone-fix"></i> +254 119 155 847</li>
           </ul>
         </div>
 
@@ -830,14 +875,14 @@
           <h4>Newsletter</h4>
           <p style="color: #a8b4cc; margin-bottom: 0;">Subscribe for agri-tips, product updates, and offers.</p>
           <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to Rise Axis Solutions!');">
-            <input type="email" placeholder="Enter your email" required>
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            <input type="email" placeholder="Enter your email" required aria-label="Email address">
+            <button type="submit" aria-label="Subscribe"><i class="fas fa-paper-plane"></i></button>
           </form>
         </div>
       </div>
 
       <div class="footer-bottom">
-        Copyright © 2026 <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
+        Copyright © <span id="year"></span> <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
       </div>
     </div>
   </footer>
@@ -860,6 +905,9 @@
        ============================================================ */
     let PRODUCTS = [];
     let CATEGORIES = [];
+    let CATEGORIES_BY_ID = {};
+    let CATEGORIES_BY_PARENT = {};
+    let CATEGORY_TREE = [];
     let PRODUCT_MAP_BY_ID = {};
     let state = { category: 'all', search: '', sort: 'featured' };
     let atcState = { product: null, selectedPackId: null, qty: 1 };
@@ -878,19 +926,228 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
     const categoryName = catId => {
-      const c = CATEGORIES.find(x => x.id === catId);
+      const c = CATEGORIES_BY_ID[catId];
       return c ? c.name : 'Uncategorized';
     };
     const categorySlug = catId => {
-      const c = CATEGORIES.find(x => x.id === catId);
+      const c = CATEGORIES_BY_ID[catId];
       return c ? c.slug : '';
     };
-    const categoryIdFromSlug = slug => {
-      const c = CATEGORIES.find(x => x.slug === slug);
-      return c ? c.id : null;
+    const categoryPath = catId => {
+      const c = CATEGORIES_BY_ID[catId];
+      return c ? (c.path || c.slug) : '';
     };
 
-    /* ---------- STICKY NAV ---------- */
+    /* Resolve a slug to its full path (walks up tree) */
+    function slugToPath(slug) {
+      const c = CATEGORIES.find(x => x.slug === slug);
+      return c ? (c.path || c.slug) : slug;
+    }
+
+    /* All descendant category ids of the given category id (inclusive) */
+    function descendantCategoryIds(catId) {
+      const ids = [catId];
+      const children = CATEGORIES_BY_PARENT[catId] || [];
+      children.forEach(ch => ids.push(...descendantCategoryIds(ch.id)));
+      return ids;
+    }
+
+    /* ============================================================
+       NORMALIZE PACKS — guarantee each pack has a unique id
+       Falls back to label (or index) when id is empty/missing.
+       ============================================================ */
+    function normalizePacks(product) {
+      if (Array.isArray(product.packs) && product.packs.length) {
+        return product.packs.map((pk, idx) => ({
+          id: (pk.id && String(pk.id).trim()) || (pk.label && String(pk.label).trim()) || ('pack-' + idx),
+          label: pk.label || pk.id || ('Pack ' + (idx + 1)),
+          price: Number(pk.price || 0)
+        }));
+      }
+      return [{
+        id: 'standard',
+        label: product.available_packaging || 'Standard',
+        price: Number(product.price || 0)
+      }];
+    }
+
+    /* ============================================================
+       BUILD CATEGORY TREE
+       ============================================================ */
+    function buildCategoryTree() {
+      CATEGORIES_BY_ID = {};
+      CATEGORIES.forEach(c => { CATEGORIES_BY_ID[c.id] = c; });
+
+      CATEGORIES_BY_PARENT = {};
+      CATEGORIES.forEach(c => {
+        const pid = c.parent_id || 'ROOT';
+        if (!CATEGORIES_BY_PARENT[pid]) CATEGORIES_BY_PARENT[pid] = [];
+        CATEGORIES_BY_PARENT[pid].push(c);
+      });
+      Object.keys(CATEGORIES_BY_PARENT).forEach(pid => {
+        CATEGORIES_BY_PARENT[pid].sort((a, b) => {
+          const so = (a.sort_order || 0) - (b.sort_order || 0);
+          if (so !== 0) return so;
+          return (a.name || '').localeCompare(b.name || '');
+        });
+      });
+
+      function buildNode(key) {
+        const list = CATEGORIES_BY_PARENT[key] || [];
+        return list.map(c => ({ ...c, children: buildNode(c.id) }));
+      }
+      CATEGORY_TREE = buildNode('ROOT');
+    }
+
+    /* ============================================================
+       RENDER NAV DROPDOWN (matches product page)
+       ============================================================ */
+    function renderNav() {
+      renderDesktopNav();
+      renderMobileNav();
+    }
+
+    function navHrefForCategory(cat) {
+      const p = cat.path || cat.slug;
+      return `product.html?path=${encodeURIComponent(p)}`;
+    }
+
+    function renderDesktopNav() {
+      const menu = document.getElementById('productsMenu');
+      if (!menu) return;
+      if (!CATEGORY_TREE.length) {
+        menu.innerHTML = '<li class="nav-loading">No categories available</li>';
+        return;
+      }
+      menu.innerHTML = CATEGORY_TREE.map(cat => renderDesktopNavItem(cat, 1)).join('');
+    }
+
+    function renderDesktopNavItem(cat, depth) {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const href = navHrefForCategory(cat);
+      const caretHtml = hasChildren ? '<i class="fas fa-chevron-right caret"></i>' : '';
+
+      return `
+        <li class="${hasChildren ? 'has-children' : ''}">
+          <a href="${escapeHtml(href)}">
+            <span>${escapeHtml(cat.name)}</span>
+            ${caretHtml}
+          </a>
+          ${hasChildren ? `<ul class="submenu">${cat.children.map(c => renderDesktopNavItem(c, depth + 1)).join('')}</ul>` : ''}
+        </li>`;
+    }
+
+    function renderMobileNav() {
+      const sub = document.getElementById('mobileProductsSubmenu');
+      if (!sub) return;
+      if (!CATEGORY_TREE.length) {
+        sub.innerHTML = '<li class="nav-loading">No categories available</li>';
+        return;
+      }
+      sub.innerHTML = CATEGORY_TREE.map(cat => renderMobileNavItem(cat, 1)).join('');
+    }
+
+    function renderMobileNavItem(cat, depth) {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const href = navHrefForCategory(cat);
+
+      if (!hasChildren) {
+        return `<li><a href="${escapeHtml(href)}">${escapeHtml(cat.name)}</a></li>`;
+      }
+      const uid = 'm-' + cat.id + '-' + depth;
+      return `
+        <li>
+          <button type="button" class="mobile-sub-sub-toggle" data-target="${uid}">
+            <span>${escapeHtml(cat.name)}</span>
+            <i class="fas fa-chevron-down mcaret"></i>
+          </button>
+          <ul class="mobile-submenu" id="${uid}">
+            <li>
+              <a href="${escapeHtml(href)}" style="font-weight:800;color:var(--navy);">
+                <i class="fas fa-layer-group" style="margin-right:6px;color:var(--green);"></i>
+                All ${escapeHtml(cat.name)}
+              </a>
+            </li>
+            ${cat.children.map(c => renderMobileNavItem(c, depth + 1)).join('')}
+          </ul>
+        </li>`;
+    }
+
+    /* Delegate mobile sub-toggle clicks */
+    document.addEventListener('click', e => {
+      const toggle = e.target.closest('.mobile-sub-sub-toggle');
+      if (!toggle) return;
+      e.preventDefault();
+      const targetId = toggle.dataset.target;
+      const list = document.getElementById(targetId);
+      if (!list) return;
+      const open = list.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+    });
+
+    /* ============================================================
+       RENDER HERO CATEGORY LIST (top-level only)
+       ============================================================ */
+    function renderHeroCategories() {
+      const wrap = document.getElementById('heroCatList');
+      if (!wrap) return;
+      const topLevel = CATEGORY_TREE.slice(0, 4); // max 4 cards
+      if (!topLevel.length) {
+        wrap.innerHTML = '<div style="padding:14px;color:rgba(255,255,255,0.6);font-size:0.85rem;text-align:center;">No categories yet</div>';
+        return;
+      }
+      const icons = ['fa-flask', 'fa-syringe', 'fa-prescription-bottle', 'fa-capsules'];
+      wrap.innerHTML = topLevel.map((cat, i) => {
+        const count = countProductsUnder(cat.id);
+        return `
+          <div class="hero-cat-item" onclick="filterCategory('${escapeHtml(cat.slug)}')">
+            <div class="cat-icon"><i class="fas ${icons[i % icons.length]}"></i></div>
+            <div class="cat-text">${escapeHtml(cat.name)}<small>${count} product${count !== 1 ? 's' : ''}</small></div>
+            <i class="fas fa-arrow-right arrow"></i>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* Count products directly or under any descendant of a category */
+    function countProductsUnder(catId) {
+      const ids = descendantCategoryIds(catId);
+      return PRODUCTS.filter(p => ids.includes(p.category_id)).length;
+    }
+
+    /* ============================================================
+       RENDER FILTER CHIPS (top-level only)
+       ============================================================ */
+    function renderFilterChips() {
+      const wrap = document.getElementById('filterChips');
+      if (!wrap) return;
+      const topLevel = CATEGORY_TREE;
+      const icons = ['fa-flask', 'fa-syringe', 'fa-prescription-bottle', 'fa-capsules', 'fa-leaf'];
+
+      let html = `<div class="chip ${state.category === 'all' ? 'active' : ''}" data-cat="all"><i class="fas fa-th-large"></i> All Products</div>`;
+      topLevel.forEach((cat, i) => {
+        html += `<div class="chip ${state.category === cat.id ? 'active' : ''}" data-cat="${escapeHtml(cat.slug)}">
+                   <i class="fas ${icons[i % icons.length]}"></i> ${escapeHtml(cat.name)}
+                 </div>`;
+      });
+      wrap.innerHTML = html;
+
+      // Attach chip handlers
+      wrap.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          wrap.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          const slug = chip.dataset.cat;
+          state.category = slug === 'all' ? 'all' : (CATEGORIES.find(c => c.slug === slug)?.id || 'all');
+          renderProducts();
+          document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    /* ============================================================
+       STICKY NAV
+       ============================================================ */
     const nav = document.getElementById('mainNav');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 30) nav.classList.add('scrolled');
@@ -904,9 +1161,10 @@
       showSkeleton();
 
       try {
-        // Parallel fetch
         const [catRes, prodRes] = await Promise.all([
-          supabaseClient.from('categories').select('id, name, slug').order('name'),
+          supabaseClient.from('categories')
+            .select('id, name, slug, parent_id, level, path, sort_order')
+            .order('level').order('sort_order').order('name'),
           supabaseClient.from('products').select('*').eq('is_active', true).order('created_at', { ascending: false })
         ]);
 
@@ -916,20 +1174,22 @@
         CATEGORIES = catRes.data || [];
         PRODUCTS = prodRes.data || [];
         PRODUCT_MAP_BY_ID = {};
-        PRODUCTS.forEach(p => PRODUCT_MAP_BY_ID[p.id] = p);
+        PRODUCTS.forEach(p => { PRODUCT_MAP_BY_ID[p.id] = p; });
 
-        // Handle URL params
+        buildCategoryTree();
+        renderNav();
+        renderHeroCategories();
+        renderFilterChips();
+
+        // Handle URL params (?category=slug or ?search=...)
         const params = new URLSearchParams(window.location.search);
         const urlCategory = params.get('category');
         const urlSearch = params.get('search');
 
         if (urlCategory) {
-          const cid = categoryIdFromSlug(urlCategory);
-          if (cid) {
-            state.category = cid;
-            document.querySelectorAll('.chip').forEach(c => {
-              c.classList.toggle('active', c.dataset.cat === urlCategory);
-            });
+          const cat = CATEGORIES.find(c => c.slug === urlCategory);
+          if (cat) {
+            state.category = cat.id;
           }
         }
         if (urlSearch) {
@@ -937,6 +1197,9 @@
           const heroInput = document.getElementById('heroSearchInput');
           if (heroInput) heroInput.value = urlSearch;
         }
+
+        // Refresh chips to reflect URL state
+        renderFilterChips();
 
         renderProducts();
       } catch (err) {
@@ -964,7 +1227,6 @@
       grid.innerHTML = `<div style="grid-column:1/-1;"><div class="products-skeleton">${s}</div></div>`;
       grid.style.display = 'block';
       grid.className = '';
-      // restore grid class after (hack to render skeleton full-width)
       setTimeout(() => {
         grid.className = 'products-grid';
         grid.innerHTML = `<div style="grid-column:1/-1;"><div class="products-skeleton">${s}</div></div>`;
@@ -984,9 +1246,13 @@
 
     function getFilteredProducts() {
       let list = [...PRODUCTS];
+
       if (state.category !== 'all') {
-        list = list.filter(p => p.category_id === state.category);
+        // Include all descendants of the selected top-level category
+        const ids = descendantCategoryIds(state.category);
+        list = list.filter(p => ids.includes(p.category_id));
       }
+
       if (state.search.trim()) {
         const q = state.search.toLowerCase();
         list = list.filter(p =>
@@ -996,6 +1262,7 @@
           categoryName(p.category_id).toLowerCase().includes(q)
         );
       }
+
       switch (state.sort) {
         case 'price-low': list.sort((a,b) => Number(a.price) - Number(b.price)); break;
         case 'price-high': list.sort((a,b) => Number(b.price) - Number(a.price)); break;
@@ -1027,7 +1294,7 @@
         }).join('');
 
         const oldPrice = p.sale_price ? `<span class="old-price">${formatPrice(p.sale_price)}</span>` : '';
-        const packs = Array.isArray(p.packs) ? p.packs : [];
+        const packs = normalizePacks(p);
         const packHint = packs.length > 1
           ? `${packs.length} pack sizes`
           : (packs[0]?.label || p.available_packaging || '');
@@ -1071,19 +1338,8 @@
     }
 
     /* ============================================================
-       FILTERS / SORT / SEARCH
+       SORT / SEARCH
        ============================================================ */
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        const slug = chip.dataset.cat;
-        state.category = slug === 'all' ? 'all' : (categoryIdFromSlug(slug) || 'all');
-        renderProducts();
-        document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
     document.getElementById('heroSearchInput').addEventListener('input', e => {
       state.search = e.target.value;
       renderProducts();
@@ -1094,14 +1350,12 @@
     });
 
     function filterCategory(slug) {
-      const cid = categoryIdFromSlug(slug);
-      state.category = cid || 'all';
+      const cat = CATEGORIES.find(c => c.slug === slug);
+      state.category = cat ? cat.id : 'all';
       state.search = '';
       const heroInput = document.getElementById('heroSearchInput');
       if (heroInput) heroInput.value = '';
-      document.querySelectorAll('.chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.cat === slug);
-      });
+      renderFilterChips();
       renderProducts();
       document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -1111,7 +1365,7 @@
       const heroInput = document.getElementById('heroSearchInput');
       if (heroInput) heroInput.value = '';
       document.getElementById('sortSelect').value = 'featured';
-      document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === 'all'));
+      renderFilterChips();
       renderProducts();
     }
 
@@ -1123,9 +1377,7 @@
       if (!product) return;
 
       atcState.product = product;
-      const packs = Array.isArray(product.packs) && product.packs.length
-        ? product.packs
-        : [{ id: 'standard', label: product.available_packaging || 'Standard', price: Number(product.price) }];
+      const packs = normalizePacks(product);
       atcState.selectedPackId = packs[0].id;
       atcState.qty = 1;
 
@@ -1162,9 +1414,7 @@
     function updateAtcSummary() {
       const product = atcState.product;
       if (!product) return;
-      const packs = Array.isArray(product.packs) && product.packs.length
-        ? product.packs
-        : [{ id: 'standard', label: product.available_packaging || 'Standard', price: Number(product.price) }];
+      const packs = normalizePacks(product);
       const pack = packs.find(p => p.id === atcState.selectedPackId) || packs[0];
       const qty = atcState.qty || 1;
       document.getElementById('atcUnitPrice').textContent = formatPrice(pack.price);
@@ -1190,9 +1440,7 @@
     function submitAddToCart() {
       const product = atcState.product;
       if (!product) return;
-      const packs = Array.isArray(product.packs) && product.packs.length
-        ? product.packs
-        : [{ id: 'standard', label: product.available_packaging || 'Standard', price: Number(product.price) }];
+      const packs = normalizePacks(product);
       const pack = packs.find(p => p.id === atcState.selectedPackId) || packs[0];
       const qty = atcState.qty || 1;
 

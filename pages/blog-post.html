@@ -160,33 +160,86 @@
     .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
     .dropdown:hover > a i,
     .dropdown:focus-within > a i { transform: rotate(180deg); }
-    .dropdown-menu {
-      position: absolute; top: calc(100% + 8px); left: 0;
-      background: var(--bg-white); min-width: 230px;
-      border-radius: 14px; padding: 10px;
+
+    /* ============ 3-LEVEL CASCADING DROPDOWN ============ */
+    .dropdown-menu,
+    .submenu {
+      position: absolute;
+      background: var(--bg-white);
+      border-radius: 14px;
+      padding: 10px;
       box-shadow: 0 20px 50px rgba(29,59,115,0.15);
       border: 1px solid var(--border);
-      opacity: 0; visibility: hidden;
+      opacity: 0;
+      visibility: hidden;
       transform: translateY(10px);
-      transition: all 0.25s;
+      transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
       z-index: 100;
+      list-style: none;
+      min-width: 230px;
     }
-    .dropdown:hover .dropdown-menu,
-    .dropdown:focus-within .dropdown-menu {
-      opacity: 1; visibility: visible; transform: translateY(0);
+    .dropdown-menu {
+      top: calc(100% + 8px);
+      left: 0;
     }
-    .dropdown-menu a {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px;
-      color: var(--navy); font-weight: 500; font-size: 0.88rem;
+    .submenu {
+      top: -10px;
+      left: calc(100% + 6px);
+      min-width: 220px;
+    }
+    .submenu .submenu {
+      top: -10px;
+      left: calc(100% + 6px);
+    }
+    .dropdown:hover > .dropdown-menu,
+    .dropdown:focus-within > .dropdown-menu,
+    .has-children:hover > .submenu,
+    .has-children:focus-within > .submenu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-menu li,
+    .submenu li { position: relative; }
+    .dropdown-menu a,
+    .submenu a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 14px;
+      color: var(--navy);
+      font-weight: 500;
+      font-size: 0.88rem;
       border-radius: 10px;
       transition: all 0.2s;
+      white-space: nowrap;
     }
-    .dropdown-menu a:hover {
+    .dropdown-menu a:hover,
+    .submenu a:hover {
       background: var(--bg-light);
       color: var(--red);
       transform: translateX(4px);
     }
+    .dropdown-menu a .caret,
+    .submenu a .caret {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .has-children:hover > a .caret { transform: translateX(3px); color: var(--red); }
+    .dropdown-menu .cat-count,
+    .submenu .cat-count {
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: var(--navy-soft);
+      color: var(--navy);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+    .nav-loading { color: var(--text-muted); font-size: 0.85rem; padding: 9px 14px; }
 
     .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .search-icon {
@@ -554,7 +607,7 @@
       transition: max-height 0.35s ease, padding 0.25s ease;
       padding-left: 16px; margin-top: 2px;
     }
-    .mobile-submenu.open { max-height: 400px; padding: 6px 0 6px 16px; }
+    .mobile-submenu.open { max-height: 2000px; padding: 6px 0 6px 16px; }
     .mobile-submenu a {
       display: block; padding: 11px 14px;
       color: var(--text-muted); font-size: 0.9rem;
@@ -566,6 +619,19 @@
       background: var(--navy-soft); color: var(--navy);
       border-left-color: var(--red);
     }
+    .mobile-submenu .mobile-submenu { padding-left: 14px; }
+    .mobile-submenu .mobile-submenu a { font-size: 0.85rem; padding-left: 12px; }
+    .mobile-sub-sub-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 11px 14px; border: none; background: none;
+      color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+      border-radius: 10px; border-left: 3px solid transparent;
+      cursor: pointer; transition: all 0.2s; text-align: left;
+    }
+    .mobile-sub-sub-toggle:hover { background: var(--navy-soft); color: var(--navy); }
+    .mobile-sub-sub-toggle .mcaret { font-size: 0.65rem; transition: transform 0.25s; }
+    .mobile-sub-sub-toggle.open .mcaret { transform: rotate(180deg); }
+
     .mobile-menu-auth {
       padding: 16px 20px;
       display: flex; flex-direction: column; gap: 10px;
@@ -1491,13 +1557,10 @@
       <ul class="nav-links">
         <li><a href="../index.html">Home</a></li>
         <li><a href="aboutUs.html">About Us</a></li>
-        <li class="dropdown">
+        <li class="dropdown" id="productsDropdown">
           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
-          <ul class="dropdown-menu">
-            <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-            <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
-            <li><a href="product.html?category=injectables">Injectables</a></li>
-            <li><a href="product.html?category=premixes">Premixes</a></li>
+          <ul class="dropdown-menu" id="productsMenu">
+            <li class="nav-loading"><i class="fas fa-spinner fa-spin"></i> Loading categories…</li>
           </ul>
         </li>
         <li><a href="blog.html" class="active">Blog</a></li>
@@ -1643,10 +1706,9 @@
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
-          <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
-          <li><a href="product.html?category=injectables">Injectables</a></li>
-          <li><a href="product.html?category=premixes">Premixes</a></li>
+          <li class="nav-loading" style="padding:11px 14px;color:var(--text-muted);font-size:0.85rem;">
+            <i class="fas fa-spinner fa-spin"></i> Loading categories…
+          </li>
         </ul>
       </li>
       <li><a href="blog.html" class="active"><i class="fas fa-newspaper"></i> Blog</a></li>
@@ -1704,16 +1766,16 @@
             <li><a href="aboutUs.html">About Us</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="product.html">Shop Now</a></li>
+            <li><a href="shop.html">Shop Now</a></li>
           </ul>
         </div>
 
         <div>
           <h4>Get In Touch</h4>
           <ul class="footer-contact">
-            <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</li>
+            <li><i class="fas fa-map-marker-alt"></i> New Horizon Industrial Park, Ruiru, Kenya</li>
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
-            <li><i class="fas fa-phone-alt"></i> +254 725 538 297</li>
+            <li><i class="fas fa-phone-alt icon-phone-fix"></i> +254 119 155 847</li>
           </ul>
         </div>
 
@@ -1774,6 +1836,132 @@
     };
 
     const slugOrId = p => p.slug || p.id;
+
+    /* ============================================================
+       DYNAMIC NAV (matches product page)
+       ============================================================ */
+    let CATEGORIES = [];
+    let CATEGORIES_BY_ID = {};
+    let CATEGORIES_BY_PARENT = {};
+    let CATEGORY_TREE = [];
+
+    function buildCategoryTree() {
+      CATEGORIES_BY_ID = {};
+      CATEGORIES.forEach(c => { CATEGORIES_BY_ID[c.id] = c; });
+
+      CATEGORIES_BY_PARENT = {};
+      CATEGORIES.forEach(c => {
+        const pid = c.parent_id || 'ROOT';
+        if (!CATEGORIES_BY_PARENT[pid]) CATEGORIES_BY_PARENT[pid] = [];
+        CATEGORIES_BY_PARENT[pid].push(c);
+      });
+      Object.keys(CATEGORIES_BY_PARENT).forEach(pid => {
+        CATEGORIES_BY_PARENT[pid].sort((a, b) => {
+          const so = (a.sort_order || 0) - (b.sort_order || 0);
+          if (so !== 0) return so;
+          return (a.name || '').localeCompare(b.name || '');
+        });
+      });
+
+      function buildNode(key) {
+        const list = CATEGORIES_BY_PARENT[key] || [];
+        return list.map(c => ({ ...c, children: buildNode(c.id) }));
+      }
+      CATEGORY_TREE = buildNode('ROOT');
+    }
+
+    function navHrefForCategory(cat) {
+      const p = cat.path || cat.slug;
+      return `product.html?path=${encodeURIComponent(p)}`;
+    }
+
+    function renderDesktopNav() {
+      const menu = document.getElementById('productsMenu');
+      if (!menu) return;
+      if (!CATEGORY_TREE.length) {
+        menu.innerHTML = '<li class="nav-loading">No categories available</li>';
+        return;
+      }
+      menu.innerHTML = CATEGORY_TREE.map(cat => renderDesktopNavItem(cat, 1)).join('');
+    }
+
+    function renderDesktopNavItem(cat, depth) {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const href = navHrefForCategory(cat);
+      const caretHtml = hasChildren ? '<i class="fas fa-chevron-right caret"></i>' : '';
+
+      return `
+        <li class="${hasChildren ? 'has-children' : ''}">
+          <a href="${escapeHtml(href)}">
+            <span>${escapeHtml(cat.name)}</span>
+            ${caretHtml}
+          </a>
+          ${hasChildren ? `<ul class="submenu">${cat.children.map(c => renderDesktopNavItem(c, depth + 1)).join('')}</ul>` : ''}
+        </li>`;
+    }
+
+    function renderMobileNav() {
+      const sub = document.getElementById('mobileProductsSubmenu');
+      if (!sub) return;
+      if (!CATEGORY_TREE.length) {
+        sub.innerHTML = '<li class="nav-loading">No categories available</li>';
+        return;
+      }
+      sub.innerHTML = CATEGORY_TREE.map(cat => renderMobileNavItem(cat, 1)).join('');
+    }
+
+    function renderMobileNavItem(cat, depth) {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const href = navHrefForCategory(cat);
+
+      if (!hasChildren) {
+        return `<li><a href="${escapeHtml(href)}">${escapeHtml(cat.name)}</a></li>`;
+      }
+      const uid = 'm-' + cat.id + '-' + depth;
+      return `
+        <li>
+          <button type="button" class="mobile-sub-sub-toggle" data-target="${uid}">
+            <span>${escapeHtml(cat.name)}</span>
+            <i class="fas fa-chevron-down mcaret"></i>
+          </button>
+          <ul class="mobile-submenu" id="${uid}">
+            <li>
+              <a href="${escapeHtml(href)}" style="font-weight:800;color:var(--navy);">
+                <i class="fas fa-layer-group" style="margin-right:6px;color:var(--green);"></i>
+                All ${escapeHtml(cat.name)}
+              </a>
+            </li>
+            ${cat.children.map(c => renderMobileNavItem(c, depth + 1)).join('')}
+          </ul>
+        </li>`;
+    }
+
+    document.addEventListener('click', e => {
+      const toggle = e.target.closest('.mobile-sub-sub-toggle');
+      if (!toggle) return;
+      e.preventDefault();
+      const targetId = toggle.dataset.target;
+      const list = document.getElementById(targetId);
+      if (!list) return;
+      const open = list.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+    });
+
+    async function loadCategoriesForNav() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('id, name, slug, parent_id, level, path, sort_order')
+          .order('level').order('sort_order').order('name');
+        if (error) throw error;
+        CATEGORIES = data || [];
+        buildCategoryTree();
+        renderDesktopNav();
+        renderMobileNav();
+      } catch (err) {
+        console.warn('Nav categories failed to load:', err);
+      }
+    }
 
     /* ============================================================
        GET POST ID/SLUG FROM URL
@@ -2231,18 +2419,6 @@
        SEARCH
        ============================================================ */
     const SEARCH_INDEX = [
-      { type: 'product', name: 'ProGrowth Feed Booster', cat: 'Feed Additives', price: 2450, img: '../image/card-supply.jpg', desc: 'Premium feed additive for enhanced feed conversion and growth.' },
-      { type: 'product', name: 'VitaMin Plus Supplement', cat: 'Feed Additives', price: 1890, img: '../image/card-supplier.jpg', desc: 'Complete vitamin and mineral blend for livestock.' },
-      { type: 'product', name: 'EnzymeMax Digestive Aid', cat: 'Feed Additives', price: 3200, img: '../image/card-supply.jpg', desc: 'Powerful enzyme complex for digestion and nutrient absorption.' },
-      { type: 'product', name: 'VetCare Antibiotic Powder', cat: 'Veterinary Products', price: 1750, img: '../image/card-quality.jpg', desc: 'Broad-spectrum antibiotic for common infections.' },
-      { type: 'product', name: 'Dewormer Oral Suspension', cat: 'Veterinary Products', price: 980, img: '../image/card-service.jpg', desc: 'Effective oral dewormer against internal parasites.' },
-      { type: 'product', name: 'Skin Heal Topical Spray', cat: 'Veterinary Products', price: 1250, img: '../image/card-supplier.jpg', desc: 'Fast-acting spray for wounds and skin conditions.' },
-      { type: 'product', name: 'Oxytetracycline Injection', cat: 'Injectables', price: 1450, img: '../image/card-supply.jpg', desc: 'Broad-spectrum injectable antibiotic.' },
-      { type: 'product', name: 'Ivermectin Injectable 1%', cat: 'Injectables', price: 2100, img: '../image/card-service.jpg', desc: 'Antiparasitic injectable for internal and external parasites.' },
-      { type: 'product', name: 'Vitamin B-Complex Injection', cat: 'Injectables', price: 1350, img: '../image/card-quality.jpg', desc: 'Supports energy, appetite, and recovery.' },
-      { type: 'product', name: 'Layer Premix Pro', cat: 'Premixes', price: 3450, img: '../image/card-supplier.jpg', desc: 'Complete premix for laying hens.' },
-      { type: 'product', name: 'Dairy Premix Gold', cat: 'Premixes', price: 4200, img: '../image/card-supply.jpg', desc: 'Premium dairy premix for milk yield and fertility.' },
-      { type: 'product', name: 'Broiler Premix Elite', cat: 'Premixes', price: 3800, img: '../image/card-experience.jpg', desc: 'Specialised premix for rapid broiler growth.' },
       { type: 'page', name: 'Home', url: '../index.html', icon: 'fa-home', desc: 'Rise Axis Solutions homepage' },
       { type: 'page', name: 'About Us', url: 'aboutUs.html', icon: 'fa-users', desc: 'Our story, mission, and values' },
       { type: 'page', name: 'Products', url: 'product.html', icon: 'fa-box', desc: 'Browse our full product range' },
@@ -2251,11 +2427,7 @@
       { type: 'page', name: 'Shop', url: 'shop.html', icon: 'fa-store', desc: 'Order agri-inputs online' },
       { type: 'page', name: 'Cart', url: 'cart.html', icon: 'fa-shopping-bag', desc: 'View your shopping cart' },
       { type: 'page', name: 'Login', url: 'login.html', icon: 'fa-sign-in-alt', desc: 'Sign in to your account' },
-      { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' },
-      { type: 'category', name: 'Feed Additives', url: 'shop.html', icon: 'fa-flask', desc: 'Nutritional supplements and feed enhancers' },
-      { type: 'category', name: 'Veterinary Products', url: 'shop.html', icon: 'fa-syringe', desc: 'Animal health and wellness products' },
-      { type: 'category', name: 'Injectables', url: 'shop.html', icon: 'fa-prescription-bottle', desc: 'Fast-acting injectable treatments' },
-      { type: 'category', name: 'Premixes', url: 'shop.html', icon: 'fa-capsules', desc: 'Complete nutrition blends for livestock' }
+      { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' }
     ];
 
     const searchOverlay = document.getElementById('searchOverlay');
@@ -2282,8 +2454,9 @@
 
     function formatPrice(n) { return 'KES ' + Number(n).toLocaleString(); }
 
-    function runSearch(query) {
+    async function runSearch(query) {
       const q = query.trim().toLowerCase();
+
       if (!q) {
         searchResults.innerHTML = `
           <div class="search-hint">
@@ -2293,12 +2466,28 @@
           </div>`;
         return;
       }
-      const matches = SEARCH_INDEX.filter(item =>
+
+      // Product search from Supabase
+      let productMatches = [];
+      try {
+        const { data } = await supabaseClient
+          .from('products')
+          .select('id, name, price, image_url')
+          .eq('is_active', true)
+          .ilike('name', `%${q}%`)
+          .limit(6);
+        productMatches = data || [];
+      } catch (_) {}
+
+      const pageMatches = SEARCH_INDEX.filter(item =>
         item.name.toLowerCase().includes(q) ||
-        (item.desc && item.desc.toLowerCase().includes(q)) ||
-        (item.cat && item.cat.toLowerCase().includes(q))
+        (item.desc && item.desc.toLowerCase().includes(q))
       );
-      if (matches.length === 0) {
+      const catMatches = CATEGORIES.filter(c =>
+        (c.name || '').toLowerCase().includes(q) || (c.slug || '').toLowerCase().includes(q)
+      ).slice(0, 4);
+
+      if (!productMatches.length && !pageMatches.length && !catMatches.length) {
         searchResults.innerHTML = `
           <div class="search-no-results">
             <i class="fas fa-search-minus"></i>
@@ -2307,40 +2496,43 @@
           </div>`;
         return;
       }
-      const products = matches.filter(m => m.type === 'product');
-      const pages = matches.filter(m => m.type === 'page');
-      const categories = matches.filter(m => m.type === 'category');
+
       let html = '';
-      if (products.length) {
-        html += `<div class="search-group-title">Products · ${products.length}</div>`;
-        html += products.slice(0, 6).map(p => `
-          <a class="search-result" href="shop.html?search=${encodeURIComponent(p.name)}">
-            <img class="search-result-img" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async">
+
+      if (productMatches.length) {
+        html += `<div class="search-group-title">Products · ${productMatches.length}</div>`;
+        html += productMatches.map(p => `
+          <a class="search-result" href="product.html?id=${escapeHtml(p.id)}">
+            ${p.image_url
+              ? `<img class="search-result-img" src="${escapeHtml(p.image_url)}" alt="" loading="lazy" decoding="async">`
+              : `<div class="search-result-icon"><i class="fas fa-box"></i></div>`}
             <div class="search-result-info">
               <strong>${escapeHtml(p.name)}</strong>
-              <small>${escapeHtml(p.cat)}</small>
+              <small>Product</small>
             </div>
             <div class="search-result-price">${formatPrice(p.price)}</div>
             <i class="fas fa-chevron-right search-result-arrow"></i>
           </a>
         `).join('');
       }
-      if (categories.length) {
-        html += `<div class="search-group-title">Categories · ${categories.length}</div>`;
-        html += categories.map(c => `
-          <a class="search-result" href="${escapeHtml(c.url)}?category=${encodeURIComponent(c.name)}">
-            <div class="search-result-icon"><i class="fas ${escapeHtml(c.icon)}"></i></div>
+
+      if (catMatches.length) {
+        html += `<div class="search-group-title">Categories · ${catMatches.length}</div>`;
+        html += catMatches.map(c => `
+          <a class="search-result" href="product.html?path=${encodeURIComponent(c.path || c.slug)}">
+            <div class="search-result-icon"><i class="fas fa-tag"></i></div>
             <div class="search-result-info">
               <strong>${escapeHtml(c.name)}</strong>
-              <small>${escapeHtml(c.desc)}</small>
+              <small>Category</small>
             </div>
             <i class="fas fa-chevron-right search-result-arrow"></i>
           </a>
         `).join('');
       }
-      if (pages.length) {
-        html += `<div class="search-group-title">Pages · ${pages.length}</div>`;
-        html += pages.map(pg => `
+
+      if (pageMatches.length) {
+        html += `<div class="search-group-title">Pages · ${pageMatches.length}</div>`;
+        html += pageMatches.map(pg => `
           <a class="search-result" href="${escapeHtml(pg.url)}">
             <div class="search-result-icon"><i class="fas ${escapeHtml(pg.icon)}"></i></div>
             <div class="search-result-info">
@@ -2351,13 +2543,14 @@
           </a>
         `).join('');
       }
+
       searchResults.innerHTML = html;
     }
 
     let searchDebounce = null;
     searchInput?.addEventListener('input', e => {
       clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => runSearch(e.target.value), 120);
+      searchDebounce = setTimeout(() => runSearch(e.target.value), 180);
     });
     searchInput?.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
@@ -2522,6 +2715,7 @@
        INIT
        ============================================================ */
     loadPost();
+    loadCategoriesForNav();
 
     console.log('%c RISE AXIS — Blog Post (Supabase) ', 'background: linear-gradient(90deg, #1D3B73, #C81E27); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
     console.log('%c Clarity · Direction · Results ', 'background: #17B052; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 4px;');

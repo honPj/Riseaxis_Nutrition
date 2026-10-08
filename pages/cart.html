@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -43,7 +43,6 @@
       --red: #C8102E;
       --red-dark: #a30d25;
       --green: #3aa335;
-      --green-deep: #0a5f2e;
       --orange: #17B052;
       --bronze: #7A5A2B;
       --bg-light: #F7F8FA;
@@ -112,15 +111,82 @@
     .nav-links { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 0.9rem; flex: 1; justify-content: center; }
     .nav-links > li > a { padding: 9px 14px; border-radius: 8px; color: var(--navy); transition: all 0.25s; position: relative; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
     .nav-links > li > a:hover, .nav-links > li > a.active { background: rgba(30, 83, 180, 0.06); color: var(--red); }
+
     .dropdown { position: relative; }
     .dropdown > a i { font-size: 0.6rem; transition: transform 0.3s; }
-    .dropdown:hover > a i { transform: rotate(180deg); }
-    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 0; background: var(--bg-white); min-width: 230px; border-radius: 14px; padding: 10px; box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15); border: 1px solid var(--border); opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.25s; }
-    .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-    .dropdown-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 14px; color: var(--navy); font-weight: 500; font-size: 0.88rem; border-radius: 10px; transition: all 0.2s; }
-    .dropdown-menu a i { width: 32px; height: 32px; border-radius: 8px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: var(--red); transition: all 0.2s; }
-    .dropdown-menu a:hover { background: var(--bg-light); color: var(--red); transform: translateX(4px); }
-    .dropdown-menu a:hover i { background: var(--red); color: #fff; }
+    .dropdown:hover > a i, .dropdown:focus-within > a i { transform: rotate(180deg); }
+
+    /* ============ 3-LEVEL CASCADING DROPDOWN ============ */
+    .dropdown-menu,
+    .submenu {
+      position: absolute;
+      background: var(--bg-white);
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: 0 20px 50px rgba(31, 58, 110, 0.15);
+      border: 1px solid var(--border);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+      z-index: 100;
+      list-style: none;
+      min-width: 230px;
+    }
+    .dropdown-menu {
+      top: calc(100% + 8px);
+      left: 0;
+    }
+    .submenu {
+      top: -10px;
+      left: calc(100% + 6px);
+      min-width: 220px;
+    }
+    .submenu .submenu {
+      top: -10px;
+      left: calc(100% + 6px);
+    }
+    .dropdown:hover > .dropdown-menu,
+    .dropdown:focus-within > .dropdown-menu,
+    .has-children:hover > .submenu,
+    .has-children:focus-within > .submenu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-menu li,
+    .submenu li { position: relative; }
+    .dropdown-menu a,
+    .submenu a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 14px;
+      color: var(--navy);
+      font-weight: 500;
+      font-size: 0.88rem;
+      border-radius: 10px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .dropdown-menu a:hover,
+    .submenu a:hover { background: var(--bg-light); color: var(--red); transform: translateX(4px); }
+    .dropdown-menu a .caret,
+    .submenu a .caret { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.2s; }
+    .has-children:hover > a .caret { transform: translateX(3px); color: var(--red); }
+    .dropdown-menu .cat-count,
+    .submenu .cat-count {
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: var(--navy-soft);
+      color: var(--navy);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+    .nav-loading { color: var(--text-muted); font-size: 0.85rem; padding: 9px 14px; }
 
     .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .search-icon { color: var(--navy); font-size: 0.95rem; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--border); border-radius: 50%; cursor: pointer; transition: all 0.25s; background: var(--bg-white); padding: 0; }
@@ -207,9 +273,21 @@
     .mobile-dropdown-toggle > i:last-child { font-size: 0.7rem; color: var(--text-muted); transition: transform 0.3s; }
     .mobile-dropdown-toggle.open > i:last-child { transform: rotate(180deg); }
     .mobile-submenu { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.25s ease; padding-left: 16px; margin-top: 2px; }
-    .mobile-submenu.open { max-height: 400px; padding: 6px 0 6px 16px; }
+    .mobile-submenu.open { max-height: 2000px; padding: 6px 0 6px 16px; }
     .mobile-submenu a { display: block; padding: 11px 14px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; border-radius: 10px; border-left: 3px solid transparent; text-decoration: none; transition: all 0.2s; }
     .mobile-submenu a:hover { background: #f5f9ff; color: var(--navy); border-left-color: var(--red); }
+    .mobile-submenu .mobile-submenu { padding-left: 14px; }
+    .mobile-submenu .mobile-submenu a { font-size: 0.85rem; padding-left: 12px; }
+    .mobile-sub-sub-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 11px 14px; border: none; background: none;
+      color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+      border-radius: 10px; border-left: 3px solid transparent;
+      cursor: pointer; transition: all 0.2s; text-align: left;
+    }
+    .mobile-sub-sub-toggle:hover { background: #f5f9ff; color: var(--navy); }
+    .mobile-sub-sub-toggle .mcaret { font-size: 0.65rem; transition: transform 0.25s; }
+    .mobile-sub-sub-toggle.open .mcaret { transform: rotate(180deg); }
     .mobile-menu-auth { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border); }
     .mobile-auth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 18px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all 0.25s; cursor: pointer; border: none; font-family: inherit; }
     .mobile-auth-outline { background: #fff; color: var(--navy); border: 1.5px solid var(--border); }
@@ -287,9 +365,33 @@
     .summary-row .label { color: var(--text-muted); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
     .summary-row .label i { color: var(--orange); font-size: 0.85rem; }
     .summary-row .value { font-weight: 800; color: var(--navy); }
-    .summary-total { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin: 16px 0 24px; border-top: 2px dashed var(--border); border-bottom: 2px dashed var(--border); }
+    .summary-total { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin: 16px 0 8px; border-top: 2px dashed var(--border); border-bottom: 2px dashed var(--border); }
     .summary-total .label { font-size: 1.05rem; font-weight: 800; color: var(--navy); }
     .summary-total .value { font-size: 1.6rem; font-weight: 900; color: var(--red); letter-spacing: -1px; }
+
+    /* NEW: Delivery fee note under total */
+    .delivery-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #fff8e6;
+      border: 1px solid #fce7a8;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 20px;
+      font-size: 0.78rem;
+      font-style: italic;
+      color: #7a5a2b;
+      line-height: 1.45;
+      font-weight: 500;
+    }
+    .delivery-note i {
+      color: #c8890e;
+      font-size: 0.85rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
     .btn-checkout { width: 100%; padding: 18px; border-radius: 14px; background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fff; border: none; font-weight: 800; cursor: pointer; font-size: 0.95rem; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.3s; box-shadow: 0 12px 30px rgba(200,16,46,0.3); margin-bottom: 12px; }
     .btn-checkout:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(200,16,46,0.5); }
     .btn-checkout:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -342,7 +444,6 @@
     .co-pm-info strong { display: block; font-size: 0.92rem; color: var(--navy); font-weight: 800; }
     .co-pm-info small { font-size: 0.72rem; color: var(--text-muted); }
 
-    /* ---------- FIXED CONTRAST: M-Pesa instructions now dark navy ---------- */
     .co-instructions { display: none; background: linear-gradient(135deg, var(--navy), var(--navy-deep)); color: #fff; border-radius: 16px; padding: 24px 24px 22px; margin-bottom: 20px; position: relative; overflow: hidden; animation: fadeIn 0.35s ease; }
     .co-instructions.show { display: block; }
     .co-instructions::after { content: ''; position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.08); }
@@ -385,6 +486,29 @@
     .co-summary-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 4px; margin-top: 8px; border-top: 2px dashed rgba(30,83,180,0.2); }
     .co-summary-total .label { font-size: 0.95rem; font-weight: 800; color: var(--navy); }
     .co-summary-total .value { font-size: 1.35rem; font-weight: 900; color: var(--red); letter-spacing: -0.5px; }
+
+    /* Delivery note in checkout summary too */
+    .co-delivery-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #fff8e6;
+      border: 1px solid #fce7a8;
+      border-radius: 10px;
+      padding: 9px 11px;
+      margin-top: 12px;
+      font-size: 0.72rem;
+      font-style: italic;
+      color: #7a5a2b;
+      line-height: 1.45;
+      font-weight: 500;
+    }
+    .co-delivery-note i {
+      color: #c8890e;
+      font-size: 0.78rem;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
 
     .checkout-modal-footer { padding: 20px 30px 26px; border-top: 1px solid var(--border); background: #fafbff; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
     .co-back-btn { background: #fff; color: var(--navy); border: 1.5px solid var(--border); padding: 12px 22px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px; }
@@ -506,15 +630,6 @@
 </head>
 <body>
 
-  <!-- TOP BAR -->
-  <div class="top-bar">
-    <div class="container">
-      <div class="top-item"><i class="fas fa-phone-alt"></i><span><strong>Phone:</strong> +254 725 538 297</span></div>
-      <div class="top-item"><i class="fas fa-map-marker-alt"></i><span><strong>Office:</strong> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5</span></div>
-      <div class="top-item"><i class="fas fa-envelope"></i><span><strong>Email:</strong> contact@riseaxissolutions.com</span></div>
-    </div>
-  </div>
-
   <!-- NAV -->
   <nav class="main-nav" id="mainNav">
     <div class="container">
@@ -533,14 +648,11 @@
       <ul class="nav-links">
         <li><a href="../index.html">Home</a></li>
         <li><a href="aboutUs.html">About Us</a></li>
-        <li class="dropdown">
+        <li class="dropdown" id="productsDropdown">
           <a href="product.html">Products <i class="fas fa-chevron-down"></i></a>
-           <ul class="dropdown-menu">
-             <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary-products">Veterinary Products</a></li>
-          <li><a href="product.html?category=injectables">Injectables</a></li>
-          <li><a href="product.html?category=premixes">Premixes</a></li>
-        </ul>
+          <ul class="dropdown-menu" id="productsMenu">
+            <li class="nav-loading"><i class="fas fa-spinner fa-spin"></i> Loading categories…</li>
+          </ul>
         </li>
         <li><a href="blog.html">Blog</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -656,10 +768,9 @@
           <i class="fas fa-chevron-down"></i>
         </button>
         <ul class="mobile-submenu" id="mobileProductsSubmenu">
-          <li><a href="product.html?category=feed-additives">Feed Additives</a></li>
-          <li><a href="product.html?category=veterinary">Veterinary Products</a></li>
-          <li><a href="product.html?category=injectables">Injectables</a></li>
-          <li><a href="product.html?category=premixes">Premixes</a></li>
+          <li class="nav-loading" style="padding:11px 14px;color:var(--text-muted);font-size:0.85rem;">
+            <i class="fas fa-spinner fa-spin"></i> Loading categories…
+          </li>
         </ul>
       </li>
       <li><a href="blog.html"> Blog</a></li>
@@ -728,14 +839,17 @@
             <span class="label"><i class="fas fa-money-bill-wave"></i> Subtotal</span>
             <span class="value" id="summarySubtotal">KES 0</span>
           </div>
-          <div class="summary-row">
-            <span class="label"><i class="fas fa-truck"></i> Delivery</span>
-            <span class="value" id="summaryDelivery">KES 300</span>
-          </div>
           <div class="summary-total">
             <span class="label">Total</span>
             <span class="value" id="summaryTotal">KES 0</span>
           </div>
+
+          <!-- NEW: Delivery fee note under total -->
+          <div class="delivery-note">
+            <i class="fas fa-truck"></i>
+            <span>Delivery fee not included. Will be quoted separately based on your location.</span>
+          </div>
+
           <button class="btn-checkout" id="checkoutBtn" onclick="openCheckoutModal()">
             Proceed to Checkout <i class="fas fa-arrow-right"></i>
           </button>
@@ -744,7 +858,7 @@
           </a>
           <div class="trust-strip">
             <div class="trust-item"><i class="fas fa-shield-alt"></i> Secure checkout</div>
-            <div class="trust-item"><i class="fas fa-truck-fast"></i> Fast nationwide delivery</div>
+            <div class="trust-item"><i class="fas fa-hand-holding-usd"></i> No hidden charges</div>
             <div class="trust-item"><i class="fas fa-headset"></i> Support from real agronomists</div>
           </div>
         </aside>
@@ -979,13 +1093,15 @@
             <span class="label">Subtotal</span>
             <span class="value" id="coSubtotal">KES 0</span>
           </div>
-          <div class="co-summary-row">
-            <span class="label">Delivery Fee</span>
-            <span class="value" id="coDelivery">KES 300</span>
-          </div>
           <div class="co-summary-total">
             <span class="label">Total</span>
             <span class="value" id="coTotal">KES 0</span>
+          </div>
+
+          <!-- NEW: Delivery fee note in checkout summary -->
+          <div class="co-delivery-note">
+            <i class="fas fa-truck"></i>
+            <span>Delivery fee not included. Will be quoted separately based on your location.</span>
           </div>
         </div>
       </div>
@@ -1027,19 +1143,13 @@
     <span id="toastText">Cart updated</span>
   </div>
 
-   <!-- ========== FOOTER ========== -->
+ <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="../index.html" class="logo">
-            <div>
-              <span class="logo-mark">
-                <span class="rise">RISE AXIS SOLUTIONS LTD</span>
-                
-              </span>
-              <!-- <span class="logo-sub">SOLUTIONS LTD</span> -->
-            </div>
+            <span>RISE AXIS SOLUTIONS LTD</span>
           </a>
           <p>Clarity, Direction, Results. We supply agri-inputs and advisory services that help East African farmers grow better, sustainably.</p>
           <div class="footer-social">
@@ -1055,16 +1165,16 @@
             <li><a href="aboutUs.html">About Us</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="contact.html">Contact Us</a></li>
-            <li><a href="product.html">Shop Now</a></li>
+            <li><a href="shop.html">Shop Now</a></li>
           </ul>
         </div>
 
         <div>
           <h4>Get In Touch</h4>
           <ul class="footer-contact">
-            <li><i class="fas fa-map-marker-alt"></i> 188 Hood Avenue, 3rd Floor 72 Riverside Drive, Office 5 </li>
+            <li><i class="fas fa-map-marker-alt"></i> New Horizon Industrial Park, Ruiru, Kenya</li>
             <li><i class="fas fa-envelope"></i> contact@riseaxissolutions.com</li>
-            <li><i class="fas fa-phone-alt"></i> +254700123456</li>
+            <li><i class="fas fa-phone-alt icon-phone-fix"></i> +254 119 155 847</li>
           </ul>
         </div>
 
@@ -1072,17 +1182,18 @@
           <h4>Newsletter</h4>
           <p style="color: #a8b4cc; margin-bottom: 0;">Subscribe for agri-tips, product updates, and offers.</p>
           <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing to Rise Axis Solutions!');">
-            <input type="email" placeholder="Enter your email" required>
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            <input type="email" placeholder="Enter your email" required aria-label="Email address">
+            <button type="submit" aria-label="Subscribe"><i class="fas fa-paper-plane"></i></button>
           </form>
         </div>
       </div>
 
       <div class="footer-bottom">
-        Copyright © 2026 <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
+        Copyright © <span id="year"></span> <strong>Rise Axis Solutions Ltd</strong>. All Rights Reserved.
       </div>
     </div>
   </footer>
+
 
 
   <a href="https://wa.me/254725538297" class="whatsapp-float" target="_blank">
@@ -1101,7 +1212,7 @@
     /* CART HELPERS */
     /* ============================================================ */
     const CART_KEY = 'riseAxisCart';
-    const DELIVERY_FEE = 300;
+    const DELIVERY_FEE = 0; // No delivery fee (quoted separately)
     let CURRENT_USER = null;
     let CURRENT_PROFILE = null;
 
@@ -1160,6 +1271,133 @@
     }
 
     /* ============================================================ */
+    /* DYNAMIC NAV (matches product page) */
+    /* ============================================================ */
+    let CATEGORIES = [];
+    let CATEGORIES_BY_ID = {};
+    let CATEGORIES_BY_PARENT = {};
+    let CATEGORY_TREE = [];
+
+    function buildCategoryTree() {
+      CATEGORIES_BY_ID = {};
+      CATEGORIES.forEach(c => { CATEGORIES_BY_ID[c.id] = c; });
+
+      CATEGORIES_BY_PARENT = {};
+      CATEGORIES.forEach(c => {
+        const pid = c.parent_id || 'ROOT';
+        if (!CATEGORIES_BY_PARENT[pid]) CATEGORIES_BY_PARENT[pid] = [];
+        CATEGORIES_BY_PARENT[pid].push(c);
+      });
+      Object.keys(CATEGORIES_BY_PARENT).forEach(pid => {
+        CATEGORIES_BY_PARENT[pid].sort((a, b) => {
+          const so = (a.sort_order || 0) - (b.sort_order || 0);
+          if (so !== 0) return so;
+          return (a.name || '').localeCompare(b.name || '');
+        });
+      });
+
+      function buildNode(key) {
+        const list = CATEGORIES_BY_PARENT[key] || [];
+        return list.map(c => ({ ...c, children: buildNode(c.id) }));
+      }
+      CATEGORY_TREE = buildNode('ROOT');
+    }
+
+    function navHrefForCategory(cat) {
+      const p = cat.path || cat.slug;
+      return `product.html?path=${encodeURIComponent(p)}`;
+    }
+
+    function renderDesktopNav() {
+      const menu = document.getElementById('productsMenu');
+      if (!menu) return;
+      if (!CATEGORY_TREE.length) {
+        menu.innerHTML = '<li class="nav-loading">No categories available</li>';
+        return;
+      }
+      menu.innerHTML = CATEGORY_TREE.map(cat => renderDesktopNavItem(cat, 1)).join('');
+    }
+
+    function renderDesktopNavItem(cat, depth) {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const href = navHrefForCategory(cat);
+      const caretHtml = hasChildren ? '<i class="fas fa-chevron-right caret"></i>' : '';
+
+      return `
+        <li class="${hasChildren ? 'has-children' : ''}">
+          <a href="${escapeHtml(href)}">
+            <span>${escapeHtml(cat.name)}</span>
+            ${caretHtml}
+          </a>
+          ${hasChildren ? `<ul class="submenu">${cat.children.map(c => renderDesktopNavItem(c, depth + 1)).join('')}</ul>` : ''}
+        </li>`;
+    }
+
+    function renderMobileNav() {
+      const sub = document.getElementById('mobileProductsSubmenu');
+      if (!sub) return;
+      if (!CATEGORY_TREE.length) {
+        sub.innerHTML = '<li class="nav-loading">No categories available</li>';
+        return;
+      }
+      sub.innerHTML = CATEGORY_TREE.map(cat => renderMobileNavItem(cat, 1)).join('');
+    }
+
+    function renderMobileNavItem(cat, depth) {
+      const hasChildren = cat.children && cat.children.length > 0;
+      const href = navHrefForCategory(cat);
+
+      if (!hasChildren) {
+        return `<li><a href="${escapeHtml(href)}">${escapeHtml(cat.name)}</a></li>`;
+      }
+      const uid = 'm-' + cat.id + '-' + depth;
+      return `
+        <li>
+          <button type="button" class="mobile-sub-sub-toggle" data-target="${uid}">
+            <span>${escapeHtml(cat.name)}</span>
+            <i class="fas fa-chevron-down mcaret"></i>
+          </button>
+          <ul class="mobile-submenu" id="${uid}">
+            <li>
+              <a href="${escapeHtml(href)}" style="font-weight:800;color:var(--navy);">
+                <i class="fas fa-layer-group" style="margin-right:6px;color:var(--green);"></i>
+                All ${escapeHtml(cat.name)}
+              </a>
+            </li>
+            ${cat.children.map(c => renderMobileNavItem(c, depth + 1)).join('')}
+          </ul>
+        </li>`;
+    }
+
+    /* Delegate mobile sub-toggle clicks */
+    document.addEventListener('click', e => {
+      const toggle = e.target.closest('.mobile-sub-sub-toggle');
+      if (!toggle) return;
+      e.preventDefault();
+      const targetId = toggle.dataset.target;
+      const list = document.getElementById(targetId);
+      if (!list) return;
+      const open = list.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+    });
+
+    async function loadCategoriesForNav() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('categories')
+          .select('id, name, slug, parent_id, level, path, sort_order')
+          .order('level').order('sort_order').order('name');
+        if (error) throw error;
+        CATEGORIES = data || [];
+        buildCategoryTree();
+        renderDesktopNav();
+        renderMobileNav();
+      } catch (err) {
+        console.warn('Nav categories failed to load:', err);
+      }
+    }
+
+    /* ============================================================ */
     /* RENDER CART */
     /* ============================================================ */
     function renderCart() {
@@ -1168,7 +1406,6 @@
       const itemCountEl = document.getElementById('cartItemCount');
       const summaryItems = document.getElementById('summaryItems');
       const summarySubtotal = document.getElementById('summarySubtotal');
-      const summaryDelivery = document.getElementById('summaryDelivery');
       const summaryTotal = document.getElementById('summaryTotal');
       const checkoutBtn = document.getElementById('checkoutBtn');
 
@@ -1185,7 +1422,6 @@
         itemCountEl.textContent = '0 items';
         summaryItems.textContent = '0';
         summarySubtotal.textContent = 'KES 0';
-        summaryDelivery.textContent = 'KES 0';
         summaryTotal.textContent = 'KES 0';
         checkoutBtn.disabled = true;
         return;
@@ -1231,8 +1467,7 @@
       itemCountEl.textContent = totalItems + (totalItems === 1 ? ' item' : ' items');
       summaryItems.textContent = totalItems;
       summarySubtotal.textContent = formatPrice(subtotal);
-      summaryDelivery.textContent = formatPrice(DELIVERY_FEE);
-      summaryTotal.textContent = formatPrice(subtotal + DELIVERY_FEE);
+      summaryTotal.textContent = formatPrice(subtotal);
       checkoutBtn.disabled = false;
     }
 
@@ -1361,7 +1596,7 @@
       const cart = getCart();
       const container = document.getElementById('coSummaryItems');
       const subtotal = getCartSubtotal();
-      const total = subtotal + DELIVERY_FEE;
+      const total = subtotal;
 
       container.innerHTML = cart.map(item => {
         const qty = item.quantity || item.qty || 1;
@@ -1377,7 +1612,6 @@
       }).join('');
 
       document.getElementById('coSubtotal').textContent = formatPrice(subtotal);
-      document.getElementById('coDelivery').textContent = formatPrice(DELIVERY_FEE);
       document.getElementById('coTotal').textContent = formatPrice(total);
       document.getElementById('coMpesaAmount').textContent = formatPrice(total);
       document.getElementById('coBankAmount').textContent = formatPrice(total);
@@ -1498,8 +1732,7 @@
 
       const method = document.querySelector('input[name="coPaymentMethod"]:checked').value;
       const subtotal = getCartSubtotal();
-      const delivery = DELIVERY_FEE;
-      const total = subtotal + delivery;
+      const total = subtotal;
 
       const customer = {
         name: document.getElementById('coName').value.trim(),
@@ -1548,7 +1781,7 @@
             payment_status: 'pending',
             order_status: 'pending',
             subtotal: Math.round(subtotal * 100) / 100,
-            delivery_fee: Math.round(delivery * 100) / 100,
+            delivery_fee: 0,
             total: Math.round(total * 100) / 100
           })
           .select()
@@ -1601,11 +1834,7 @@
       { type: 'page', name: 'Shop', url: 'shop.html', icon: 'fa-store', desc: 'Order agri-inputs online' },
       { type: 'page', name: 'My Account', url: 'account.html', icon: 'fa-user-circle', desc: 'Track your orders' },
       { type: 'page', name: 'Login', url: 'login.html', icon: 'fa-sign-in-alt', desc: 'Sign in to your account' },
-      { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' },
-      { type: 'category', name: 'Feed Additives', url: 'shop.html', icon: 'fa-flask', desc: 'Nutritional supplements and feed enhancers' },
-      { type: 'category', name: 'Veterinary Products', url: 'shop.html', icon: 'fa-syringe', desc: 'Animal health and wellness products' },
-      { type: 'category', name: 'Injectables', url: 'shop.html', icon: 'fa-prescription-bottle', desc: 'Fast-acting injectable treatments' },
-      { type: 'category', name: 'Premixes', url: 'shop.html', icon: 'fa-capsules', desc: 'Complete nutrition blends for livestock' }
+      { type: 'page', name: 'Register', url: 'register.html', icon: 'fa-user-plus', desc: 'Create a new account' }
     ];
 
     const searchOverlay = document.getElementById('searchOverlay');
@@ -1641,8 +1870,10 @@
         productMatches = data || [];
       } catch (_) {}
 
-      const pageMatches = SEARCH_INDEX.filter(p => p.type === 'page' && (p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)));
-      const catMatches = SEARCH_INDEX.filter(p => p.type === 'category' && (p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q)));
+      const pageMatches = SEARCH_INDEX.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+      const catMatches = CATEGORIES.filter(c =>
+        (c.name || '').toLowerCase().includes(q) || (c.slug || '').toLowerCase().includes(q)
+      ).slice(0, 4);
 
       if (!productMatches.length && !pageMatches.length && !catMatches.length) {
         searchResults.innerHTML = `<div class="search-no-results"><i class="fas fa-search-minus"></i><strong>No results for "${escapeHtml(query)}"</strong></div>`;
@@ -1664,9 +1895,9 @@
       if (catMatches.length) {
         html += `<div class="search-group-title">Categories · ${catMatches.length}</div>`;
         html += catMatches.map(c => `
-          <a class="search-result" href="${escapeHtml(c.url)}?category=${encodeURIComponent(c.name)}">
-            <div class="search-result-icon"><i class="fas ${escapeHtml(c.icon)}"></i></div>
-            <div class="search-result-info"><strong>${escapeHtml(c.name)}</strong><small>${escapeHtml(c.desc)}</small></div>
+          <a class="search-result" href="product.html?path=${encodeURIComponent(c.path || c.slug)}">
+            <div class="search-result-icon"><i class="fas fa-tag"></i></div>
+            <div class="search-result-info"><strong>${escapeHtml(c.name)}</strong><small>Category</small></div>
             <i class="fas fa-chevron-right search-result-arrow"></i>
           </a>
         `).join('');
@@ -1842,6 +2073,7 @@
     /* ============================================================ */
     renderCart();
     updateCartBadges();
+    loadCategoriesForNav();
     window.addEventListener('storage', e => {
       if (e.key === CART_KEY) { updateCartBadges(); renderCart(); }
     });
