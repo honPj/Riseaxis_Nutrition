@@ -2030,7 +2030,7 @@
             existing.qty = existing.quantity;
           } else {
             cart.push({
-              productId: null,
+              productId: item.product_id || null,
               name: item.product_name,
               price: Number(item.price_per_unit),
               image: item.product_image,

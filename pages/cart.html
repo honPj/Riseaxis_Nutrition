@@ -1791,6 +1791,7 @@
 
         const itemsPayload = cart.map(item => ({
           order_id: orderRow.id,
+          product_id: item.productId || null,  
           product_name: item.name + (item.packLabel ? ` (${item.packLabel})` : ''),
           product_image: item.image || null,
           quantity: item.quantity || item.qty || 1,
