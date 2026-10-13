@@ -1638,16 +1638,22 @@
       return list.map(c => ({ ...c, children: buildNode(c.id) }));
     }
 
-    /* Count products under a category, including descendants */
+    /* ============================================================
+       CATEGORY HELPERS — id-based (no dependency on products.category_path)
+       ============================================================ */
+
+    /* All descendant category ids of the given category id (inclusive) */
+    function descendantCategoryIds(catId) {
+      const ids = [catId];
+      const children = categoriesByParent[catId] || [];
+      children.forEach(ch => ids.push(...descendantCategoryIds(ch.id)));
+      return ids;
+    }
+
+    /* Count products under a category, including descendants (by category_id) */
     function productCountForCategory(catId) {
-      const cat = categoriesById[catId];
-      if (!cat) return 0;
-      const path = cat.path || '';
-      if (!path) return allProducts.filter(p => p.category_id === catId).length;
-      return allProducts.filter(p => {
-        const cp = p.category_path || '';
-        return cp === path || cp.startsWith(path + '/');
-      }).length;
+      const ids = descendantCategoryIds(catId);
+      return allProducts.filter(p => ids.includes(p.category_id)).length;
     }
 
     /* ============================================================ */
@@ -2436,19 +2442,23 @@
       setTimeout(() => { btn.classList.remove('added'); btn.innerHTML = original; }, 1200);
     }
 
-    /* ============================================================ */
-    /* ALL PRODUCTS GRID */
+    /* ============================================================
+       ALL PRODUCTS GRID — filtered by category_id (no category_path)
+       ============================================================ */
     function renderAllProductsGrid(pathPrefix, overrideProducts) {
       let products = overrideProducts || allProducts;
       let catLabel = 'All Products';
 
       if (!overrideProducts && pathPrefix) {
-        products = allProducts.filter(p => {
-          const cp = p.category_path || '';
-          return cp === pathPrefix || cp.startsWith(pathPrefix + '/');
-        });
+        // Find the category by path, then include all descendants by id
         const matchedCat = categories.find(c => c.path === pathPrefix);
-        if (matchedCat) catLabel = matchedCat.name;
+        if (matchedCat) {
+          const ids = descendantCategoryIds(matchedCat.id);
+          products = allProducts.filter(p => ids.includes(p.category_id));
+          catLabel = matchedCat.name;
+        } else {
+          products = [];
+        }
       } else if (overrideProducts) {
         catLabel = 'Search Results';
       }
@@ -2493,10 +2503,13 @@
       }
       let pool = allProducts;
       if (currentPathFilter) {
-        pool = allProducts.filter(p => {
-          const cp = p.category_path || '';
-          return cp === currentPathFilter || cp.startsWith(currentPathFilter + '/');
-        });
+        const matchedCat = categories.find(c => c.path === currentPathFilter);
+        if (matchedCat) {
+          const ids = descendantCategoryIds(matchedCat.id);
+          pool = allProducts.filter(p => ids.includes(p.category_id));
+        } else {
+          pool = [];
+        }
       }
       const filtered = pool.filter(p =>
         p.name.toLowerCase().includes(q) ||
