@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="splash.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="admin-sidebar.js"></script>
   <style>
@@ -271,6 +272,73 @@
       .logo-upload-row { flex-direction: column; }
       .logo-preview { width: 100%; height: 160px; }
     }
+        /* Sessions panel */
+    .session-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .session-row:last-child { border-bottom: none; }
+    .session-row .sr-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .session-row .sr-icon.current {
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
+    }
+    .session-row .sr-body { flex: 1; min-width: 0; }
+    .session-row .sr-device {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .session-row .sr-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .session-row .sr-badge {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: var(--green-soft);
+      color: var(--green-deep);
+      white-space: nowrap;
+    }
+    .session-row .sr-revoke {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: var(--red);
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .session-row .sr-revoke:hover {
+      background: var(--red);
+      color: #fff;
+      border-color: var(--red);
+    }
+    .sessions-empty {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -295,7 +363,9 @@
       window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
       window.addEventListener('load', () => setTimeout(hide, 300));
     }
+    
   })();
+  
 </script>
 
 
@@ -499,7 +569,20 @@
                 <i class="fas fa-save"></i> Save Changes
               </button>
             </div>
-
+            <!-- Active Sessions -->
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i class="fas fa-shield-alt"></i>
+                Active Sessions
+                <small>Where this account is currently signed in</small>
+              </div>
+              <div id="sessionsContainer">
+                <div class="loading-skeleton" style="padding:20px;text-align:center;">
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                  <p style="font-size:0.85rem;color:var(--text-muted);margin-top:8px;">Loading sessions...</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- RIGHT: live preview -->
@@ -917,15 +1000,98 @@
         btn.innerHTML = orig;
       }
     }
+    /* ============================================================
+       ACTIVE SESSIONS
+       ============================================================ */
+    let currentSessionUserId = null;
 
+    async function loadSessions() {
+      const container = document.getElementById('sessionsContainer');
+      if (!container) return;
+
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+          container.innerHTML = `<div class="sessions-empty">Not signed in.</div>`;
+          return;
+        }
+        currentSessionUserId = user.id;
+
+        const { data: sessions, error } = await supabaseClient
+          .from('user_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .is('revoked_at', null)
+          .order('last_seen_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!sessions || sessions.length === 0) {
+          container.innerHTML = `<div class="sessions-empty">No active sessions found.</div>`;
+          return;
+        }
+
+        const ua = navigator.userAgent;
+        const currentUA = ua;
+
+        container.innerHTML = sessions.map(s => {
+          const isCurrent = s.user_agent === currentUA;
+          const icon = (s.device_label || '').toLowerCase().includes('ios') ? 'fa-mobile-alt'
+                     : (s.device_label || '').toLowerCase().includes('android') ? 'fa-mobile-alt'
+                     : (s.device_label || '').toLowerCase().includes('windows') ? 'fa-desktop'
+                     : (s.device_label || '').toLowerCase().includes('mac') ? 'fa-laptop'
+                     : 'fa-globe';
+          const lastSeen = new Date(s.last_seen_at).toLocaleString('en-KE', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+          });
+
+          return `
+            <div class="session-row">
+              <div class="sr-icon ${isCurrent ? 'current' : ''}">
+                <i class="fas ${icon}"></i>
+              </div>
+              <div class="sr-body">
+                <div class="sr-device">${escapeHtml(s.device_label || 'Unknown device')}</div>
+                <div class="sr-meta">Last active: ${escapeHtml(lastSeen)}</div>
+              </div>
+              ${isCurrent
+                ? '<span class="sr-badge">This Device</span>'
+                : `<button class="sr-revoke" onclick="revokeSession('${s.id}')">
+                     <i class="fas fa-sign-out-alt"></i> Revoke
+                   </button>`}
+            </div>`;
+        }).join('');
+      } catch (err) {
+        console.error('Load sessions failed:', err);
+        container.innerHTML = `<div class="sessions-empty" style="color:var(--red);">Could not load sessions: ${escapeHtml(err.message || 'Unknown error')}</div>`;
+      }
+    }
+
+    async function revokeSession(sessionId) {
+      if (!confirm('Revoke this session? The device will be signed out on its next request.')) return;
+      try {
+        const { error } = await supabaseClient
+          .from('user_sessions')
+          .update({ revoked_at: new Date().toISOString() })
+          .eq('id', sessionId);
+        if (error) throw error;
+        showToast('Session revoked');
+        await loadSessions();
+      } catch (err) {
+        console.error('Revoke failed:', err);
+        showToast('Could not revoke session: ' + (err.message || 'Unknown error'), 'error');
+      }
+    }
     /* ============================================================
        INIT
        ============================================================ */
-    (async function init() {
+        (async function init() {
       const ok = await checkAdminAccess();
       if (!ok) return;
       document.getElementById('adminMain').style.display = 'block';
       await loadSettings();
+      await loadSessions();
     })();
   </script>
 <script src="pwa.js"></script>
