@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --navy: #1D3B73;
+      --navy-deep: #0f2557;
+      --navy-soft: #e8eef8;
+      --red: #C81E27;
+      --red-soft: #fdecee;
+      --green: #17B052;
+      --green-deep: #0d7a38;
+      --bg-light: #f7f8fa;
+      --text-dark: #0f1729;
+      --text-muted: #4a5568;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(15,23,41,0.12);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 32px 36px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--navy), var(--red));
+      border-radius: 20px 20px 0 0;
+    }
+
+    .login-brand {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .login-brand .logo-mark {
+      font-weight: 900;
+      font-size: 1.8rem;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      gap: 2px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .login-brand .logo-mark .rise { color: var(--navy); }
+    .login-brand .logo-mark .axis { color: var(--green); }
+    .login-brand small {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .login-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--navy);
+      text-align: center;
+      margin-bottom: 4px;
+      letter-spacing: -0.4px;
+    }
+    .login-sub {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 26px;
+    }
+
+    .form-field { margin-bottom: 16px; }
+    .form-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap i {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s;
+      background: #fff;
+      font-family: inherit;
+    }
+    .input-wrap input:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(29,59,115,0.1);
+    }
+    .toggle-pw {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .toggle-pw:hover { color: var(--navy); background: var(--bg-light); }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 20px rgba(29,59,115,0.3);
+      margin-top: 8px;
+      font-family: inherit;
+    }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(29,59,115,0.4);
+    }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .login-footer a {
+      color: var(--navy);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .login-footer a:hover { color: var(--red); }
+
+    /* Customer-denied state */
+    .customer-denied {
+      text-align: center;
+      display: none;
+    }
+    .customer-denied .cd-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--red-soft);
+      color: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 20px;
+    }
+    .customer-denied h3 {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .customer-denied p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+    .btn-shop {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(23,176,82,0.3);
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-shop:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(23,176,82,0.45);
+    }
+
+    /* Toast */
+    .toast-message {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      background: #e5f4e6;
+      border-radius: 12px;
+      color: var(--green-deep);
+      font-weight: 700;
+      font-size: 0.88rem;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(23,176,82,0.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      z-index: 3000;
+      max-width: 360px;
+      animation: slideUp 0.3s ease;
+    }
+    .toast-message.show { display: flex; }
+    .toast-message.error {
+      background: var(--red-soft);
+      color: var(--red);
+      border-color: rgba(200,30,39,0.35);
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 32px 22px 28px; border-radius: 16px; }
+      .login-brand .logo-mark { font-size: 1.5rem; }
+      .login-title { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    // Hide on DOMContentLoaded; fall back to load + 2s
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+  <div class="login-card">
+    <!-- Login form (default view) -->
+    <div id="loginView">
+      <div class="login-brand">
+        <div class="logo-mark"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+        <small>Admin Panel</small>
+      </div>
+
+      <h1 class="login-title">Sign In</h1>
+      <p class="login-sub">Staff only — enter your admin credentials</p>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="loginPassword" placeholder="Enter password" required autocomplete="current-password">
+            <button type="button" class="toggle-pw" onclick="togglePassword()">
+              <i class="fas fa-eye" id="pwToggleIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <a href="../index.html"><i class="fas fa-arrow-left" style="margin-right:4px;"></i> Back to website</a>
+      </div>
+    </div>
+
+    <!-- Customer-denied view -->
+    <div class="customer-denied" id="customerDeniedView">
+      <div class="cd-icon"><i class="fas fa-user-lock"></i></div>
+      <h3>Staff Access Only</h3>
+      <p>
+        You're signed in as a customer. This app is for Rise Axis staff.
+        Head back to the shop to continue shopping.
+      </p>
+      <a href="../index.html" class="btn-shop">
+        <i class="fas fa-store"></i> Go to Shop
+      </a>
+    </div>
+  </div>
+
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">—</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    /* ============================================================
+       SHOW/HIDE PASSWORD
+       ============================================================ */
+    function togglePassword() {
+      const input = document.getElementById('loginPassword');
+      const icon = document.getElementById('pwToggleIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    /* ============================================================
+       SHOW CUSTOMER-DENIED VIEW
+       ============================================================ */
+    function showCustomerDenied() {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('customerDeniedView').style.display = 'block';
+    }
+
+    /* ============================================================
+       HANDLE LOGIN
+       ============================================================ */
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const original = btn.innerHTML;
+
+      if (!email || !password) {
+        showToast('Please fill in both fields', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing in...';
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+
+        // Check role
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        const role = profile?.role;
+
+        if (role === 'admin' || role === 'sales') {
+          showToast('Welcome back!');
+          setTimeout(() => { window.location.href = 'orders.html'; }, 600);
+        } else if (role === 'customer') {
+          showCustomerDenied();
+          // Sign them out so they don't stay in a weird state
+          await supabaseClient.auth.signOut();
+          btn.disabled = false;
+          btn.innerHTML = original;
+        } else {
+          showToast('Unknown role. Contact your administrator.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = original;
+        }
+      } catch (err) {
+        console.error('Login failed:', err);
+        const m = (err.message || '').toLowerCase();
+        let msg = 'Sign-in failed. Please try again.';
+        if (m.includes('invalid login credentials')) msg = 'Incorrect email or password.';
+        else if (m.includes('email not confirmed')) msg = 'Please confirm your email first.';
+        else if (m.includes('too many')) msg = 'Too many attempts. Please wait a moment.';
+        showToast(msg, 'error');
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    }
+
+    /* ============================================================
+       AUTO-REDIRECT IF ALREADY LOGGED IN
+       ============================================================ */
+    (async function init() {
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) return;
+
+        const { data: profile } = await supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        const role = profile?.role;
+
+        if (role === 'admin' || role === 'sales') {
+          // Already authenticated as staff — go straight to admin
+          window.location.replace('orders.html');
+        } else if (role === 'customer') {
+          // Show "staff only" message
+          showCustomerDenied();
+        }
+      } catch (err) {
+        console.error('Auto-redirect check failed:', err);
+      }
+    })();
+  </script>
+
+</body>
+</html>

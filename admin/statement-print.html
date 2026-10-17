@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statement of Account | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="admin-sidebar.js"></script>
+  <style>
+    :root {
+      --navy:      #1D3B73;
+      --navy-deep: #0f2557;
+      --navy-soft: #e8eef8;
+      --red:       #C81E27;
+      --red-soft:  #fdecee;
+      --green:     #17B052;
+      --green-deep:#0d7a38;
+      --green-soft:#e6f7ee;
+      --text-dark: #0f1729;
+      --text-muted:#111111;
+      --border:    #0f0f0f;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: #e2e8f0;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      color: var(--text-dark);
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Background mode — when running inside the hidden iframe for direct download */
+    body.bg-mode {
+      background: #fff;
+    }
+    body.bg-mode .print-toolbar { display: none !important; }
+    body.bg-mode .page-wrap { padding: 0; }
+    body.bg-mode .page {
+      box-shadow: none;
+      width: auto;
+      min-height: auto;
+      padding: 14mm 12mm;
+    }
+
+    /* ---------- Screen-only toolbar ---------- */
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 12px rgba(15,23,41,0.15);
+      z-index: 100;
+      flex-wrap: wrap;
+    }
+    .print-toolbar .pt-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+    }
+    .print-toolbar .pt-title i { color: var(--green); }
+    .print-toolbar .pt-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .print-toolbar button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+    }
+    .print-toolbar button:hover { background: rgba(255,255,255,0.22); }
+    .print-toolbar button.primary {
+      background: #fff;
+      color: var(--navy);
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(255,255,255,0.25);
+    }
+    .print-toolbar button.primary:hover { transform: translateY(-1px); }
+    .print-toolbar button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ---------- A4 page ---------- */
+    .page-wrap {
+      padding: 26px 20px 60px;
+      display: flex;
+      justify-content: center;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      padding: 16mm 14mm;
+      box-shadow: 0 10px 40px rgba(15,23,41,0.15);
+      position: relative;
+    }
+    .page.capturing {
+      box-shadow: none !important;
+      width: auto !important;
+      min-height: auto !important;
+      padding: 14mm 12mm !important;
+    }
+
+    /* ---------- Header (matches invoice) ---------- */
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 30px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--navy);
+      margin-bottom: 22px;
+    }
+    .biz-block .biz-logo {
+      max-height: 60px;
+      max-width: 200px;
+      object-fit: contain;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .biz-block .biz-line {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+    .biz-block .biz-line strong { color: var(--navy); font-weight: 700; }
+
+    .inv-header-right { text-align: right; flex-shrink: 0; }
+    .inv-header-right .inv-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: 3px;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+    .inv-header-right .inv-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .inv-header-right .inv-meta-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      font-size: 0.82rem;
+      padding: 3px 0;
+    }
+    .inv-header-right .inv-meta-row .k { color: var(--text-muted); font-weight: 600; }
+    .inv-header-right .inv-meta-row .v { color: var(--navy); font-weight: 700; }
+
+    /* ---------- Customer block ---------- */
+    .customer-block {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 30px;
+      margin-bottom: 22px;
+      align-items: start;
+    }
+    .cust-to .label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      margin-bottom: 6px;
+    }
+    .cust-to .cust-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .cust-to .cust-line {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    .balance-card {
+      background: var(--navy-soft);
+      border: 1px solid rgba(29,59,115,0.15);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+    .balance-card .bc-label {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .balance-card .bc-amount {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 6px;
+    }
+    .balance-card .bc-amount.due { color: var(--red); }
+    .balance-card .bc-amount.cleared { color: var(--green-deep); }
+    .balance-card .bc-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ---------- Statement table ---------- */
+    .stmt-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 0.82rem;
+      border: 1px solid #111111;
+    }
+    .stmt-table thead th {
+      background: var(--navy);
+      color: #fff;
+      text-align: left;
+      padding: 9px 11px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border: 1px solid #0c0c0c;
+    }
+    .stmt-table thead th.num { text-align: right; }
+    .stmt-table tbody td {
+      padding: 9px 11px;
+      border: 1px solid #0d0d0e;
+      vertical-align: top;
+    }
+    .stmt-table tbody td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .stmt-table tbody td.mono {
+      font-family: 'Courier New', monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.2px;
+    }
+    .stmt-table tbody tr:nth-child(even) { background: #fafbfd; }
+    .stmt-table tbody tr.invoice-row td:nth-child(2) { color: var(--navy); font-weight: 700; }
+    .stmt-table tbody tr.payment-row td:nth-child(2) { color: var(--green-deep); font-weight: 700; }
+    .stmt-table tbody td.debit  { color: var(--navy); font-weight: 700; }
+    .stmt-table tbody td.credit { color: var(--green-deep); font-weight: 700; }
+    .stmt-table tbody td.balance { font-weight: 800; color: var(--navy); }
+    .stmt-table tbody td.balance.zero { color: var(--green-deep); }
+    .stmt-table tfoot td {
+      padding: 10px 11px;
+      background: #f0f4fa;
+      border: 1px solid #0c0c0c;
+      font-weight: 800;
+      color: var(--navy);
+      font-variant-numeric: tabular-nums;
+    }
+    .stmt-table tfoot td.num { text-align: right; }
+
+    /* ---------- Aging ---------- */
+    .aging-section {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    .aging-section h4 {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+    .aging-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      border: 1px solid #080808;
+      margin-bottom: 12px;
+    }
+    .aging-table th {
+      background: #f0f4fa;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 0.6rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      border: 1px solid #0f0f0f;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .aging-table th:first-child { text-align: left; }
+    .aging-table td {
+      padding: 8px 10px;
+      border: 1px solid #080808;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .aging-table td:first-child {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .aging-table td.overdue { color: var(--red); }
+
+    /* ---------- Terms / footer ---------- */
+    .terms-block {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: #f7fafd;
+      border: 1px solid #dbe5f0;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .terms-block strong {
+      color: var(--navy);
+      font-weight: 800;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.62rem;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .inv-footer {
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 0.68rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ---------- Void watermark ---------- */
+    .page.void { position: relative; }
+    .page.void::after {
+      content: 'VOID';
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-22deg);
+      font-size: 140px;
+      font-weight: 900;
+      color: rgba(29,59,115,0.08);
+      letter-spacing: 20px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ---------- Loading / error ---------- */
+    .state {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .state .state-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 44px 40px;
+      max-width: 460px;
+      box-shadow: 0 20px 60px rgba(15,23,41,0.15);
+    }
+    .state .state-icon {
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+      color: var(--navy);
+      background: var(--navy-soft);
+    }
+    .state .state-icon.err { background: var(--red-soft); color: var(--red); }
+    .state h2 {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .state p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* ---------- Print rules (still work if user prints manually) ---------- */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    @media print {
+      html, body {
+        background: #fff !important;
+        font-size: 12px;
+      }
+      .print-toolbar { display: none !important; }
+      .page-wrap { padding: 0; display: block; }
+      .page {
+        width: auto;
+        min-height: auto;
+        box-shadow: none;
+        padding: 12mm 12mm;
+      }
+      .stmt-table thead { display: table-header-group; }
+      .stmt-table tr { page-break-inside: avoid; }
+      .aging-section, .terms-block, .inv-footer { page-break-inside: avoid; }
+      .page.void::after { color: rgba(29,59,115,0.12); }
+    }
+
+    /* ---------- Mobile (screen only) ---------- */
+    @media (max-width: 900px) {
+      .page { width: 100%; padding: 20px 16px; min-height: auto; }
+      .inv-header { flex-direction: column; gap: 20px; }
+      .inv-header-right { text-align: left; width: 100%; }
+      .inv-header-right .inv-meta-row { justify-content: flex-start; }
+      .customer-block { grid-template-columns: 1fr; gap: 18px; }
+      .balance-card { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOOLBAR (hidden in bg-mode / iframe) -->
+  <div class="print-toolbar" id="printToolbar" style="display:none;">
+    <div class="pt-title">
+      <i class="fas fa-file-invoice-dollar"></i>
+      <span id="toolbarTitle">Statement of Account</span>
+    </div>
+    <div class="pt-actions">
+      <button class="primary" id="downloadPdfBtn" onclick="downloadPDF()">
+        <i class="fas fa-file-pdf"></i> <span id="downloadPdfBtnText">Download PDF</span>
+      </button>
+      <button onclick="window.close()">
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+  </div>
+
+  <!-- ROOT -->
+  <div id="root">
+    <div class="state">
+      <div class="state-card">
+        <div class="state-icon"><i class="fas fa-circle-notch fa-spin"></i></div>
+        <h2>Loading statement...</h2>
+        <p>Please wait a moment.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const fmtDate = iso => {
+      if (!iso) return '—';
+      try {
+        return new Date(String(iso).slice(0,10) + 'T00:00:00').toLocaleDateString('en-KE', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        });
+      } catch { return iso; }
+    };
+    const fmtDateShort = iso => {
+      if (!iso) return '—';
+      try {
+        const d = new Date(String(iso).slice(0,10) + 'T00:00:00');
+        return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+      } catch { return iso; }
+    };
+    const fmtDateTime = iso => {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+             + ' · ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
+      } catch { return iso; }
+    };
+    const todayISO = () => new Date().toISOString().slice(0,10);
+
+    const paymentMethodLabel = m => ({
+      cash: 'Cash', mpesa: 'M-Pesa', bank: 'Bank Transfer',
+      cheque: 'Cheque', card: 'Card', other: 'Other'
+    }[m] || m || '—');
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const uid       = params.get('uid') || '';
+      const name      = params.get('name') || '';
+      const phone     = params.get('phone') || '';
+      const fromDate  = params.get('from') || todayISO();
+      const toDate    = params.get('to')   || todayISO();
+      const autoprint = params.get('autoprint') === '1';
+      const bgMode    = params.get('bg') === '1';
+
+      // Background mode: hide toolbar, no visual chrome, auto-download
+      if (bgMode) document.body.classList.add('bg-mode');
+
+      if (!uid && !name && !phone) {
+        return showError('No customer specified', 'Open a statement from the Reports page.');
+      }
+
+      try {
+        // 1. Business settings
+        const { data: settings, error: settingsErr } = await supabaseClient
+          .from('settings')
+          .select('*')
+          .eq('id', 1)
+          .single();
+        if (settingsErr) throw settingsErr;
+
+        // 2. Invoices for this customer in the range (not drafts)
+        let invoicesQuery = supabaseClient
+          .from('invoices')
+          .select('id, invoice_number, issue_date, due_date, status, total, amount_paid, customer_user_id, customer_name, customer_phone, customer_email, created_at')
+          .in('status', ['issued', 'partial', 'paid'])
+          .gte('issue_date', fromDate)
+          .lte('issue_date', toDate)
+          .order('issue_date', { ascending: true });
+
+        if (uid) {
+          invoicesQuery = invoicesQuery.eq('customer_user_id', uid);
+        } else if (phone) {
+          invoicesQuery = invoicesQuery.or(`customer_phone.eq.${phone},customer_user_id.is.null`);
+        } else {
+          invoicesQuery = invoicesQuery.eq('customer_name', name);
+        }
+
+        const { data: rangeInvoices, error: invErr } = await invoicesQuery;
+        if (invErr) throw invErr;
+
+        // 3. Payments tied to those invoices, within the range
+        const invoiceIds = (rangeInvoices || []).map(i => i.id);
+
+        let payments = [];
+        if (invoiceIds.length) {
+          const { data: pays, error: payErr } = await supabaseClient
+            .from('payments')
+            .select('id, invoice_id, amount, method, reference, paid_at, notes')
+            .in('invoice_id', invoiceIds)
+            .gte('paid_at', fromDate + 'T00:00:00')
+            .lte('paid_at', toDate + 'T23:59:59')
+            .order('paid_at', { ascending: true });
+          if (payErr) throw payErr;
+          payments = pays || [];
+        }
+
+        // 4. Aging — all outstanding invoices for this customer
+        let agingInvoices = [];
+        try {
+          let agingQuery = supabaseClient
+            .from('invoices')
+            .select('id, invoice_number, issue_date, due_date, total, amount_paid, status')
+            .in('status', ['issued', 'partial'])
+            .gt('total', 0);
+
+          if (uid) {
+            agingQuery = agingQuery.eq('customer_user_id', uid);
+          } else if (phone) {
+            agingQuery = agingQuery.or(`customer_phone.eq.${phone},customer_user_id.is.null`);
+          } else {
+            agingQuery = agingQuery.eq('customer_name', name);
+          }
+          const { data } = await agingQuery;
+          agingInvoices = (data || []).filter(i => (Number(i.total) - Number(i.amount_paid)) > 0.01);
+        } catch (e) {
+          console.warn('Aging fetch failed:', e);
+        }
+
+        // 5. Render
+        document.title = `Statement — ${name || 'Customer'} | Rise Axis Solutions Ltd`;
+        document.getElementById('toolbarTitle').textContent = `Statement — ${name || 'Customer'}`;
+        renderStatement({
+          settings: settings || {},
+          customer: { uid, name, phone },
+          from: fromDate,
+          to: toDate,
+          invoices: rangeInvoices || [],
+          payments,
+          agingInvoices
+        });
+
+        if (!bgMode) document.getElementById('printToolbar').style.display = 'flex';
+
+        // If the caller passed autoprint=1, trigger download automatically
+        // (used by the hidden-iframe path from the reports table)
+        if (autoprint) {
+          setTimeout(() => downloadPDF(), 800);
+        }
+      } catch (err) {
+        console.error('Statement load failed:', err);
+        showError('Could not load statement', err.message || 'Please try again.');
+      }
+    })();
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
+    function renderStatement({ settings, customer, from, to, invoices, payments, agingInvoices }) {
+      const txs = [];
+
+      invoices.forEach(inv => {
+        txs.push({
+          date: inv.issue_date,
+          sortKey: inv.issue_date + 'T00:00:00',
+          type: 'Invoice',
+          reference: inv.invoice_number || '—',
+          debit: Number(inv.total) || 0,
+          credit: 0
+        });
+      });
+
+      payments.forEach(p => {
+        txs.push({
+          date: String(p.paid_at).slice(0, 10),
+          sortKey: String(p.paid_at),
+          type: 'Payment',
+          reference: p.reference || paymentMethodLabel(p.method),
+          debit: 0,
+          credit: Number(p.amount) || 0
+        });
+      });
+
+      txs.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+      let running = 0;
+      const rows = txs.map(tx => {
+        running += tx.debit - tx.credit;
+        return { ...tx, balance: running };
+      });
+
+      const totalDebit  = rows.reduce((s, r) => s + r.debit, 0);
+      const totalCredit = rows.reduce((s, r) => s + r.credit, 0);
+      const closingBalance = totalDebit - totalCredit;
+
+      // Aging buckets
+      const today = new Date(todayISO() + 'T00:00:00');
+      const buckets = { current: 0, d30: 0, d60: 0, d90: 0, d120: 0, d150: 0, d150p: 0 };
+      agingInvoices.forEach(inv => {
+        const balance = Number(inv.total) - Number(inv.amount_paid);
+        if (balance <= 0.01) return;
+        const due = new Date(String(inv.due_date).slice(0,10) + 'T00:00:00');
+        const daysLate = Math.floor((today - due) / 86400000);
+        if (daysLate <= 0) buckets.current += balance;
+        else if (daysLate <= 30) buckets.d30 += balance;
+        else if (daysLate <= 60) buckets.d60 += balance;
+        else if (daysLate <= 90) buckets.d90 += balance;
+        else if (daysLate <= 120) buckets.d120 += balance;
+        else if (daysLate <= 150) buckets.d150 += balance;
+        else buckets.d150p += balance;
+      });
+      const agingTotal = Object.values(buckets).reduce((s, v) => s + v, 0);
+
+      const bizHeader = `
+        <div class="biz-block">
+          ${settings.business_logo_url ? `<img class="biz-logo" src="${escapeHtml(settings.business_logo_url)}" alt="" crossorigin="anonymous">` : ''}
+          <div class="biz-line">
+            ${settings.business_name ? `<strong>${escapeHtml(settings.business_name)}</strong><br>` : ''}
+            ${settings.business_pin ? `<strong>KRA PIN:</strong> ${escapeHtml(settings.business_pin)}<br>` : ''}
+            ${settings.business_address ? `${escapeHtml(settings.business_address)}<br>` : ''}
+            ${settings.business_po_box ? `P.O. Box ${escapeHtml(settings.business_po_box)}<br>` : ''}
+            ${settings.business_email ? `${escapeHtml(settings.business_email)}<br>` : ''}
+            ${settings.business_phone ? escapeHtml(settings.business_phone) : ''}
+          </div>
+        </div>`;
+
+      const displayName = customer.name || 'Customer';
+      const displayPhone = customer.phone || '';
+      const displayEmail = invoices[0]?.customer_email || '';
+
+      const customerBlock = `
+        <div class="customer-block">
+          <div class="cust-to">
+            <div class="label">Statement For</div>
+            <div class="cust-name">${escapeHtml(displayName)}</div>
+            <div class="cust-line">
+              ${displayPhone ? `${escapeHtml(displayPhone)}<br>` : ''}
+              ${displayEmail ? escapeHtml(displayEmail) : ''}
+            </div>
+          </div>
+          <div class="balance-card">
+            <div class="bc-label">Balance Due</div>
+            <div class="bc-amount ${closingBalance <= 0.01 ? 'cleared' : 'due'}">
+              ${closingBalance <= 0.01 ? 'Fully Settled' : fmtKES(closingBalance)}
+            </div>
+            <div class="bc-sub">
+              Debits ${fmtKES(totalDebit)} · Credits ${fmtKES(totalCredit)}
+            </div>
+          </div>
+        </div>`;
+
+      const rowsHtml = rows.map(r => `
+        <tr class="${r.type === 'Invoice' ? 'invoice-row' : 'payment-row'}">
+          <td class="mono">${escapeHtml(fmtDateShort(r.date))}</td>
+          <td>${escapeHtml(r.type)}</td>
+          <td class="mono">${escapeHtml(r.reference)}</td>
+          <td class="num debit">${r.debit > 0 ? fmtKES(r.debit) : '—'}</td>
+          <td class="num credit">${r.credit > 0 ? fmtKES(r.credit) : '—'}</td>
+          <td class="num balance ${Math.abs(r.balance) < 0.01 ? 'zero' : ''}">${fmtKES(r.balance)}</td>
+        </tr>`).join('');
+
+      const noActivity = rows.length === 0;
+
+      document.getElementById('root').innerHTML = `
+        <div class="page-wrap">
+          <div class="page">
+
+            <div class="inv-header">
+              ${bizHeader}
+              <div class="inv-header-right">
+                <div class="inv-title">STATEMENT</div>
+                <div class="inv-sub">OF ACCOUNT</div>
+                <div style="height:14px;"></div>
+                <div class="inv-meta-row">
+                  <span class="k">Statement Date:</span>
+                  <span class="v">${escapeHtml(fmtDate(todayISO()))}</span>
+                </div>
+                <div class="inv-meta-row">
+                  <span class="k">Period:</span>
+                  <span class="v">${escapeHtml(fmtDate(from))} → ${escapeHtml(fmtDate(to))}</span>
+                </div>
+                <div class="inv-meta-row">
+                  <span class="k">Generated:</span>
+                  <span class="v">${escapeHtml(fmtDateTime(new Date().toISOString()))}</span>
+                </div>
+              </div>
+            </div>
+
+            ${customerBlock}
+
+            <table class="stmt-table">
+              <thead>
+                <tr>
+                  <th style="width:80px;">Date</th>
+                  <th style="width:80px;">Type</th>
+                  <th>Reference</th>
+                  <th class="num" style="width:110px;">Debit</th>
+                  <th class="num" style="width:110px;">Credit</th>
+                  <th class="num" style="width:120px;">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml || `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">No transactions in this period.</td></tr>`}
+              </tbody>
+              ${noActivity ? '' : `
+              <tfoot>
+                <tr>
+                  <td colspan="3">TOTALS</td>
+                  <td class="num">${fmtKES(totalDebit)}</td>
+                  <td class="num">${fmtKES(totalCredit)}</td>
+                  <td class="num">${fmtKES(closingBalance)}</td>
+                </tr>
+              </tfoot>`}
+            </table>
+
+            ${agingTotal > 0 ? `
+              <div class="aging-section">
+                <h4>Aging Summary — Outstanding Invoices</h4>
+                <table class="aging-table">
+                  <thead>
+                    <tr>
+                      <th>Status</th>
+                      <th>Current</th>
+                      <th>30 Days</th>
+                      <th>60 Days</th>
+                      <th>90 Days</th>
+                      <th>120 Days</th>
+                      <th>150 Days</th>
+                      <th>&gt; 150 Days</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Balance (KES)</td>
+                      <td>${fmtKES(buckets.current)}</td>
+                      <td class="${buckets.d30 > 0 ? 'overdue' : ''}">${fmtKES(buckets.d30)}</td>
+                      <td class="${buckets.d60 > 0 ? 'overdue' : ''}">${fmtKES(buckets.d60)}</td>
+                      <td class="${buckets.d90 > 0 ? 'overdue' : ''}">${fmtKES(buckets.d90)}</td>
+                      <td class="${buckets.d120 > 0 ? 'overdue' : ''}">${fmtKES(buckets.d120)}</td>
+                      <td class="${buckets.d150 > 0 ? 'overdue' : ''}">${fmtKES(buckets.d150)}</td>
+                      <td class="${buckets.d150p > 0 ? 'overdue' : ''}">${fmtKES(buckets.d150p)}</td>
+                      <td>${fmtKES(agingTotal)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>` : ''}
+
+            <div class="terms-block">
+              <strong>Terms &amp; Conditions</strong>
+              Payment is strictly due by the dates shown above. Kindly send us your remittance advice with each payment.
+              We reserve the right to charge 2% interest per month on total overdue balances.
+              ${settings.invoice_footer_note ? `<div style="margin-top:8px;">${escapeHtml(settings.invoice_footer_note)}</div>` : ''}
+            </div>
+
+            <div class="inv-footer">
+              Generated ${escapeHtml(fmtDateTime(new Date().toISOString()))} · This statement is a summary of your account and may not include very recent payments.
+            </div>
+
+          </div>
+        </div>`;
+    }
+
+    /* ============================================================
+       DOWNLOAD AS PDF — direct, no dialog
+       ============================================================ */
+    let pdfDownloading = false;
+
+    async function downloadPDF() {
+      if (pdfDownloading) return;
+      const btn = document.getElementById('downloadPdfBtn');
+      const labelEl = document.getElementById('downloadPdfBtnText');
+      const originalLabel = labelEl ? labelEl.textContent : 'Download PDF';
+
+      if (typeof html2canvas === 'undefined' || !window.jspdf || !window.jspdf.jsPDF) {
+        console.error('PDF library not loaded');
+        return;
+      }
+
+      pdfDownloading = true;
+      if (btn) btn.disabled = true;
+      if (labelEl) labelEl.textContent = 'Generating...';
+
+      try {
+        const pageEl = document.querySelector('.page');
+        if (!pageEl) throw new Error('Statement not rendered yet.');
+        pageEl.classList.add('capturing');
+
+        // Make sure any scroll offsets don't clip the capture
+        const origWindowScroll = { x: window.scrollX, y: window.scrollY };
+        window.scrollTo(0, 0);
+
+        // Give the browser a tick to apply the .capturing styles
+        await new Promise(r => setTimeout(r, 60));
+
+        const canvas = await html2canvas(pageEl, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          windowWidth: pageEl.scrollWidth,
+          windowHeight: pageEl.scrollHeight
+        });
+
+        window.scrollTo(origWindowScroll.x, origWindowScroll.y);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+          compress: true
+        });
+
+        const pdfWidth  = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth  = pdfWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+        if (imgHeight <= pdfHeight) {
+          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        } else {
+          let remaining = imgHeight;
+          let yOffset = 0;
+          let page = 0;
+          while (remaining > 0) {
+            if (page > 0) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, -yOffset, imgWidth, imgHeight);
+            yOffset += pdfHeight;
+            remaining -= pdfHeight;
+            page += 1;
+          }
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const customerName = (params.get('name') || 'Customer')
+          .replace(/[^a-zA-Z0-9]+/g, '_')
+          .replace(/^_+|_+$/g, '');
+        const today = new Date().toISOString().slice(0, 10);
+        pdf.save(`Statement_${customerName}_${today}.pdf`);
+      } catch (err) {
+        console.error('PDF generation failed:', err);
+        alert('Could not generate PDF: ' + (err.message || 'Unknown error'));
+      } finally {
+        const p = document.querySelector('.page');
+        if (p) p.classList.remove('capturing');
+        pdfDownloading = false;
+        if (btn) btn.disabled = false;
+        if (labelEl) labelEl.textContent = originalLabel;
+      }
+    }
+
+    /* ============================================================
+       ERROR STATE
+       ============================================================ */
+    function showError(title, msg) {
+      document.getElementById('root').innerHTML = `
+        <div class="state">
+          <div class="state-card">
+            <div class="state-icon err"><i class="fas fa-exclamation-triangle"></i></div>
+            <h2>${escapeHtml(title)}</h2>
+            <p>${escapeHtml(msg)}</p>
+          </div>
+        </div>`;
+      document.getElementById('printToolbar').style.display = 'flex';
+    }
+  </script>
+
+</body>
+</html>

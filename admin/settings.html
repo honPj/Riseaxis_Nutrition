@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Settings | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin-sidebar.js"></script>
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC STYLES — settings.html
+       ============================================================ */
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .settings-layout { grid-template-columns: 1fr; }
+      .preview-rail { position: static !important; }
+    }
+
+    .settings-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+
+    .settings-section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-section-title i { color: var(--orange); }
+    .settings-section-title small {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .settings-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    /* Logo upload block */
+    .logo-upload-row {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 22px;
+    }
+    .logo-preview {
+      width: 180px;
+      height: 120px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f0f4fa, #e6ecf5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      border: 1.5px solid var(--border);
+    }
+    .logo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 8px;
+      display: none;
+    }
+    .logo-preview > i {
+      color: #94a3b8;
+      font-size: 1.8rem;
+    }
+    .logo-preview .uploading {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .logo-preview.uploading .uploading { display: flex; }
+
+    /* Preview rail */
+    .preview-rail {
+      position: sticky;
+      top: 24px;
+    }
+    .preview-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      box-shadow: 0 6px 20px rgba(31,58,110,0.06);
+      margin-bottom: 16px;
+    }
+    .preview-card h3 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-card h3 i { color: var(--orange); }
+
+    .preview-invoice {
+      background: #fafbff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 0.82rem;
+    }
+    .preview-invoice .pv-logo {
+      max-height: 44px;
+      max-width: 140px;
+      object-fit: contain;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .preview-invoice .pv-biz-name {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--navy);
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+    .preview-invoice .pv-biz-line {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .preview-invoice .pv-biz-line strong { color: var(--navy); font-weight: 700; }
+    .preview-invoice .pv-inv-num {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: 0.5px;
+      font-size: 0.88rem;
+      padding: 6px 10px;
+      background: #e8eef8;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .preview-invoice .pv-label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+    .preview-invoice .pv-pay-block {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .preview-invoice .pv-pay-block strong {
+      display: block;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .preview-invoice .pv-pay-block .mono {
+      font-family: 'Courier New', monospace;
+      color: var(--navy);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .preview-invoice .pv-footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.7rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .save-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 18px 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-top: 24px;
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .save-bar .left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      gap: 8px;
+      min-width: 200px;
+    }
+    .save-bar .left i { color: var(--green); }
+
+    /* Input grid tweaks */
+    .settings-card .form-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .settings-card .form-field.full { grid-column: 1 / -1; }
+    .settings-card .form-field small {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      display: block;
+    }
+    .settings-card .mono-input {
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.4px;
+    }
+
+    @media (max-width: 768px) {
+      .settings-card { padding: 20px 18px; }
+      .settings-card .form-grid { grid-template-columns: 1fr; }
+      .save-bar { flex-direction: column-reverse; }
+      .save-bar button { width: 100%; justify-content: center; }
+      .logo-upload-row { flex-direction: column; }
+      .logo-preview { width: 100%; height: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    // Hide on DOMContentLoaded; fall back to load + 2s
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+
+
+  <!-- ACCESS DENIED -->
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">Your account does not have administrator privileges.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <div class="page-title-row">
+          <div>
+            <h1><i class="fas fa-cog"></i> Settings</h1>
+            <p>Business information and invoice defaults. These values appear on every invoice you issue.</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="refreshBtn" onclick="loadSettings(true)">
+              <i class="fas fa-sync-alt"></i> Reload
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-layout">
+
+          <!-- LEFT: form -->
+          <div>
+
+            <!-- Business identity -->
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i class="fas fa-building"></i>
+                Business Identity
+                <small>Appears in the invoice header</small>
+              </div>
+
+              <!-- Logo upload row -->
+              <div class="logo-upload-row">
+                <div class="logo-preview" id="logoPreviewBox">
+                  <img id="logoPreviewImg" src="" alt="">
+                  <i id="logoPreviewPh" class="fas fa-image"></i>
+                  <div class="uploading">
+                    <i class="fas fa-circle-notch fa-spin"></i>
+                    <span>Uploading...</span>
+                  </div>
+                </div>
+                <div style="flex:1; min-width: 0;">
+                  <label style="display:block; font-size:0.78rem; font-weight:700; color:var(--navy); margin-bottom:8px;">Business Logo</label>
+                  <input type="file" id="logoFile" accept="image/*" style="display:none;">
+                  <button class="btn-upload" onclick="document.getElementById('logoFile').click()" type="button">
+                    <i class="fas fa-upload"></i> Upload Logo
+                  </button>
+                  <button class="btn-remove-img" id="logoRemoveBtn" onclick="removeLogo()" type="button" style="display:none; margin-left:6px;">
+                    <i class="fas fa-trash"></i> Remove
+                  </button>
+                  <div style="margin-top:12px;">
+                    <label style="font-size:0.75rem; font-weight:700; color:var(--navy); display:block; margin-bottom:6px;">Or paste a logo URL</label>
+                    <input type="text" id="businessLogoUrl" placeholder="https://... or /image/logo.png"
+                           style="width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:0.85rem; font-family:'Courier New', monospace;">
+                  </div>
+                  <div class="settings-hint">PNG with transparent background works best. Shown on every printed invoice.</div>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label>Business Name <span class="req">*</span></label>
+                  <input type="text" id="businessName" placeholder="e.g. Rise Axis Solutions Ltd">
+                </div>
+                <div class="form-field">
+                  <label>KRA PIN</label>
+                  <input type="text" id="businessPin" class="mono-input" placeholder="e.g. P051987654A">
+                </div>
+                <div class="form-field">
+                  <label>P.O. Box</label>
+                  <input type="text" id="businessPoBox" placeholder="e.g. 45000-00100">
+                </div>
+                <div class="form-field full">
+                  <label>Address</label>
+                  <input type="text" id="businessAddress" placeholder="e.g. New Horizon Industrial Park, Ruiru, Kenya">
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i class="fas fa-address-card"></i>
+                Contact Information
+              </div>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>Phone</label>
+                  <input type="text" id="businessPhone" placeholder="+254 119 155 847">
+                </div>
+                <div class="form-field">
+                  <label>Email</label>
+                  <input type="email" id="businessEmail" placeholder="contact@riseaxissolutions.com">
+                </div>
+              </div>
+            </div>
+
+            <!-- Invoice defaults -->
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i class="fas fa-file-invoice"></i>
+                Invoice Defaults
+                <small>Used on every new invoice</small>
+              </div>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>Default VAT Rate (%)</label>
+                  <input type="number" id="defaultVatRate" min="0" max="100" step="0.01" placeholder="16">
+                  <small>Applied to VAT-taxable lines when a product doesn't override it.</small>
+                </div>
+                <div class="form-field">
+                  <label>Default Payment Terms (days)</label>
+                  <input type="number" id="defaultPaymentTermsDays" min="0" max="365" step="1" placeholder="14">
+                  <small>Due date = issue date + this many days.</small>
+                </div>
+                <div class="form-field full">
+                  <label>Invoice Number Prefix</label>
+                  <input type="text" id="invoicePrefix" class="mono-input" placeholder="INV" maxlength="10">
+                  <small>Used as: <strong id="prefixPreview">INV-2026-0001</strong>. Changing this does not affect existing invoice numbers.</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment instructions -->
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i class="fas fa-money-bill-wave"></i>
+                Payment Instructions
+                <small>Shown on printed invoices</small>
+              </div>
+
+              <div class="form-grid" style="margin-bottom:18px;">
+                <div class="form-field full">
+                  <label>M-PESA Paybill / Till Number</label>
+                  <input type="text" id="mpesaPaybill" class="mono-input" placeholder="e.g. 522522">
+                </div>
+                <div class="form-field full">
+                  <label>M-PESA Account / Reference Hint</label>
+                  <input type="text" id="mpesaAccount" placeholder="e.g. Your invoice number">
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>Bank Name</label>
+                  <input type="text" id="bankName" placeholder="e.g. Equity Bank">
+                </div>
+                <div class="form-field">
+                  <label>Branch</label>
+                  <input type="text" id="bankBranch" placeholder="e.g. Kenyatta Avenue">
+                </div>
+                <div class="form-field">
+                  <label>Account Name</label>
+                  <input type="text" id="bankAccountName" placeholder="e.g. Rise Axis Solutions Ltd">
+                </div>
+                <div class="form-field">
+                  <label>Account Number</label>
+                  <input type="text" id="bankAccountNumber" class="mono-input" placeholder="e.g. 0170293847561">
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer note -->
+            <div class="settings-card">
+              <div class="settings-section-title">
+                <i class="fas fa-comment-alt"></i>
+                Invoice Footer Note
+                <small>Shown at the bottom of every printed invoice</small>
+              </div>
+              <div class="form-field full">
+                <label>Footer Text</label>
+                <textarea id="invoiceFooterNote" rows="4" placeholder="e.g. This document is an operational billing invoice generated by Rise Axis Solutions Ltd. For fiscal tax compliance, please refer to the official KRA eTIMS invoice where applicable."></textarea>
+                <small>Leave blank to hide the footer note on printed invoices.</small>
+              </div>
+            </div>
+
+            <!-- Save bar -->
+            <div class="save-bar">
+              <div class="left" id="saveStatus">
+                <i class="fas fa-info-circle"></i>
+                <span>Changes apply immediately to new invoices.</span>
+              </div>
+              <button class="btn-secondary" onclick="loadSettings(false)">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+              <button class="btn-primary" id="saveBtn" onclick="saveSettings()">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
+            </div>
+
+          </div>
+
+          <!-- RIGHT: live preview -->
+          <div class="preview-rail">
+            <div class="preview-card">
+              <h3><i class="fas fa-eye"></i> Live Preview</h3>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:14px; line-height:1.5;">
+                How your invoice header and payment instructions will look with these settings.
+              </p>
+
+              <div class="preview-invoice">
+                <img id="pvLogo" class="pv-logo" src="" alt="">
+                <div class="pv-biz-name" id="pvName">Rise Axis Solutions Ltd</div>
+                <div class="pv-biz-line" id="pvBizLine">
+                  <strong>KRA PIN:</strong> —<br>
+                  New Horizon Industrial Park, Ruiru, Kenya<br>
+                  P.O. Box —<br>
+                  contact@riseaxissolutions.com<br>
+                  +254 119 155 847
+                </div>
+
+                <span class="pv-inv-num" id="pvInvNum">INV-2026-0001</span>
+
+                <div class="pv-label">Payment Instructions</div>
+                <div id="pvPayInstructions">
+                  <div class="pv-pay-block" id="pvMpesa">
+                    <strong>M-PESA</strong>
+                    Paybill: <span class="mono">—</span>
+                  </div>
+                  <div class="pv-pay-block" id="pvBank">
+                    <strong>Bank Transfer</strong>
+                    —
+                  </div>
+                </div>
+
+                <div class="pv-footer" id="pvFooter">
+                  This document is an operational billing invoice generated by Rise Axis Solutions Ltd. For fiscal tax compliance, please refer to the official KRA eTIMS invoice where applicable.
+                </div>
+              </div>
+            </div>
+
+            <div class="preview-card">
+              <h3><i class="fas fa-info-circle"></i> Tips</h3>
+              <ul style="font-size:0.82rem; color:var(--text-muted); line-height:1.9; padding-left:0;">
+                <li><i class="fas fa-check-circle" style="color:var(--green); margin-right:6px;"></i> Invoice numbers are never reused, even if you delete drafts.</li>
+                <li><i class="fas fa-check-circle" style="color:var(--green); margin-right:6px;"></i> Changing the prefix affects only future invoices.</li>
+                <li><i class="fas fa-check-circle" style="color:var(--green); margin-right:6px;"></i> VAT default applies to new lines only. Existing invoices are frozen.</li>
+                <li><i class="fas fa-check-circle" style="color:var(--green); margin-right:6px;"></i> Bank &amp; M-PESA details appear on printed invoices only.</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let currentSettings = null;
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+   
+
+    /* ============================================================
+       AUTH
+       ============================================================ */
+       
+    async function checkAdminAccess() {
+      return await window.adminAuthCheck(['admin']);
+    }
+    function showAccessDenied(msg) {
+      document.getElementById('adminMain').style.display = 'none';
+      document.getElementById('accessDenied').style.display = 'flex';
+      if (msg) document.getElementById('accessDeniedMsg').textContent = msg;
+    }
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../index.html';
+    }
+
+    /* ============================================================
+       LOAD
+       ============================================================ */
+    async function loadSettings(showSpinner = false) {
+      const btn = document.getElementById('refreshBtn');
+      if (showSpinner) { btn.classList.add('spinning'); btn.disabled = true; }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('settings')
+          .select('*')
+          .eq('id', 1)
+          .single();
+        if (error) throw error;
+
+        currentSettings = data || {};
+        fillForm(currentSettings);
+        renderPreview();
+        updateSaveStatus('idle');
+      } catch (err) {
+        console.error('Load settings failed:', err);
+        showToast('Could not load settings: ' + (err.message || ''), 'error');
+      } finally {
+        if (showSpinner) {
+          setTimeout(() => { btn.classList.remove('spinning'); btn.disabled = false; }, 400);
+        }
+      }
+    }
+
+    function fillForm(s) {
+      document.getElementById('businessName').value = s.business_name || '';
+      document.getElementById('businessPin').value = s.business_pin || '';
+      document.getElementById('businessPoBox').value = s.business_po_box || '';
+      document.getElementById('businessAddress').value = s.business_address || '';
+      document.getElementById('businessPhone').value = s.business_phone || '';
+      document.getElementById('businessEmail').value = s.business_email || '';
+      document.getElementById('businessLogoUrl').value = s.business_logo_url || '';
+      document.getElementById('defaultVatRate').value = s.default_vat_rate ?? 16;
+      document.getElementById('defaultPaymentTermsDays').value = s.default_payment_terms_days ?? 14;
+      document.getElementById('invoicePrefix').value = s.invoice_prefix || 'INV';
+      document.getElementById('mpesaPaybill').value = s.mpesa_paybill || '';
+      document.getElementById('mpesaAccount').value = s.mpesa_account || '';
+      document.getElementById('bankName').value = s.bank_name || '';
+      document.getElementById('bankBranch').value = s.bank_branch || '';
+      document.getElementById('bankAccountName').value = s.bank_account_name || '';
+      document.getElementById('bankAccountNumber').value = s.bank_account_number || '';
+      document.getElementById('invoiceFooterNote').value = s.invoice_footer_note || '';
+      renderLogoPreview(s.business_logo_url || '');
+    }
+
+    /* ============================================================
+       LOGO UPLOAD
+       ============================================================ */
+    function renderLogoPreview(url) {
+      const img = document.getElementById('logoPreviewImg');
+      const ph = document.getElementById('logoPreviewPh');
+      const removeBtn = document.getElementById('logoRemoveBtn');
+      if (url) {
+        img.src = url;
+        img.style.display = 'block';
+        ph.style.display = 'none';
+        removeBtn.style.display = 'inline-flex';
+      } else {
+        img.src = '';
+        img.style.display = 'none';
+        ph.style.display = '';
+        removeBtn.style.display = 'none';
+      }
+    }
+
+    function removeLogo() {
+      document.getElementById('businessLogoUrl').value = '';
+      renderLogoPreview('');
+      renderPreview();
+      updateSaveStatus('dirty');
+    }
+
+    document.getElementById('businessLogoUrl').addEventListener('input', e => {
+      renderLogoPreview(e.target.value.trim());
+      renderPreview();
+    });
+
+    document.getElementById('logoFile').addEventListener('change', async e => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const box = document.getElementById('logoPreviewBox');
+      box.classList.add('uploading');
+
+      try {
+        const ext = file.name.split('.').pop();
+        const filename = `logo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const path = `branding/${filename}`;
+
+        const { error: uploadError } = await supabaseClient.storage
+          .from('product-images')
+          .upload(path, file, { cacheControl: '3600', upsert: false });
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabaseClient.storage
+          .from('product-images')
+          .getPublicUrl(path);
+
+        const url = urlData.publicUrl;
+        document.getElementById('businessLogoUrl').value = url;
+        renderLogoPreview(url);
+        renderPreview();
+        updateSaveStatus('dirty');
+        showToast('Logo uploaded');
+      } catch (err) {
+        console.error('Logo upload failed:', err);
+        showToast('Logo upload failed: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        box.classList.remove('uploading');
+        e.target.value = '';
+      }
+    });
+
+    /* ============================================================
+       LIVE PREVIEW
+       ============================================================ */
+    function renderPreview() {
+      const name = document.getElementById('businessName').value.trim() || 'Your Business Name';
+      const pin = document.getElementById('businessPin').value.trim();
+      const poBox = document.getElementById('businessPoBox').value.trim();
+      const addr = document.getElementById('businessAddress').value.trim();
+      const phone = document.getElementById('businessPhone').value.trim();
+      const email = document.getElementById('businessEmail').value.trim();
+      const logoUrl = document.getElementById('businessLogoUrl').value.trim();
+      const prefix = document.getElementById('invoicePrefix').value.trim() || 'INV';
+      const year = new Date().getFullYear();
+      const paybill = document.getElementById('mpesaPaybill').value.trim();
+      const mpesaAcct = document.getElementById('mpesaAccount').value.trim();
+      const bName = document.getElementById('bankName').value.trim();
+      const bBranch = document.getElementById('bankBranch').value.trim();
+      const bAcctName = document.getElementById('bankAccountName').value.trim();
+      const bAcctNum = document.getElementById('bankAccountNumber').value.trim();
+      const footer = document.getElementById('invoiceFooterNote').value.trim();
+
+      // Logo
+      const pvLogo = document.getElementById('pvLogo');
+      if (logoUrl) {
+        pvLogo.src = logoUrl;
+        pvLogo.style.display = 'block';
+      } else {
+        pvLogo.src = '';
+        pvLogo.style.display = 'none';
+      }
+
+      document.getElementById('pvName').textContent = name;
+
+      const lines = [];
+      if (pin) lines.push(`<strong>KRA PIN:</strong> ${escapeHtml(pin)}`);
+      if (addr) lines.push(escapeHtml(addr));
+      if (poBox) lines.push(`P.O. Box ${escapeHtml(poBox)}`);
+      if (email) lines.push(escapeHtml(email));
+      if (phone) lines.push(escapeHtml(phone));
+      document.getElementById('pvBizLine').innerHTML = lines.length
+        ? lines.join('<br>')
+        : '<em style="color:#94a3b8;">Fill in the Business Identity fields to see them here.</em>';
+
+      document.getElementById('pvInvNum').textContent = `${prefix}-${year}-0001`;
+      document.getElementById('prefixPreview').textContent = `${prefix}-${year}-0001`;
+
+      // Payment instructions — rebuild wholesale so nothing lingers
+      const payWrap = document.getElementById('pvPayInstructions');
+      if (!paybill && !bName) {
+        payWrap.innerHTML = `<div style="color:#94a3b8;font-style:italic;font-size:0.75rem;">No payment instructions configured.</div>`;
+      } else {
+        let html = '';
+        if (paybill) {
+          html += `<div class="pv-pay-block">
+            <strong>M-PESA</strong>
+            Paybill: <span class="mono">${escapeHtml(paybill)}</span>
+            ${mpesaAcct ? `<br>Account: <span class="mono">${escapeHtml(mpesaAcct)}</span>` : ''}
+          </div>`;
+        }
+        if (bName) {
+          const bl = [];
+          bl.push(escapeHtml(bName));
+          if (bAcctName) bl.push(`Account Name: ${escapeHtml(bAcctName)}`);
+          if (bAcctNum) bl.push(`Account No: <span class="mono">${escapeHtml(bAcctNum)}</span>`);
+          if (bBranch) bl.push(`Branch: ${escapeHtml(bBranch)}`);
+          html += `<div class="pv-pay-block"><strong>Bank Transfer</strong>${bl.join('<br>')}</div>`;
+        }
+        payWrap.innerHTML = html;
+      }
+
+      // Footer
+      const fEl = document.getElementById('pvFooter');
+      if (footer) {
+        fEl.style.display = '';
+        fEl.textContent = footer;
+      } else {
+        fEl.style.display = 'none';
+      }
+    }
+
+    /* Wire all inputs to update the preview live */
+    const previewInputs = [
+      'businessName','businessPin','businessPoBox','businessAddress',
+      'businessPhone','businessEmail','invoicePrefix',
+      'mpesaPaybill','mpesaAccount','bankName','bankBranch',
+      'bankAccountName','bankAccountNumber','invoiceFooterNote'
+    ];
+    previewInputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', renderPreview);
+    });
+
+    /* ============================================================
+       SAVE STATUS INDICATOR
+       ============================================================ */
+    function updateSaveStatus(state) {
+      const el = document.getElementById('saveStatus');
+      if (!el) return;
+      if (state === 'idle') {
+        el.innerHTML = `<i class="fas fa-info-circle"></i> <span>Changes apply immediately to new invoices.</span>`;
+      } else if (state === 'dirty') {
+        el.innerHTML = `<i class="fas fa-pencil-alt" style="color:var(--orange);"></i> <span>Unsaved changes.</span>`;
+      } else if (state === 'saving') {
+        el.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>Saving...</span>`;
+      } else if (state === 'saved') {
+        el.innerHTML = `<i class="fas fa-check-circle"></i> <span>Saved successfully.</span>`;
+      }
+    }
+
+    /* Track dirty state on any form field */
+    document.querySelectorAll('#adminMain input, #adminMain textarea').forEach(el => {
+      el.addEventListener('input', () => updateSaveStatus('dirty'));
+    });
+
+    /* ============================================================
+       SAVE
+       ============================================================ */
+    async function saveSettings() {
+      const name = document.getElementById('businessName').value.trim();
+      const vatRate = parseFloat(document.getElementById('defaultVatRate').value);
+      const termsDays = parseInt(document.getElementById('defaultPaymentTermsDays').value, 10);
+      const prefix = document.getElementById('invoicePrefix').value.trim();
+
+      if (!name) { showToast('Business name is required', 'error'); return; }
+      if (isNaN(vatRate) || vatRate < 0 || vatRate > 100) {
+        showToast('VAT rate must be between 0 and 100', 'error'); return;
+      }
+      if (isNaN(termsDays) || termsDays < 0 || termsDays > 365) {
+        showToast('Payment terms must be between 0 and 365 days', 'error'); return;
+      }
+      if (!prefix) { showToast('Invoice prefix cannot be empty', 'error'); return; }
+      if (!/^[A-Za-z0-9\-_]+$/.test(prefix)) {
+        showToast('Invoice prefix can only contain letters, numbers, dashes, and underscores', 'error'); return;
+      }
+
+      const payload = {
+        business_name: name,
+        business_pin: document.getElementById('businessPin').value.trim() || '',
+        business_po_box: document.getElementById('businessPoBox').value.trim() || '',
+        business_address: document.getElementById('businessAddress').value.trim() || '',
+        business_phone: document.getElementById('businessPhone').value.trim() || '',
+        business_email: document.getElementById('businessEmail').value.trim() || '',
+        business_logo_url: document.getElementById('businessLogoUrl').value.trim() || '',
+        default_vat_rate: vatRate,
+        default_payment_terms_days: termsDays,
+        invoice_prefix: prefix.toUpperCase(),
+        mpesa_paybill: document.getElementById('mpesaPaybill').value.trim() || '',
+        mpesa_account: document.getElementById('mpesaAccount').value.trim() || '',
+        bank_name: document.getElementById('bankName').value.trim() || '',
+        bank_branch: document.getElementById('bankBranch').value.trim() || '',
+        bank_account_name: document.getElementById('bankAccountName').value.trim() || '',
+        bank_account_number: document.getElementById('bankAccountNumber').value.trim() || '',
+        invoice_footer_note: document.getElementById('invoiceFooterNote').value.trim() || ''
+      };
+
+      const btn = document.getElementById('saveBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
+      updateSaveStatus('saving');
+
+      try {
+        const { error } = await supabaseClient
+          .from('settings')
+          .update(payload)
+          .eq('id', 1);
+        if (error) throw error;
+
+        currentSettings = { ...currentSettings, ...payload };
+        document.getElementById('invoicePrefix').value = prefix.toUpperCase();
+        renderPreview();
+        updateSaveStatus('saved');
+        showToast('Settings saved');
+      } catch (err) {
+        console.error('Save failed:', err);
+        updateSaveStatus('dirty');
+        showToast('Could not save: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+      await loadSettings();
+    })();
+  </script>
+<script src="pwa.js"></script>
+</body>
+</html>

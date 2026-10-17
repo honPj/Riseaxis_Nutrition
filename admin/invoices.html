@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Invoices | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin-sidebar.js"></script>
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC STYLES — invoices.html
+       ============================================================ */
+
+    /* Period selector */
+    .period-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+    }
+    .period-bar .pb-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 6px;
+    }
+    .period-bar .pb-label i { color: var(--orange); }
+
+    .period-btn {
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: var(--bg-light);
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .period-btn:hover {
+      border-color: var(--navy);
+      transform: translateY(-1px);
+    }
+    .period-btn.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      border-color: var(--navy);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(30,83,180,0.25);
+    }
+
+    .period-bar .pb-range {
+      margin-left: auto;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .period-bar .pb-range strong { color: var(--navy); font-weight: 800; }
+
+    /* Filter chips row */
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .chip i { font-size: 0.75rem; }
+    .chip .chip-count {
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: var(--bg-light);
+      color: var(--text-muted);
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-left: 4px;
+    }
+    .chip:hover {
+      border-color: var(--navy);
+      transform: translateY(-1px);
+    }
+    .chip.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      border-color: var(--navy);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(30,83,180,0.25);
+    }
+    .chip.active .chip-count { background: rgba(255,255,255,0.2); color: #fff; }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .summary-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(31,58,110,0.1);
+    }
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 4px;
+      border-radius: 16px 0 0 16px;
+    }
+    .summary-card.sc-open::before        { background: var(--navy); }
+    .summary-card.sc-outstanding::before { background: var(--yellow); }
+    .summary-card.sc-overdue::before     { background: var(--red); }
+    .summary-card.sc-paid::before        { background: var(--green); }
+
+    .summary-card .sc-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .summary-card .sc-label i {
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+    .summary-card.sc-open        .sc-label i { background: linear-gradient(135deg, var(--navy), var(--navy-deep)); }
+    .summary-card.sc-outstanding .sc-label i { background: linear-gradient(135deg, var(--yellow), #D97706); }
+    .summary-card.sc-overdue     .sc-label i { background: linear-gradient(135deg, var(--red), var(--red-dark)); }
+    .summary-card.sc-paid        .sc-label i { background: linear-gradient(135deg, var(--green), var(--green-deep)); }
+
+    .summary-card .sc-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1.05;
+      letter-spacing: -0.8px;
+      margin-bottom: 3px;
+    }
+    .summary-card.sc-overdue .sc-value { color: var(--red); }
+    .summary-card .sc-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Invoice table */
+    .invoice-num {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    .customer-cell strong {
+      display: block;
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .customer-cell small {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+    .date-cell {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+    .amount-cell {
+      font-weight: 700;
+      color: var(--navy);
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+    .amount-cell.muted { color: var(--text-muted); font-weight: 600; }
+    .balance-cell {
+      font-weight: 900;
+      color: var(--red);
+      white-space: nowrap;
+      font-size: 0.95rem;
+    }
+    .balance-cell.zero { color: var(--green); }
+
+    /* Row actions menu */
+    .row-actions-wrap { position: relative; display: inline-block; }
+    .row-actions-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .row-actions-btn:hover { background: var(--bg-light); color: var(--navy); }
+
+    .row-actions-menu {
+      position: fixed;
+      min-width: 190px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(15,23,41,0.15);
+      padding: 6px;
+      z-index: 950;
+      display: none;
+      animation: menuIn 0.15s ease;
+    }
+    .row-actions-menu.open { display: block; }
+    @keyframes menuIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .row-actions-menu button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      background: none;
+      border-radius: 8px;
+      color: var(--navy);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
+    }
+    .row-actions-menu button:hover { background: var(--bg-light); }
+    .row-actions-menu button i {
+      width: 16px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .row-actions-menu button:hover i { color: var(--navy); }
+    .row-actions-menu button.danger { color: var(--red); }
+    .row-actions-menu button.danger i { color: var(--red); }
+    .row-actions-menu button.danger:hover { background: #fef2f2; }
+    .row-actions-menu button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ============================================================
+       MOBILE DROPDOWN STYLES (New Addition)
+       ============================================================ */
+    .mobile-dropdown-wrap {
+      display: none; /* Hidden on desktop */
+      position: relative;
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .mobile-dropdown-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(31,58,110,0.04);
+      transition: border-color 0.2s;
+    }
+    .mobile-dropdown-trigger:active {
+      border-color: var(--navy);
+    }
+    .mobile-dropdown-trigger i.fa-chevron-down {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .mobile-dropdown-wrap.open .mobile-dropdown-trigger i.fa-chevron-down {
+      transform: rotate(180deg);
+    }
+
+    .mobile-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(15,23,41,0.15);
+      z-index: 100;
+      display: none;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 6px;
+      animation: menuIn 0.2s ease;
+    }
+    .mobile-dropdown-wrap.open .mobile-dropdown-menu {
+      display: block;
+    }
+
+    .mobile-dropdown-menu button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
+      background: none;
+      border-radius: 8px;
+      color: var(--navy);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
+    }
+    .mobile-dropdown-menu button:hover,
+    .mobile-dropdown-menu button:active {
+      background: var(--bg-light);
+    }
+    .mobile-dropdown-menu button.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+    }
+    .mobile-dropdown-menu button.active i {
+      color: #fff;
+    }
+    .mobile-dropdown-menu button i {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .mobile-dropdown-menu button .chip-count {
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: var(--bg-light);
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .mobile-dropdown-menu button.active .chip-count {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .period-bar .pb-range { margin-left: 0; width: 100%; }
+    }
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      
+      /* Hide desktop period bar and chip row on mobile */
+      .period-bar .period-btn,
+      .period-bar .pb-label {
+        display: none;
+      }
+      .period-bar {
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        background: transparent;
+        margin-bottom: 12px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .period-bar .pb-range {
+        margin-left: 0;
+        width: 100%;
+        padding: 8px 0;
+        justify-content: center;
+      }
+      
+      .chip-row {
+        display: none; /* Hidden on mobile, replaced by dropdown */
+      }
+
+      /* Show mobile dropdowns */
+      .mobile-dropdown-wrap {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+ <div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    // Hide on DOMContentLoaded; fall back to load + 2s
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+
+ 
+  <!-- ACCESS DENIED -->
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">Your account does not have administrator privileges.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <div class="page-title-row">
+          <div>
+            <h1><i class="fas fa-file-invoice"></i> Invoices</h1>
+            <p>Manage customer invoices, record payments, and track outstanding balances</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="refreshBtn" onclick="loadInvoices(true)">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-add" onclick="newInvoice()">
+              <i class="fas fa-plus"></i> New Invoice
+            </button>
+          </div>
+        </div>
+
+        <!-- Period selector (Desktop) -->
+        <div class="period-bar">
+          <div class="pb-label"><i class="fas fa-calendar-alt"></i> Period</div>
+          <button class="period-btn" data-period="today">Today</button>
+          <button class="period-btn" data-period="week">This Week</button>
+          <button class="period-btn active" data-period="month">This Month</button>
+          <button class="period-btn" data-period="year">This Year</button>
+          <button class="period-btn" data-period="all">All Time</button>
+          <div class="pb-range">
+            Showing: <strong id="periodRangeLabel">—</strong>
+          </div>
+        </div>
+
+        <!-- Period selector (Mobile Dropdown) -->
+        <div class="mobile-dropdown-wrap" id="mobilePeriodDropdown">
+          <button class="mobile-dropdown-trigger" onclick="toggleMobileDropdown('mobilePeriodDropdown')">
+            <span><i class="fas fa-calendar-alt" style="margin-right:8px; color:var(--orange);"></i> Period: <span id="mobilePeriodLabel">This Month</span></span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="mobile-dropdown-menu">
+            <button data-period="today" onclick="selectMobilePeriod('today')">Today <i class="fas fa-check" style="opacity:0;"></i></button>
+            <button data-period="week" onclick="selectMobilePeriod('week')">This Week <i class="fas fa-check" style="opacity:0;"></i></button>
+            <button data-period="month" class="active" onclick="selectMobilePeriod('month')">This Month <i class="fas fa-check"></i></button>
+            <button data-period="year" onclick="selectMobilePeriod('year')">This Year <i class="fas fa-check" style="opacity:0;"></i></button>
+            <button data-period="all" onclick="selectMobilePeriod('all')">All Time <i class="fas fa-check" style="opacity:0;"></i></button>
+          </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="summary-grid">
+          <div class="summary-card sc-open">
+            <div class="sc-label"><i class="fas fa-folder-open"></i> Open</div>
+            <div class="sc-value" id="sumOpen">—</div>
+            <div class="sc-sub" id="sumOpenSub">—</div>
+          </div>
+          <div class="summary-card sc-outstanding">
+            <div class="sc-label"><i class="fas fa-hourglass-half"></i> Outstanding</div>
+            <div class="sc-value" id="sumOutstanding">—</div>
+            <div class="sc-sub" id="sumOutstandingSub">—</div>
+          </div>
+          <div class="summary-card sc-overdue">
+            <div class="sc-label"><i class="fas fa-exclamation-triangle"></i> Overdue</div>
+            <div class="sc-value" id="sumOverdue">—</div>
+            <div class="sc-sub" id="sumOverdueSub">—</div>
+          </div>
+          <div class="summary-card sc-paid">
+            <div class="sc-label"><i class="fas fa-check-circle"></i> <span id="sumPaidTitle">Paid this month</span></div>
+            <div class="sc-value" id="sumPaidMonth">—</div>
+            <div class="sc-sub" id="sumPaidMonthSub">—</div>
+          </div>
+        </div>
+
+        <!-- Filter chips (Desktop) -->
+        <div class="chip-row" id="chipRow">
+          <div class="chip active" data-filter="all">
+            <i class="fas fa-layer-group"></i> All <span class="chip-count" id="cntAll">0</span>
+          </div>
+          <div class="chip" data-filter="draft">
+            <i class="fas fa-pen"></i> Draft <span class="chip-count" id="cntDraft">0</span>
+          </div>
+          <div class="chip" data-filter="issued">
+            <i class="fas fa-paper-plane"></i> Issued <span class="chip-count" id="cntIssued">0</span>
+          </div>
+          <div class="chip" data-filter="partial">
+            <i class="fas fa-hourglass-half"></i> Partial <span class="chip-count" id="cntPartial">0</span>
+          </div>
+          <div class="chip" data-filter="paid">
+            <i class="fas fa-check-circle"></i> Paid <span class="chip-count" id="cntPaid">0</span>
+          </div>
+          <div class="chip" data-filter="overdue">
+            <i class="fas fa-exclamation-triangle"></i> Overdue <span class="chip-count" id="cntOverdue">0</span>
+          </div>
+          <div class="chip" data-filter="void">
+            <i class="fas fa-ban"></i> Void <span class="chip-count" id="cntVoid">0</span>
+          </div>
+        </div>
+
+        <!-- Filter chips (Mobile Dropdown) -->
+        <div class="mobile-dropdown-wrap" id="mobileCategoryDropdown">
+          <button class="mobile-dropdown-trigger" onclick="toggleMobileDropdown('mobileCategoryDropdown')">
+            <span><i class="fas fa-layer-group" style="margin-right:8px; color:var(--orange);"></i> Category: <span id="mobileCategoryLabel">All</span></span>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="mobile-dropdown-menu">
+            <button data-filter="all" class="active" onclick="selectMobileCategory('all')">
+              <span><i class="fas fa-layer-group" style="margin-right:8px;"></i> All</span>
+              <span class="chip-count" id="mCntAll">0</span>
+            </button>
+            <button data-filter="draft" onclick="selectMobileCategory('draft')">
+              <span><i class="fas fa-pen" style="margin-right:8px;"></i> Draft</span>
+              <span class="chip-count" id="mCntDraft">0</span>
+            </button>
+            <button data-filter="issued" onclick="selectMobileCategory('issued')">
+              <span><i class="fas fa-paper-plane" style="margin-right:8px;"></i> Issued</span>
+              <span class="chip-count" id="mCntIssued">0</span>
+            </button>
+            <button data-filter="partial" onclick="selectMobileCategory('partial')">
+              <span><i class="fas fa-hourglass-half" style="margin-right:8px;"></i> Partial</span>
+              <span class="chip-count" id="mCntPartial">0</span>
+            </button>
+            <button data-filter="paid" onclick="selectMobileCategory('paid')">
+              <span><i class="fas fa-check-circle" style="margin-right:8px;"></i> Paid</span>
+              <span class="chip-count" id="mCntPaid">0</span>
+            </button>
+            <button data-filter="overdue" onclick="selectMobileCategory('overdue')">
+              <span><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i> Overdue</span>
+              <span class="chip-count" id="mCntOverdue">0</span>
+            </button>
+            <button data-filter="void" onclick="selectMobileCategory('void')">
+              <span><i class="fas fa-ban" style="margin-right:8px;"></i> Void</span>
+              <span class="chip-count" id="mCntVoid">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search invoice #, customer name, phone, reference...">
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="data-card">
+          <div id="invoicesContent">
+            <div class="loading-skeleton">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <p>Loading invoices...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- VOID CONFIRM MODAL -->
+  <div class="confirm-overlay" id="voidOverlay">
+    <div class="confirm-modal">
+      <div class="confirm-icon"><i class="fas fa-ban"></i></div>
+      <h3>Void this invoice?</h3>
+      <p>Are you sure you want to void <strong id="voidInvNum">this invoice</strong>? Voided invoices are kept for audit but excluded from reports.</p>
+      <div style="margin-bottom:18px;">
+        <label style="display:block;font-size:0.78rem;font-weight:700;color:var(--navy);text-align:left;margin-bottom:6px;">
+          Reason (optional)
+        </label>
+        <input type="text" id="voidReason" placeholder="e.g. Customer cancelled order"
+               style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:0.9rem;outline:none;">
+      </div>
+      <div class="confirm-actions">
+        <button class="btn-danger" onclick="confirmVoid()">
+          <i class="fas fa-ban"></i> Yes, Void Invoice
+        </button>
+        <button class="btn-secondary" onclick="cancelVoid()" style="justify-content:center;">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let allInvoices = [];         // from invoice_summary
+    let allPayments = [];         // from payments (id, invoice_id, amount, paid_at)
+    let filteredInvoices = [];
+    let activeFilter = 'all';
+    let activePeriod = 'month';
+    let voidingId = null;
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const fmtDate = iso => {
+      if (!iso) return '—';
+      try {
+        return new Date(iso + 'T00:00:00').toLocaleDateString('en-KE', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        });
+      } catch { return iso; }
+    };
+
+    /* ============================================================
+       PERIOD HELPERS
+       ============================================================ */
+    function getPeriodRange(period) {
+      const now = new Date();
+      const start = new Date(now);
+      const end = new Date(now);
+      end.setHours(23, 59, 59, 999);
+
+      switch (period) {
+        case 'today':
+          start.setHours(0, 0, 0, 0);
+          return { start, end, label: now.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' }) };
+
+        case 'week': {
+          // Monday to Sunday
+          const day = now.getDay();               // 0 Sun .. 6 Sat
+          const diff = (day === 0 ? -6 : 1 - day); // shift to Monday
+          start.setDate(now.getDate() + diff);
+          start.setHours(0, 0, 0, 0);
+          const endOfWeek = new Date(start);
+          endOfWeek.setDate(start.getDate() + 6);
+          endOfWeek.setHours(23, 59, 59, 999);
+          return {
+            start,
+            end: endOfWeek,
+            label: `${start.toLocaleDateString('en-KE',{day:'2-digit',month:'short'})} – ${endOfWeek.toLocaleDateString('en-KE',{day:'2-digit',month:'short',year:'numeric'})}`
+          };
+        }
+
+        case 'month':
+          start.setDate(1);
+          start.setHours(0, 0, 0, 0);
+          return {
+            start,
+            end,
+            label: now.toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })
+          };
+
+        case 'year':
+          start.setMonth(0, 1);
+          start.setHours(0, 0, 0, 0);
+          return { start, end, label: String(now.getFullYear()) };
+
+        case 'all':
+        default:
+          return { start: null, end: null, label: 'All time' };
+      }
+    }
+
+    function toISODate(d) {
+      if (!d) return null;
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function isDateInPeriod(dateStr, start, end) {
+      if (!start || !end) return true;   // All time
+      if (!dateStr) return false;
+      const d = new Date(String(dateStr).slice(0, 10) + 'T00:00:00');
+      return d >= start && d <= end;
+    }
+
+    function isDateTimeInPeriod(isoStr, start, end) {
+      if (!start || !end) return true;   // All time
+      if (!isoStr) return false;
+      const d = new Date(isoStr);
+      return d >= start && d <= end;
+    }
+
+    function periodTitle(period) {
+      return {
+        today: 'Paid today',
+        week: 'Paid this week',
+        month: 'Paid this month',
+        year: 'Paid this year',
+        all: 'Paid all time'
+      }[period] || 'Paid';
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+  
+
+    /* ============================================================
+       MOBILE DROPDOWNS (New Addition)
+       ============================================================ */
+    function toggleMobileDropdown(id) {
+      const el = document.getElementById(id);
+      // Close others
+      document.querySelectorAll('.mobile-dropdown-wrap').forEach(wrap => {
+        if (wrap.id !== id) wrap.classList.remove('open');
+      });
+      el.classList.toggle('open');
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.mobile-dropdown-wrap')) {
+        document.querySelectorAll('.mobile-dropdown-wrap').forEach(wrap => {
+          wrap.classList.remove('open');
+        });
+      }
+    });
+
+    function selectMobilePeriod(period) {
+      // Update active state in dropdown
+      document.querySelectorAll('#mobilePeriodDropdown .mobile-dropdown-menu button').forEach(btn => {
+        const isActive = btn.dataset.period === period;
+        btn.classList.toggle('active', isActive);
+        const checkIcon = btn.querySelector('.fa-check');
+        if (checkIcon) checkIcon.style.opacity = isActive ? '1' : '0';
+      });
+
+      // Update label
+      const labels = { today: 'Today', week: 'This Week', month: 'This Month', year: 'This Year', all: 'All Time' };
+      document.getElementById('mobilePeriodLabel').textContent = labels[period] || period;
+
+      // Close dropdown
+      document.getElementById('mobilePeriodDropdown').classList.remove('open');
+
+      // Trigger the same logic as desktop
+      activePeriod = period;
+      updateSummary();
+      applyFilters();
+
+      // Also update the desktop period buttons so state stays in sync
+      document.querySelectorAll('.period-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.period === period);
+      });
+    }
+
+    function selectMobileCategory(filter) {
+      // Update active state in dropdown
+      document.querySelectorAll('#mobileCategoryDropdown .mobile-dropdown-menu button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+
+      // Update label
+      const labels = { all: 'All', draft: 'Draft', issued: 'Issued', partial: 'Partial', paid: 'Paid', overdue: 'Overdue', void: 'Void' };
+      document.getElementById('mobileCategoryLabel').textContent = labels[filter] || filter;
+
+      // Close dropdown
+      document.getElementById('mobileCategoryDropdown').classList.remove('open');
+
+      // Trigger the same logic as desktop
+      activeFilter = filter;
+      applyFilters();
+
+      // Also update the desktop chips so state stays in sync
+      document.querySelectorAll('#chipRow .chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.filter === filter);
+      });
+    }
+
+       /* ============================================================
+       AUTH — delegated to shared admin-sidebar.js
+       ============================================================ */
+    async function checkAdminAccess() {
+      return await window.adminAuthCheck(['admin', 'sales']);
+    }
+
+    function showAccessDenied(msg) {
+      document.getElementById('adminMain').style.display = 'none';
+      document.getElementById('accessDenied').style.display = 'flex';
+      if (msg) document.getElementById('accessDeniedMsg').textContent = msg;
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../index.html';
+    }
+
+    /* ============================================================
+       LOAD INVOICES + PAYMENTS
+       ============================================================ */
+    async function loadInvoices(showSpinner = false) {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (showSpinner) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
+
+      try {
+        const [invRes, payRes] = await Promise.all([
+          supabaseClient
+            .from('invoice_summary')
+            .select('*')
+            .order('created_at', { ascending: false }),
+          supabaseClient
+            .from('payments')
+            .select('id, invoice_id, amount, paid_at')
+        ]);
+
+        if (invRes.error) throw invRes.error;
+        if (payRes.error) throw payRes.error;
+
+        allInvoices = invRes.data || [];
+        allPayments = payRes.data || [];
+
+        updateSummary();
+        updateChipCounts();
+        applyFilters();
+      } catch (err) {
+        console.error('Load invoices failed:', err);
+        document.getElementById('invoicesContent').innerHTML = `
+          <div class="empty-state">
+            <div class="icon"><i class="fas fa-exclamation-triangle" style="color:var(--red);"></i></div>
+            <h3>Could not load invoices</h3>
+            <p>${escapeHtml(err.message || 'Please refresh the page.')}</p>
+          </div>`;
+        showToast('Failed to load invoices', 'error');
+      } finally {
+        if (showSpinner) {
+          setTimeout(() => { refreshBtn.classList.remove('spinning'); refreshBtn.disabled = false; }, 400);
+        }
+      }
+    }
+
+    /* ============================================================
+       PERIOD SELECTOR (Desktop)
+       ============================================================ */
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activePeriod = btn.dataset.period;
+        
+        // Sync mobile label
+        const labels = { today: 'Today', week: 'This Week', month: 'This Month', year: 'This Year', all: 'All Time' };
+        document.getElementById('mobilePeriodLabel').textContent = labels[activePeriod] || activePeriod;
+        
+        updateSummary();
+        applyFilters();
+      });
+    });
+
+    /* ============================================================
+       SUMMARY CARDS (period-aware)
+       ============================================================ */
+    function updateSummary() {
+      const { start, end, label } = getPeriodRange(activePeriod);
+      document.getElementById('periodRangeLabel').textContent = label;
+      document.getElementById('sumPaidTitle').textContent = periodTitle(activePeriod);
+
+      // ---- INVOICES issued in the period (by issue_date)
+      const invoicesInPeriod = allInvoices.filter(inv =>
+        isDateInPeriod(inv.issue_date, start, end)
+      );
+
+      // ---- OPEN: draft + issued + partial issued in the period
+      const openInPeriod = invoicesInPeriod.filter(i =>
+        ['draft', 'issued', 'partial'].includes(i.status)
+      );
+
+      // ---- OUTSTANDING: unpaid balance of issued + partial invoices issued in the period
+      const outstandingList = invoicesInPeriod.filter(i =>
+        ['issued', 'partial'].includes(i.status)
+      );
+      const outstanding = outstandingList.reduce((s, i) => s + Number(i.balance || 0), 0);
+
+      // ---- OVERDUE: overdue invoices that are within the period (by issue date).
+      const overdueList = allInvoices.filter(i => i.is_overdue);
+      const overdue = overdueList.reduce((s, i) => s + Number(i.balance || 0), 0);
+
+      // ---- PAID in the period: sum of *actual payments* whose paid_at is within the period.
+      const paidTotal = allPayments
+        .filter(p => isDateTimeInPeriod(p.paid_at, start, end))
+        .reduce((s, p) => s + Number(p.amount || 0), 0);
+
+      const paidCount = allPayments.filter(p =>
+        isDateTimeInPeriod(p.paid_at, start, end)
+      ).length;
+
+      // ---- Update the DOM
+      document.getElementById('sumOpen').textContent = openInPeriod.length;
+      document.getElementById('sumOpenSub').textContent =
+        `${openInPeriod.filter(i => i.status==='draft').length} draft · ` +
+        `${openInPeriod.filter(i => i.status==='issued').length} issued · ` +
+        `${openInPeriod.filter(i => i.status==='partial').length} partial`;
+
+      document.getElementById('sumOutstanding').textContent = fmtKES(outstanding);
+      document.getElementById('sumOutstandingSub').textContent =
+        `${outstandingList.length} invoice${outstandingList.length !== 1 ? 's' : ''}`;
+
+      document.getElementById('sumOverdue').textContent = fmtKES(overdue);
+      document.getElementById('sumOverdueSub').textContent =
+        overdueList.length ? `${overdueList.length} overdue` : 'nothing overdue';
+
+      document.getElementById('sumPaidMonth').textContent = fmtKES(paidTotal);
+      document.getElementById('sumPaidMonthSub').textContent =
+        paidCount > 0
+          ? `${paidCount} payment${paidCount !== 1 ? 's' : ''} · ${label}`
+          : `no payments · ${label}`;
+    }
+
+    function updateChipCounts() {
+      // Chips reflect the *period* too — so when you pick "Today", "Paid 1" means
+      // 1 invoice issued today whose status is paid.
+      const { start, end } = getPeriodRange(activePeriod);
+      const inPeriod = allInvoices.filter(inv => isDateInPeriod(inv.issue_date, start, end));
+
+      const c = {
+        all: inPeriod.length,
+        draft: inPeriod.filter(i => i.status === 'draft').length,
+        issued: inPeriod.filter(i => i.status === 'issued').length,
+        partial: inPeriod.filter(i => i.status === 'partial').length,
+        paid: inPeriod.filter(i => i.status === 'paid').length,
+        overdue: inPeriod.filter(i => i.is_overdue).length,
+        void: inPeriod.filter(i => i.status === 'void').length
+      };
+      document.getElementById('cntAll').textContent = c.all;
+      document.getElementById('cntDraft').textContent = c.draft;
+      document.getElementById('cntIssued').textContent = c.issued;
+      document.getElementById('cntPartial').textContent = c.partial;
+      document.getElementById('cntPaid').textContent = c.paid;
+      document.getElementById('cntOverdue').textContent = c.overdue;
+      document.getElementById('cntVoid').textContent = c.void;
+
+      // Update mobile counts
+      document.getElementById('mCntAll').textContent = c.all;
+      document.getElementById('mCntDraft').textContent = c.draft;
+      document.getElementById('mCntIssued').textContent = c.issued;
+      document.getElementById('mCntPartial').textContent = c.partial;
+      document.getElementById('mCntPaid').textContent = c.paid;
+      document.getElementById('mCntOverdue').textContent = c.overdue;
+      document.getElementById('mCntVoid').textContent = c.void;
+    }
+
+    /* ============================================================
+       CHIPS (Desktop)
+       ============================================================ */
+    document.getElementById('chipRow').addEventListener('click', e => {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      document.querySelectorAll('#chipRow .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      
+      // Sync mobile label
+      const labels = { all: 'All', draft: 'Draft', issued: 'Issued', partial: 'Partial', paid: 'Paid', overdue: 'Overdue', void: 'Void' };
+      document.getElementById('mobileCategoryLabel').textContent = labels[activeFilter] || activeFilter;
+
+      applyFilters();
+    });
+
+    /* ============================================================
+       FILTERS
+       ============================================================ */
+    function applyFilters() {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const { start, end } = getPeriodRange(activePeriod);
+
+      filteredInvoices = allInvoices.filter(inv => {
+        // Period filter — applied to issue_date
+        if (!isDateInPeriod(inv.issue_date, start, end)) return false;
+
+        // Status filter
+        if (activeFilter === 'overdue') {
+          if (!inv.is_overdue) return false;
+        } else if (activeFilter !== 'all') {
+          if (inv.status !== activeFilter) return false;
+        }
+
+        // Search
+        if (q) {
+          const hay = [
+            inv.invoice_number,
+            inv.customer_name,
+            inv.customer_phone,
+            inv.customer_email,
+            inv.reference
+          ].filter(Boolean).join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+
+        return true;
+      });
+
+      renderInvoices();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
+    function statusBadge(inv) {
+      if (inv.is_overdue) {
+        return `<span class="badge badge-overdue"><i class="fas fa-exclamation-triangle"></i> Overdue</span>`;
+      }
+      const map = {
+        draft:   { cls: 'badge-draft',   icon: 'fa-pen',            label: 'Draft'   },
+        issued:  { cls: 'badge-issued',  icon: 'fa-paper-plane',    label: 'Issued'  },
+        partial: { cls: 'badge-partial', icon: 'fa-hourglass-half', label: 'Partial' },
+        paid:    { cls: 'badge-paid',    icon: 'fa-check-circle',   label: 'Paid'    },
+        void:    { cls: 'badge-void',    icon: 'fa-ban',            label: 'Void'    }
+      };
+      const s = map[inv.status] || map.draft;
+      return `<span class="badge ${s.cls}"><i class="fas ${s.icon}"></i> ${s.label}</span>`;
+    }
+
+    function renderInvoices() {
+      const wrap = document.getElementById('invoicesContent');
+
+      if (filteredInvoices.length === 0) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <div class="icon"><i class="fas fa-file-invoice"></i></div>
+            <h3>No invoices match</h3>
+            <p>Try changing the period, status filter, or search term.</p>
+          </div>`;
+        return;
+      }
+
+      const rows = filteredInvoices.map(inv => {
+        const balance = Number(inv.balance || 0);
+        const isVoid = inv.status === 'void';
+
+        return `
+          <tr data-invoice-id="${escapeHtml(inv.id)}" onclick="viewInvoice('${escapeHtml(inv.id)}', event)">
+            <td><span class="invoice-num">${escapeHtml(inv.invoice_number || 'DRAFT')}</span></td>
+            <td>
+              <div class="customer-cell">
+                <strong>${escapeHtml(inv.customer_name)}</strong>
+                <small>${escapeHtml(inv.customer_phone || inv.customer_email || '—')}</small>
+              </div>
+            </td>
+            <td class="date-cell">${fmtDate(inv.issue_date)}</td>
+            <td class="date-cell">${fmtDate(inv.due_date)}</td>
+            <td class="amount-cell ${isVoid ? 'muted' : ''}">${fmtKES(inv.total)}</td>
+            <td class="amount-cell ${isVoid ? 'muted' : ''}">${fmtKES(inv.amount_paid)}</td>
+            <td class="balance-cell ${balance === 0 || isVoid ? 'zero' : ''}">${fmtKES(balance)}</td>
+            <td>${statusBadge(inv)}</td>
+            <td style="text-align:right;">
+              <div class="row-actions-wrap" onclick="event.stopPropagation();">
+                <button class="row-actions-btn" onclick="openRowMenu(event, '${escapeHtml(inv.id)}')">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      wrap.innerHTML = `
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Customer</th>
+                <th>Issued</th>
+                <th>Due</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    /* ============================================================
+       ROW ACTIONS MENU
+       ============================================================ */
+    let menuEl = null;
+
+    function closeRowMenu() {
+      if (menuEl) { menuEl.remove(); menuEl = null; }
+      document.removeEventListener('click', closeRowMenu);
+      window.removeEventListener('scroll', closeRowMenu, true);
+      window.removeEventListener('resize', closeRowMenu);
+    }
+
+    function openRowMenu(e, invoiceId) {
+      e.stopPropagation();
+      closeRowMenu();
+
+      const inv = allInvoices.find(i => i.id === invoiceId);
+      if (!inv) return;
+
+      const isVoid = inv.status === 'void';
+      const isDraft = inv.status === 'draft';
+
+      const menu = document.createElement('div');
+      menu.className = 'row-actions-menu open';
+      menu.innerHTML = `
+        <button onclick="viewInvoice('${escapeHtml(inv.id)}')">
+          <i class="fas fa-eye"></i> View Invoice
+        </button>
+        <button onclick="editInvoice('${escapeHtml(inv.id)}')" ${isVoid ? 'disabled' : ''}>
+          <i class="fas fa-pen"></i> Edit
+        </button>
+        <button onclick="printInvoice('${escapeHtml(inv.id)}')" ${isDraft ? 'disabled' : ''}>
+          <i class="fas fa-print"></i> Print / PDF
+        </button>
+        <button onclick="copyInvoiceLink('${escapeHtml(inv.id)}')" ${isVoid ? 'disabled' : ''}>
+          <i class="fas fa-link"></i> Copy Public Link
+        </button>
+        <button class="danger" onclick="askVoid('${escapeHtml(inv.id)}')" ${isVoid || isDraft ? 'disabled' : ''}>
+          <i class="fas fa-ban"></i> Void
+        </button>
+      `;
+
+      document.body.appendChild(menu);
+      menuEl = menu;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const mw = menu.offsetWidth;
+      const mh = menu.offsetHeight;
+      let left = rect.right - mw;
+      let top = rect.bottom + 6;
+      if (left < 8) left = 8;
+      if (top + mh > window.innerHeight - 8) top = rect.top - mh - 6;
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+
+      setTimeout(() => {
+        document.addEventListener('click', closeRowMenu);
+        window.addEventListener('scroll', closeRowMenu, true);
+        window.addEventListener('resize', closeRowMenu);
+      }, 0);
+    }
+
+    /* ============================================================
+       ACTIONS
+       ============================================================ */
+    function newInvoice() {
+      window.location.href = 'invoice-edit.html';
+    }
+
+    function viewInvoice(id, e) {
+      if (e) e.stopPropagation();
+      closeRowMenu();
+      window.location.href = 'invoice-view.html?id=' + encodeURIComponent(id);
+    }
+
+    function editInvoice(id) {
+      closeRowMenu();
+      window.location.href = 'invoice-edit.html?id=' + encodeURIComponent(id);
+    }
+
+    function printInvoice(id) {
+      closeRowMenu();
+      window.open('invoice-print.html?id=' + encodeURIComponent(id), '_blank');
+    }
+
+    /* ============================================================
+       VOID FLOW
+       ============================================================ */
+    function askVoid(id) {
+      closeRowMenu();
+      const inv = allInvoices.find(i => i.id === id);
+      if (!inv) return;
+      voidingId = id;
+      document.getElementById('voidInvNum').textContent = inv.invoice_number || 'this invoice';
+      document.getElementById('voidReason').value = '';
+      document.getElementById('voidOverlay').classList.add('open');
+    }
+
+    function cancelVoid() {
+      voidingId = null;
+      document.getElementById('voidOverlay').classList.remove('open');
+    }
+
+    async function confirmVoid() {
+      if (!voidingId) return;
+      const btn = document.querySelector('#voidOverlay .btn-danger');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Voiding...';
+
+      const reason = (document.getElementById('voidReason').value || '').trim() || null;
+
+      try {
+        const { error } = await supabaseClient
+          .from('invoices')
+          .update({ status: 'void', voided_reason: reason })
+          .eq('id', voidingId);
+        if (error) throw error;
+
+        showToast('Invoice voided');
+        cancelVoid();
+        await loadInvoices();
+      } catch (err) {
+        console.error('Void failed:', err);
+        showToast('Could not void: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    }
+
+    document.getElementById('voidOverlay').addEventListener('click', e => {
+      if (e.target.id === 'voidOverlay') cancelVoid();
+    });
+       document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        cancelVoid();
+        closeRowMenu();
+        adminCloseSidebar();
+      }
+    });
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+      await loadInvoices();
+    })();
+  </script>
+<script src="pwa.js"></script>
+</body>
+</html>

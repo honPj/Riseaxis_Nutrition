@@ -1748,14 +1748,15 @@
 
         if (error) throw error;
 
-        let redirect = 'account.html';
+              let redirect = 'account.html';
         try {
           const { data: profile } = await supabaseClient
             .from('profiles')
             .select('role')
             .eq('id', data.user.id)
             .single();
-          if (profile && profile.role === 'admin') {
+          const role = profile?.role;
+          if (role === 'admin' || role === 'sales') {
             redirect = '../admin/orders.html';
           }
         } catch (_) {}
@@ -1783,7 +1784,7 @@
        AUTO-REDIRECT IF ALREADY LOGGED IN
        ============================================================ */
     (async function init() {
-      try {
+          try {
         const { data: { user } } = await supabaseClient.auth.getUser();
         if (user) {
           let redirect = 'account.html';
@@ -1793,7 +1794,10 @@
               .select('role')
               .eq('id', user.id)
               .single();
-            if (profile && profile.role === 'admin') redirect = '../admin/orders.html';
+            const role = profile?.role;
+            if (role === 'admin' || role === 'sales') {
+              redirect = '../admin/orders.html';
+            }
           } catch (_) {}
           window.location.href = redirect;
         }

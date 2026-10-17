@@ -1,0 +1,57 @@
+/* ============================================================
+   RISE AXIS — PWA SPLASH SCREEN
+   Shows a branded overlay on cold start, disappears on load.
+   ============================================================ */
+
+#raxSplash {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #1D3B73, #0f2557);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}
+
+#raxSplash.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#raxSplash .splash-logo {
+  font-weight: 900;
+  font-size: 2.2rem;
+  letter-spacing: 0.5px;
+  display: flex;
+  gap: 3px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+#raxSplash .splash-logo .rise { color: #fff; }
+#raxSplash .splash-logo .axis { color: #17B052; }
+
+#raxSplash .splash-sub {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+#raxSplash .splash-spinner {
+  margin-top: 32px;
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255,255,255,0.25);
+  border-top-color: #17B052;
+  border-radius: 50%;
+  animation: splashSpin 0.7s linear infinite;
+}
+
+@keyframes splashSpin {
+  to { transform: rotate(360deg); }
+}

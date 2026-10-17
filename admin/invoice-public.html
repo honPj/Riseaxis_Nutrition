@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Invoice | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --navy:      #1D3B73;
+      --navy-deep: #0f2557;
+      --green:     #17B052;
+      --text-dark: #0f1729;
+      --text-muted:#4a5568;
+      --border:    #d1d8e0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: #e2e8f0;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      color: var(--text-dark);
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---------- Screen-only top bar ---------- */
+    .pub-topbar {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(15,23,41,0.04);
+      flex-wrap: wrap;
+    }
+    .pub-topbar .pub-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--navy);
+    }
+    .pub-topbar .pub-brand .logo-mark {
+      font-weight: 900;
+      font-size: 1.05rem;
+      letter-spacing: 0.5px;
+    }
+    .pub-topbar .pub-brand .rise { color: var(--navy); }
+    .pub-topbar .pub-brand .axis { color: #E85D26; }
+    .pub-topbar .pub-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pub-topbar button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--navy);
+    }
+    .pub-topbar button:hover { border-color: var(--navy); background: #f7fafd; }
+    .pub-topbar button.primary {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(29,59,115,0.25);
+    }
+    .pub-topbar button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(29,59,115,0.4);
+    }
+
+    /* ---------- The A4 page ---------- */
+    .page-wrap {
+      padding: 26px 20px 60px;
+      display: flex;
+      justify-content: center;
+    }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      padding: 16mm 14mm;
+      box-shadow: 0 10px 40px rgba(15,23,41,0.15);
+      position: relative;
+    }
+
+    /* ---------- Header ---------- */
+    .inv-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 30px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--navy);
+      margin-bottom: 22px;
+    }
+    .biz-block .biz-logo {
+      max-height: 60px;
+      max-width: 200px;
+      object-fit: contain;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .biz-block .biz-name {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.3px;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .biz-block .biz-line {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+    .biz-block .biz-line strong { color: var(--navy); font-weight: 700; }
+
+    .inv-header-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .inv-header-right .inv-title {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: 4px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .inv-header-right .inv-num {
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    .inv-header-right .inv-meta-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      font-size: 0.82rem;
+      padding: 3px 0;
+    }
+    .inv-header-right .inv-meta-row .k { color: var(--text-muted); font-weight: 600; }
+    .inv-header-right .inv-meta-row .v { color: var(--navy); font-weight: 700; }
+    .inv-header-right .status-pill {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 3px 12px;
+      border-radius: 30px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      background: #e8eef8;
+      color: var(--navy);
+    }
+    .inv-header-right .status-pill.paid { background: #D1FAE5; color: #065F46; }
+    .inv-header-right .status-pill.void { background: #e5e7eb; color: #374151; text-decoration: line-through; }
+    .inv-header-right .status-pill.overdue { background: #e8eef8; color: var(--navy); }
+
+    /* ---------- Billed to + payment status ---------- */
+    .inv-mid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 30px;
+      margin-bottom: 22px;
+      align-items: start;
+    }
+    .billed-to .label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      margin-bottom: 6px;
+    }
+    .billed-to .cust-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .billed-to .cust-line {
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    .pay-status-box {
+      background: #f7fafd;
+      border: 1px solid #dbe5f0;
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+    .pay-status-box .psb-label {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .pay-status-box .psb-balance {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+    .pay-status-box .psb-balance.zero { color: var(--green); }
+    .pay-status-box .psb-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      padding: 3px 0;
+    }
+    .pay-status-box .psb-row .k { color: var(--text-muted); font-weight: 600; }
+    .pay-status-box .psb-row .v { color: var(--navy); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    /* ---------- Line items table ---------- */
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      border: 1px solid #c8d2e0;
+    }
+    .items-table thead th {
+      background: var(--navy);
+      color: #fff;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border: 1px solid #c8d2e0;
+    }
+    .items-table thead th.num { text-align: right; }
+    .items-table tbody td {
+      padding: 10px 12px;
+      border: 1px solid #d1d8e0;
+      vertical-align: top;
+    }
+    .items-table tbody td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .items-table tbody td.line-total {
+      text-align: right;
+      font-weight: 800;
+      color: var(--navy);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .items-table tbody tr:nth-child(even) { background: #fafbfd; }
+    .items-table tbody tr:last-child td { border-bottom: 1px solid #c8d2e0; }
+    .desc-cell strong {
+      display: block;
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.87rem;
+    }
+    .desc-cell small {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    /* ---------- Bottom ---------- */
+    .inv-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: start;
+      margin-bottom: 22px;
+    }
+    .pay-instructions h4 {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+    .pay-instructions .pi-block {
+      background: #f7fafd;
+      border: 1px solid #dbe5f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .pay-instructions .pi-block strong {
+      color: var(--navy);
+      font-weight: 800;
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.72rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    .pay-instructions .pi-block .mono-line {
+      font-family: 'Courier New', monospace;
+      color: var(--navy);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .totals-block .trow {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 0.87rem;
+    }
+    .totals-block .trow .k { color: var(--text-muted); font-weight: 600; }
+    .totals-block .trow .v { color: var(--navy); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .totals-block .grand {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 2px solid var(--navy);
+      margin-top: 8px;
+      padding-top: 12px;
+    }
+    .totals-block .grand .k {
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .totals-block .grand .v {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .totals-block .paid-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 0.87rem;
+      border-top: 1px dashed #e2e8f0;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+    .totals-block .paid-line .k { color: var(--green); font-weight: 700; }
+    .totals-block .paid-line .v { color: var(--green); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .totals-block .balance-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0 0;
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+    .totals-block .balance-line.due .v { color: var(--navy); font-size: 1.05rem; }
+    .totals-block .balance-line.cleared .k,
+    .totals-block .balance-line.cleared .v { color: var(--green); }
+
+    .notes-block {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+    .notes-block h4 {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 6px;
+      margin-top: 12px;
+    }
+    .notes-block h4:first-child { margin-top: 0; }
+
+    .pay-history-block {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+    }
+    .pay-history-block h4 {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+    .pay-history-block table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      border: 1px solid #c8d2e0;
+    }
+    .pay-history-block th {
+      text-align: left;
+      background: #f0f4fa;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 0.65rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 8px 10px;
+      border: 1px solid #c8d2e0;
+    }
+    .pay-history-block th.num { text-align: right; }
+    .pay-history-block td {
+      padding: 8px 10px;
+      border: 1px solid #d1d8e0;
+      color: var(--navy);
+    }
+    .pay-history-block td.num {
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .pay-history-block td.muted { color: var(--text-muted); }
+
+    .inv-footer {
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 0.68rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* Void watermark */
+    .page.void { position: relative; }
+    .page.void::after {
+      content: 'VOID';
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-22deg);
+      font-size: 140px;
+      font-weight: 900;
+      color: rgba(29,59,115,0.08);
+      letter-spacing: 20px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ---------- States (loading / not found / error) ---------- */
+    .state {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .state .state-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 44px 40px;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgba(15,23,41,0.15);
+    }
+    .state .state-icon {
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+      color: var(--navy);
+      background: #e8eef8;
+    }
+    .state .state-icon.err { background: #fef2f2; color: var(--navy); }
+    .state h2 {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .state p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* ---------- Print rules ---------- */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    @media print {
+      html, body {
+        background: #fff !important;
+        font-size: 12px;
+      }
+      .pub-topbar { display: none !important; }
+      .page-wrap { padding: 0; display: block; }
+      .page {
+        width: auto;
+        min-height: auto;
+        box-shadow: none;
+        padding: 12mm 12mm;
+      }
+      .items-table thead { display: table-header-group; }
+      .items-table tr { page-break-inside: avoid; }
+      .pay-history-block tr { page-break-inside: avoid; }
+      .notes-block, .inv-footer { page-break-inside: avoid; }
+    }
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 900px) {
+      .page { width: 100%; padding: 20px 16px; min-height: auto; }
+      .inv-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .inv-header-right { text-align: left; width: 100%; }
+      .inv-header-right .inv-meta-row { justify-content: flex-start; }
+      .inv-header-right .inv-title { font-size: 1.6rem; }
+      .inv-mid { grid-template-columns: 1fr; gap: 20px; }
+      .inv-bottom { grid-template-columns: 1fr; gap: 22px; }
+      .items-table .hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    // Hide on DOMContentLoaded; fall back to load + 2s
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+  <!-- ============================================================
+       TOP BAR (screen only)
+       ============================================================ -->
+  <div class="pub-topbar" id="pubTopbar" style="display:none;">
+    <div class="pub-brand">
+      <span class="logo-mark"><span class="rise">RISE</span><span class="axis">AXIS</span></span>
+      <span style="color:var(--text-muted); font-weight:600;">· Invoice</span>
+    </div>
+    <div class="pub-actions">
+      <button class="primary" onclick="window.print()">
+        <i class="fas fa-print"></i> Print / Save PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ROOT
+       ============================================================ -->
+  <div id="root">
+    <div class="state">
+      <div class="state-card">
+        <div class="state-icon"><i class="fas fa-circle-notch fa-spin"></i></div>
+        <h2>Loading invoice...</h2>
+        <p>Please wait a moment.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const fmtDate = iso => {
+      if (!iso) return '—';
+      try {
+        return new Date(String(iso).slice(0, 10) + 'T00:00:00').toLocaleDateString('en-KE', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        });
+      } catch { return iso; }
+    };
+    const fmtDateTime = iso => {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+             + ' · ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
+      } catch { return iso; }
+    };
+    const paymentMethodLabel = m => ({
+      cash: 'Cash', mpesa: 'M-Pesa', bank: 'Bank Transfer',
+      cheque: 'Cheque', card: 'Card', other: 'Other'
+    }[m] || m || '—');
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const token = params.get('token');
+
+      if (!id || !token) {
+        return showError('Invoice not found', 'This link is incomplete. Please request a new one.');
+      }
+
+      // Basic UUID validation to avoid sending junk to the RPC
+      const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRe.test(id) || !uuidRe.test(token)) {
+        return showError('Invoice not found', 'This link appears to be invalid.');
+      }
+
+      try {
+        const { data, error } = await supabaseClient.rpc('get_public_invoice', {
+          p_id: id,
+          p_token: token
+        });
+
+        if (error) throw error;
+        if (!data || data.ok !== true) {
+          return showError('Invoice not found', 'This link is invalid or has been revoked. Please contact the sender for a fresh link.');
+        }
+
+        document.title = (data.invoice?.invoice_number || 'Invoice') + ' | Rise Axis Solutions Ltd';
+        renderPage(data);
+        document.getElementById('pubTopbar').style.display = 'flex';
+      } catch (err) {
+        console.error('Load failed:', err);
+        showError('Could not load invoice', err.message || 'Please try again later.');
+      }
+    })();
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
+    function renderPage(payload) {
+      const inv = payload.invoice || {};
+      const items = payload.items || [];
+      const payments = payload.payments || [];
+      const biz = payload.business || {};
+
+      const isVoid = inv.status === 'void';
+      const isOverdue = inv.status !== 'void'
+                     && inv.status !== 'paid'
+                     && inv.status !== 'draft'
+                     && inv.due_date
+                     && new Date(inv.due_date) < new Date(new Date().toDateString());
+      const balance = Number(inv.total) - Number(inv.amount_paid);
+
+      // ---- Line items
+      const itemRows = items.map((it, i) => {
+        const qty = Number(it.quantity) || 0;
+        const price = Number(it.unit_price) || 0;
+        const disc = Number(it.line_discount) || 0;
+        const vatRate = it.is_custom ? 0 : Number(it.vat_rate) || 0;
+        const lineNet = Math.max(0, qty * price - disc);
+        const lineVat = lineNet * (vatRate / 100);
+        const lineTotal = lineNet + lineVat;
+        return `
+          <tr>
+            <td style="width:26px;">${i + 1}</td>
+            <td class="desc-cell">
+              <strong>${escapeHtml(it.description || 'Item')}</strong>
+              ${it.pack_label ? `<small>${escapeHtml(it.pack_label)}</small>` : ''}
+            </td>
+            <td class="num hide-sm">${qty.toLocaleString('en-KE')}</td>
+            <td class="num hide-sm">${fmtKES(price)}</td>
+            <td class="num hide-sm">${disc > 0 ? '− ' + fmtKES(disc) : '—'}</td>
+            <td class="num hide-sm">${vatRate > 0 ? vatRate + '%' : 'Exempt'}</td>
+            <td class="line-total">${fmtKES(lineTotal)}</td>
+          </tr>`;
+      }).join('');
+
+      // ---- Payment instructions
+      const hasPayInstr = biz.mpesa_paybill || biz.bank_name;
+      const payInstrHtml = hasPayInstr ? `
+        <div class="pay-instructions">
+          <h4>Payment Instructions</h4>
+          ${biz.mpesa_paybill ? `
+            <div class="pi-block">
+              <strong>M-PESA</strong>
+              Paybill: <span class="mono-line">${escapeHtml(biz.mpesa_paybill)}</span><br>
+              ${biz.mpesa_account ? `Account: <span class="mono-line">${escapeHtml(biz.mpesa_account)}</span>` : ''}
+            </div>` : ''}
+          ${biz.bank_name ? `
+            <div class="pi-block">
+              <strong>Bank Transfer</strong>
+              ${escapeHtml(biz.bank_name)}<br>
+              ${biz.bank_account_name ? `Account Name: ${escapeHtml(biz.bank_account_name)}<br>` : ''}
+              ${biz.bank_account_number ? `Account No: <span class="mono-line">${escapeHtml(biz.bank_account_number)}</span><br>` : ''}
+              ${biz.bank_branch ? `Branch: ${escapeHtml(biz.bank_branch)}` : ''}
+            </div>` : ''}
+        </div>` : '<div></div>';
+
+      // ---- Totals
+      const totalsHtml = `
+        <div class="totals-block">
+          <div class="trow"><span class="k">Subtotal</span><span class="v">${fmtKES(inv.subtotal)}</span></div>
+          ${Number(inv.line_discount_total) > 0 ? `<div class="trow"><span class="k">Line Discounts</span><span class="v">− ${fmtKES(inv.line_discount_total)}</span></div>` : ''}
+          ${Number(inv.invoice_discount) > 0 ? `<div class="trow"><span class="k">Invoice Discount</span><span class="v">− ${fmtKES(inv.invoice_discount)}</span></div>` : ''}
+          <div class="trow"><span class="k">Net Amount</span><span class="v">${fmtKES(inv.net_amount)}</span></div>
+          <div class="trow"><span class="k">VAT</span><span class="v">${fmtKES(inv.vat_total)}</span></div>
+          ${Number(inv.delivery_total) > 0 ? `<div class="trow"><span class="k">Delivery</span><span class="v">${fmtKES(inv.delivery_total)}</span></div>` : ''}
+          <div class="grand">
+            <span class="k">Grand Total</span>
+            <span class="v">${fmtKES(inv.total)}</span>
+          </div>
+          ${Number(inv.amount_paid) > 0 ? `
+            <div class="paid-line">
+              <span class="k">Amount Paid</span>
+              <span class="v">${fmtKES(inv.amount_paid)}</span>
+            </div>` : ''}
+          <div class="balance-line ${balance <= 0.01 ? 'cleared' : 'due'}">
+            <span class="k">${balance <= 0.01 ? 'Balance Cleared' : 'Balance Due'}</span>
+            <span class="v">${fmtKES(balance)}</span>
+          </div>
+        </div>`;
+
+      // ---- Notes / terms
+      const notesHtml = (inv.customer_notes || inv.terms) ? `
+        <div class="notes-block">
+          ${inv.customer_notes ? `<h4>Notes</h4><div>${escapeHtml(inv.customer_notes)}</div>` : ''}
+          ${inv.terms ? `<h4>Terms &amp; Conditions</h4><div>${escapeHtml(inv.terms)}</div>` : ''}
+        </div>` : '';
+
+      // ---- Payment history
+      const paymentsHtml = payments.length ? `
+        <div class="pay-history-block">
+          <h4>Payment History</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Reference</th>
+                <th class="num">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${payments.map(p => `
+                <tr>
+                  <td class="muted">${escapeHtml(fmtDateTime(p.paid_at))}</td>
+                  <td>${escapeHtml(paymentMethodLabel(p.method))}</td>
+                  <td class="muted">${escapeHtml(p.reference || '—')}</td>
+                  <td class="num">${fmtKES(p.amount)}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '';
+
+      // ---- Status pill
+      const statusPill = (() => {
+        if (isVoid) return '<span class="status-pill void">Void</span>';
+        if (isOverdue) return '<span class="status-pill overdue">Overdue</span>';
+        if (inv.status === 'paid') return '<span class="status-pill paid">Paid</span>';
+        return '';
+      })();
+
+      // ---- Full page
+      document.getElementById('root').innerHTML = `
+        <div class="page-wrap">
+          <div class="page ${isVoid ? 'void' : ''}">
+
+            <div class="inv-header">
+              <div class="biz-block">
+                ${biz.business_logo_url ? `<img class="biz-logo" src="${escapeHtml(biz.business_logo_url)}" alt="">` : ''}
+                <div class="biz-name">${escapeHtml(biz.business_name || 'Rise Axis Solutions Ltd')}</div>
+                <div class="biz-line">
+                  ${biz.business_pin ? `<strong>KRA PIN:</strong> ${escapeHtml(biz.business_pin)}<br>` : ''}
+                  ${biz.business_address ? `${escapeHtml(biz.business_address)}<br>` : ''}
+                  ${biz.business_po_box ? `P.O. Box ${escapeHtml(biz.business_po_box)}<br>` : ''}
+                  ${biz.business_email ? `${escapeHtml(biz.business_email)}<br>` : ''}
+                  ${biz.business_phone ? escapeHtml(biz.business_phone) : ''}
+                </div>
+              </div>
+
+              <div class="inv-header-right">
+                <div class="inv-title">INVOICE</div>
+                <div class="inv-num">${escapeHtml(inv.invoice_number || 'DRAFT')}</div>
+                <div class="inv-meta-row"><span class="k">Issue Date:</span><span class="v">${escapeHtml(fmtDate(inv.issue_date))}</span></div>
+                <div class="inv-meta-row"><span class="k">Due Date:</span><span class="v">${escapeHtml(fmtDate(inv.due_date))}</span></div>
+                ${inv.reference ? `<div class="inv-meta-row"><span class="k">Reference:</span><span class="v">${escapeHtml(inv.reference)}</span></div>` : ''}
+                ${statusPill}
+              </div>
+            </div>
+
+            <div class="inv-mid">
+              <div class="billed-to">
+                <div class="label">Billed To</div>
+                <div class="cust-name">${escapeHtml(inv.customer_name || 'Customer')}</div>
+                <div class="cust-line">
+                  ${inv.customer_phone ? `${escapeHtml(inv.customer_phone)}<br>` : ''}
+                  ${inv.customer_email ? escapeHtml(inv.customer_email) : ''}
+                </div>
+              </div>
+
+              <div class="pay-status-box">
+                <div class="psb-label">Payment Status</div>
+                <div class="psb-balance ${balance <= 0.01 ? 'zero' : ''}">
+                  ${balance <= 0.01 ? 'Fully Paid' : 'Balance Due: ' + fmtKES(balance)}
+                </div>
+                <div class="psb-row"><span class="k">Total Amount</span><span class="v">${fmtKES(inv.total)}</span></div>
+                <div class="psb-row"><span class="k">Amount Paid</span><span class="v">${fmtKES(inv.amount_paid)}</span></div>
+              </div>
+            </div>
+
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width:26px;">#</th>
+                  <th>Description</th>
+                  <th class="num hide-sm">Qty</th>
+                  <th class="num hide-sm">Unit Price</th>
+                  <th class="num hide-sm">Discount</th>
+                  <th class="num hide-sm">VAT</th>
+                  <th class="num">Line Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemRows || '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:24px;">No line items</td></tr>'}
+              </tbody>
+            </table>
+
+            <div class="inv-bottom">
+              ${payInstrHtml}
+              ${totalsHtml}
+            </div>
+
+            ${notesHtml}
+            ${paymentsHtml}
+
+            <div class="inv-footer">
+              ${biz.invoice_footer_note ? `<div>${escapeHtml(biz.invoice_footer_note)}</div>` : ''}
+              <div style="margin-top:6px;">Generated ${escapeHtml(fmtDateTime(new Date().toISOString()))}</div>
+            </div>
+
+          </div>
+        </div>`;
+    }
+
+    /* ============================================================
+       ERROR STATE
+       ============================================================ */
+    function showError(title, msg) {
+      document.getElementById('root').innerHTML = `
+        <div class="state">
+          <div class="state-card">
+            <div class="state-icon err"><i class="fas fa-exclamation-triangle"></i></div>
+            <h2>${escapeHtml(title)}</h2>
+            <p>${escapeHtml(msg)}</p>
+          </div>
+        </div>`;
+    }
+  </script>
+
+</body>
+</html>

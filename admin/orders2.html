@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Orders | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC STYLES — orders.html
+       Everything else lives in admin.css
+       ============================================================ */
+
+    /* Orders table */
+    .orders-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(31,58,110,0.05);
+    }
+    .orders-table-wrap { overflow-x: auto; }
+    table.orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 1180px;
+    }
+    .orders-table thead th {
+      text-align: left;
+      padding: 16px 20px;
+      background: #fafbff;
+      color: var(--navy);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .orders-table tbody td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .orders-table tbody tr {
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .orders-table tbody tr:hover { background: #fafbff; }
+    .orders-table tbody tr:last-child td { border-bottom: none; }
+
+    .order-num {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 0.82rem;
+      letter-spacing: 0.5px;
+    }
+    .customer-cell strong {
+      display: block;
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .customer-cell small {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+    .total-cell {
+      font-weight: 900;
+      color: var(--red);
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+    .date-cell {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    /* Payment method */
+    .pay-method {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .pay-method i {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--bg-light);
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+    .pay-method.mpesa i { background: #DCFCE7; color: var(--green); }
+    .pay-method.bank i  { background: #DBEAFE; color: var(--navy); }
+    .pay-method.cash i  { background: #FEF3C7; color: #92400E; }
+
+    /* Invoice link chip */
+    .invoice-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-decoration: none;
+      background: #e8eef8;
+      color: var(--navy);
+      border: 1px solid #dbe5f0;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .invoice-chip:hover {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+    .invoice-chip.paid    { background: #D1FAE5; color: #065F46; border-color: #a7f3d0; }
+    .invoice-chip.partial { background: #FEF3C7; color: #92400E; border-color: #fde68a; }
+    .invoice-chip.void    { background: #e5e7eb; color: #4b5563; border-color: #d1d5db; text-decoration: line-through; }
+    .invoice-chip.overdue { background: #FEE2E2; color: #991B1B; border-color: #fecaca; }
+    .invoice-chip.draft   { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+    .invoice-chip:hover * { color: #fff; }
+
+    .invoice-empty {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-style: italic;
+    }
+
+    /* Empty state */
+    .empty-orders { padding: 80px 30px; text-align: center; }
+    .empty-orders .icon {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(30,83,180,0.08), rgba(200,16,46,0.06));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2.2rem;
+      color: var(--navy);
+    }
+    .empty-orders h3 {
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+    .empty-orders p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Modal specifics */
+    .detail-section { margin-bottom: 26px; }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .detail-section-title i { color: var(--orange); }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 24px;
+    }
+    .detail-row { display: flex; flex-direction: column; gap: 3px; }
+    .detail-row.full { grid-column: 1 / -1; }
+    .detail-row .label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .detail-row .value {
+      font-size: 0.92rem;
+      color: var(--navy);
+      font-weight: 600;
+      word-break: break-word;
+    }
+    .detail-row .value.mono {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .items-list { display: flex; flex-direction: column; gap: 10px; }
+    .item-row {
+      display: flex;
+      gap: 14px;
+      padding: 12px 14px;
+      background: #fafbff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      align-items: center;
+    }
+    .item-row img {
+      width: 52px; height: 52px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--bg-light);
+    }
+    .item-row .info { flex: 1; min-width: 0; }
+    .item-row .info h4 {
+      font-size: 0.88rem;
+      color: var(--navy);
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+    .item-row .info small {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .item-row .amt {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: var(--red);
+      white-space: nowrap;
+    }
+
+    .totals-block {
+      background: linear-gradient(135deg, #f7fafd, #eef4fb);
+      border-radius: 12px;
+      padding: 16px 20px;
+      border: 1px solid rgba(30,83,180,0.1);
+    }
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 0.88rem;
+    }
+    .totals-row .label { color: var(--text-muted); font-weight: 600; }
+    .totals-row .value { color: var(--navy); font-weight: 700; }
+    .totals-row.grand {
+      border-top: 2px dashed rgba(30,83,180,0.2);
+      margin-top: 8px;
+      padding-top: 12px;
+      font-size: 1.05rem;
+    }
+    .totals-row.grand .label { color: var(--navy); font-weight: 900; }
+    .totals-row.grand .value { color: var(--red); font-weight: 900; font-size: 1.2rem; }
+
+    .status-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .status-controls label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .status-controls select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      background: #fff;
+      color: var(--navy);
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .status-controls select:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(30,83,180,0.1);
+    }
+
+    /* Export button */
+    .export-btn {
+      background: linear-gradient(135deg, var(--green), var(--green-deep));
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(14,122,60,0.25);
+    }
+    .export-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(14,122,60,0.4);
+    }
+
+    /* Invoice action button in modal */
+    .btn-invoice {
+      background: linear-gradient(135deg, var(--orange), #d44a15);
+      color: #fff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(232,93,38,0.3);
+    }
+    .btn-invoice:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(232,93,38,0.45);
+    }
+
+    /* Existing invoice callout in modal */
+    .existing-invoice {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #e8eef8;
+      border: 1px solid #dbe5f0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 0;
+    }
+    .existing-invoice .ei-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .existing-invoice .ei-info { flex: 1; min-width: 0; }
+    .existing-invoice .ei-info strong {
+      display: block;
+      color: var(--navy);
+      font-size: 0.92rem;
+      font-weight: 800;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.5px;
+    }
+    .existing-invoice .ei-info small {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .existing-invoice a {
+      background: var(--navy);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .existing-invoice a:hover { background: var(--navy-deep); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .status-controls { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MOBILE BAR -->
+  <div class="admin-mobile-bar">
+    <div class="brand-mini"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+    <button class="admin-mobile-toggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar-brand">
+      <div class="logo-mark"><span class="axis">RISE</span><span class="axis">AXIS</span></div>
+      <small>Admin Panel</small>
+    </div>
+   <nav class="admin-sidebar-nav">
+      <div class="nav-section">Operations</div>
+      <a href="orders.html" class="active"><i class="fas fa-boxes-packing"></i> Orders</a>
+      <a href="invoices.html"><i class="fas fa-file-invoice"></i> Invoices</a>
+      <a href="products.html"><i class="fas fa-box"></i> Products</a>
+      <div class="nav-section">Content</div>
+      <a href="posts.html"><i class="fas fa-newspaper"></i> Blog</a>
+      <div class="nav-section">Insights</div>
+      <a href="reports.html" ><i class="fas fa-chart-line"></i> Reports</a>
+      <a href="analytics.html"><i class="fas fa-bolt"></i> Analytics</a>
+      <div class="nav-section">System</div>
+      <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <div class="user-chip">
+        <i id="userInitials">··</i>
+        <span id="userEmail">Loading...</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </aside>
+  <div class="admin-sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ACCESS DENIED -->
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">You don't have permission to view this page. Only administrators can access the orders dashboard.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <div class="page-title-row">
+          <div>
+            <h1><i class="fas fa-boxes-packing"></i> Orders Dashboard</h1>
+            <p>Manage incoming orders, update statuses, and issue invoices</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="refreshBtn" onclick="loadOrders(true)">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-label">Total Orders</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+            <div class="stat-value" id="statPending">—</div>
+            <div class="stat-label">Pending Payment</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-value" id="statPaid">—</div>
+            <div class="stat-label">Paid</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+            <div class="stat-value" id="statRevenue">—</div>
+            <div class="stat-label">Total Revenue</div>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by order number, name, phone, email, transaction code...">
+          </div>
+          <select class="filter-select" id="filterPayment">
+            <option value="">All Payments</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="failed">Failed</option>
+            <option value="refunded">Refunded</option>
+          </select>
+          <select class="filter-select" id="filterStatus">
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <select class="filter-select" id="filterMethod">
+            <option value="">All Methods</option>
+            <option value="mpesa">M-Pesa</option>
+            <option value="bank">Bank Transfer</option>
+            <option value="cash">Cash on Delivery</option>
+          </select>
+          <button class="export-btn" onclick="exportCSV()">
+            <i class="fas fa-file-csv"></i> Export CSV
+          </button>
+        </div>
+
+        <div class="orders-card">
+          <div id="ordersContent">
+            <div class="loading-skeleton">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <p>Loading orders...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal wide">
+      <div class="modal-header">
+        <div>
+          <h2><i class="fas fa-receipt"></i> Order Details</h2>
+          <p id="modalOrderNumber">—</p>
+        </div>
+        <button class="modal-close" onclick="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" id="modalBody"></div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">
+          <i class="fas fa-times"></i> Close
+        </button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="export-btn" id="invoiceBtn" onclick="handleInvoiceAction()" style="display:none;">
+            <i class="fas fa-file-invoice"></i> <span id="invoiceBtnLabel">Create Invoice</span>
+          </button>
+          <button class="btn-primary" id="saveBtn" onclick="saveStatusChanges()">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let allOrders = [];
+    let filteredOrders = [];
+    let invoicesByOrderId = {};     // order_id -> invoice row
+    let currentOrder = null;
+    let currentOrderItems = [];
+    let currentInvoice = null;      // invoice linked to current order (or null)
+
+    const PAYMENT_BADGES = {
+      'pending':  { class: 'badge-pending',  label: 'Pending',  icon: 'fa-hourglass-half' },
+      'paid':     { class: 'badge-paid',     label: 'Paid',     icon: 'fa-check-circle' },
+      'failed':   { class: 'badge-failed',   label: 'Failed',   icon: 'fa-times-circle' },
+      'refunded': { class: 'badge-refunded', label: 'Refunded', icon: 'fa-undo-alt' }
+    };
+    const STATUS_BADGES = {
+      'pending':    { class: 'badge-pending',    label: 'Pending',    icon: 'fa-clock' },
+      'processing': { class: 'badge-processing', label: 'Processing', icon: 'fa-cog' },
+      'shipped':    { class: 'badge-shipped',    label: 'Shipped',    icon: 'fa-truck' },
+      'delivered':  { class: 'badge-delivered',  label: 'Delivered',  icon: 'fa-check-double' },
+      'cancelled':  { class: 'badge-cancelled',  label: 'Cancelled',  icon: 'fa-ban' }
+    };
+    const PAY_METHOD_ICONS = {
+      'mpesa': { class: 'mpesa', icon: 'fa-mobile-alt', label: 'M-Pesa' },
+      'bank':  { class: 'bank',  icon: 'fa-university', label: 'Bank' },
+      'cash':  { class: 'cash',  icon: 'fa-money-bill-wave', label: 'Cash' }
+    };
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE');
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const fmtDate = iso => {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+        + ' · ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    function invoiceChipForInvoice(inv) {
+      if (!inv) return `<span class="invoice-empty">—</span>`;
+      // Determine visual class
+      let cls = '';
+      let label = inv.invoice_number || 'DRAFT';
+      const isOverdue = inv.status !== 'void'
+                     && inv.status !== 'paid'
+                     && inv.status !== 'draft'
+                     && inv.due_date
+                     && new Date(inv.due_date) < new Date(new Date().toDateString())
+                     && (Number(inv.total) - Number(inv.amount_paid)) > 0.01;
+      if (inv.status === 'paid') cls = 'paid';
+      else if (inv.status === 'partial') cls = 'partial';
+      else if (inv.status === 'void') cls = 'void';
+      else if (inv.status === 'draft') cls = 'draft';
+      else if (isOverdue) cls = 'overdue';
+      return `<a href="invoice-view.html?id=${encodeURIComponent(inv.id)}"
+                 class="invoice-chip ${cls}"
+                 onclick="event.stopPropagation();"
+                 title="View invoice ${escapeHtml(inv.invoice_number || '')}">
+                <i class="fas fa-file-invoice"></i> ${escapeHtml(label)}
+             </a>`;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    /* ============================================================
+       SIDEBAR (mobile)
+       ============================================================ */
+    function toggleSidebar() {
+      document.getElementById('adminSidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+    function closeSidebar() {
+      document.getElementById('adminSidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+    }
+
+    /* ============================================================
+       AUTH
+       ============================================================ */
+    async function checkAdminAccess() {
+      try {
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
+        if (error || !user) {
+          showAccessDenied('You need to be signed in as an administrator to view this page.');
+          return false;
+        }
+        const { data: profile, error: profileErr } = await supabaseClient
+          .from('profiles')
+          .select('role, first_name, last_name')
+          .eq('id', user.id)
+          .single();
+        if (profileErr) console.warn('Profile fetch error:', profileErr);
+        if (!profile || profile.role !== 'admin') {
+          showAccessDenied('Your account does not have administrator privileges.');
+          return false;
+        }
+        const initials = ((profile.first_name || user.email || 'A')[0] + (profile.last_name || '')[0]).toUpperCase();
+        document.getElementById('userInitials').textContent = initials;
+        document.getElementById('userEmail').textContent = user.email;
+        return true;
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        showAccessDenied('Could not verify your access. Please refresh and try again.');
+        return false;
+      }
+    }
+    function showAccessDenied(msg) {
+      document.getElementById('adminMain').style.display = 'none';
+      document.getElementById('accessDenied').style.display = 'flex';
+      if (msg) document.getElementById('accessDeniedMsg').textContent = msg;
+    }
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../index.html';
+    }
+
+    /* ============================================================
+       LOAD ORDERS
+       ============================================================ */
+    async function loadOrders(showSpinner = false) {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (showSpinner) { refreshBtn.classList.add('spinning'); refreshBtn.disabled = true; }
+
+      try {
+        // Load orders and invoices in parallel
+        const [ordersRes, invoicesRes] = await Promise.all([
+          supabaseClient.from('orders').select('*').order('created_at', { ascending: false }),
+          supabaseClient.from('invoices').select('id, order_id, invoice_number, status, due_date, total, amount_paid').not('order_id', 'is', null)
+        ]);
+
+        if (ordersRes.error) throw ordersRes.error;
+        if (invoicesRes.error) throw invoicesRes.error;
+
+        allOrders = ordersRes.data || [];
+        invoicesByOrderId = {};
+        (invoicesRes.data || []).forEach(inv => {
+          if (inv.order_id) invoicesByOrderId[inv.order_id] = inv;
+        });
+
+        applyFilters();
+        updateStats();
+      } catch (err) {
+        console.error('Failed to load orders:', err);
+        document.getElementById('ordersContent').innerHTML = `
+          <div class="empty-orders">
+            <div class="icon"><i class="fas fa-exclamation-triangle" style="color:var(--red);"></i></div>
+            <h3>Could not load orders</h3>
+            <p>${escapeHtml(err.message || 'Unknown error')}</p>
+          </div>`;
+        showToast('Failed to load orders', 'error');
+      } finally {
+        if (showSpinner) {
+          setTimeout(() => { refreshBtn.classList.remove('spinning'); refreshBtn.disabled = false; }, 400);
+        }
+      }
+    }
+
+    function updateStats() {
+      const total = allOrders.length;
+      const pending = allOrders.filter(o => o.payment_status === 'pending').length;
+      const paid = allOrders.filter(o => o.payment_status === 'paid').length;
+      const revenue = allOrders
+        .filter(o => o.payment_status === 'paid')
+        .reduce((s, o) => s + Number(o.total || 0), 0);
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPending').textContent = pending;
+      document.getElementById('statPaid').textContent = paid;
+      document.getElementById('statRevenue').textContent = fmtKES(revenue);
+    }
+
+    /* ============================================================
+       FILTERS
+       ============================================================ */
+    function applyFilters() {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const payment = document.getElementById('filterPayment').value;
+      const status = document.getElementById('filterStatus').value;
+      const method = document.getElementById('filterMethod').value;
+
+      filteredOrders = allOrders.filter(o => {
+        if (payment && o.payment_status !== payment) return false;
+        if (status && o.order_status !== status) return false;
+        if (method && o.payment_method !== method) return false;
+        if (q) {
+          const haystack = [
+            o.order_number,
+            o.customer_name,
+            o.customer_phone,
+            o.customer_email,
+            o.transaction_code,
+            o.mpesa_number,
+            o.bank_reference,
+            o.payer_account
+          ].filter(Boolean).join(' ').toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      });
+
+      renderOrders();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('filterPayment').addEventListener('change', applyFilters);
+    document.getElementById('filterStatus').addEventListener('change', applyFilters);
+    document.getElementById('filterMethod').addEventListener('change', applyFilters);
+
+    /* ============================================================
+       RENDER TABLE
+       ============================================================ */
+    function renderOrders() {
+      const wrap = document.getElementById('ordersContent');
+
+      if (filteredOrders.length === 0) {
+        wrap.innerHTML = `
+          <div class="empty-orders">
+            <div class="icon"><i class="fas fa-inbox"></i></div>
+            <h3>${allOrders.length === 0 ? 'No orders yet' : 'No orders match your filters'}</h3>
+            <p>${allOrders.length === 0
+              ? 'Orders placed on the shop will appear here automatically.'
+              : 'Try adjusting the filters or search terms.'}</p>
+          </div>`;
+        return;
+      }
+
+      const rows = filteredOrders.map(o => {
+        const pay = PAYMENT_BADGES[o.payment_status] || PAYMENT_BADGES.pending;
+        const ord = STATUS_BADGES[o.order_status] || STATUS_BADGES.pending;
+        const pm = PAY_METHOD_ICONS[o.payment_method] || { class: '', icon: 'fa-credit-card', label: o.payment_method || '—' };
+        const inv = invoicesByOrderId[o.id] || null;
+
+        return `
+          <tr onclick="openOrder('${o.id}')">
+            <td><span class="order-num">${escapeHtml(o.order_number)}</span></td>
+            <td>
+              <div class="customer-cell">
+                <strong>${escapeHtml(o.customer_name)}</strong>
+                <small>${escapeHtml(o.customer_phone)}</small>
+              </div>
+            </td>
+            <td>
+              <span class="pay-method ${pm.class}">
+                <i class="fas ${pm.icon}"></i> ${escapeHtml(pm.label)}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${pay.class}">
+                <i class="fas ${pay.icon}"></i> ${pay.label}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${ord.class}">
+                <i class="fas ${ord.icon}"></i> ${ord.label}
+              </span>
+            </td>
+            <td class="total-cell">${fmtKES(o.total)}</td>
+            <td>${invoiceChipForInvoice(inv)}</td>
+            <td class="date-cell">${fmtDate(o.created_at)}</td>
+            <td style="text-align:right;">
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </td>
+          </tr>`;
+      }).join('');
+
+      wrap.innerHTML = `
+        <div class="orders-table-wrap">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Payment Method</th>
+                <th>Payment</th>
+                <th>Fulfillment</th>
+                <th>Total</th>
+                <th>Invoice</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    /* ============================================================
+       ORDER MODAL
+       ============================================================ */
+    async function openOrder(orderId) {
+      const order = allOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      currentOrder = order;
+      currentInvoice = invoicesByOrderId[orderId] || null;
+
+      document.getElementById('modalOrderNumber').textContent = order.order_number;
+      document.getElementById('modalBody').innerHTML = `
+        <div class="loading-skeleton" style="padding:40px 20px;">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <p>Loading order details...</p>
+        </div>`;
+
+      // Show/hide invoice button based on existing invoice
+      updateInvoiceButton();
+      document.getElementById('orderModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      try {
+        const { data: items, error } = await supabaseClient
+          .from('order_items').select('*').eq('order_id', orderId);
+        if (error) throw error;
+        currentOrderItems = items || [];
+      } catch (err) {
+        console.warn('Could not load order items:', err);
+        currentOrderItems = [];
+      }
+
+      renderOrderModal();
+    }
+
+    function updateInvoiceButton() {
+      const btn = document.getElementById('invoiceBtn');
+      const label = document.getElementById('invoiceBtnLabel');
+      const icon = btn.querySelector('i');
+
+      if (currentInvoice) {
+        label.textContent = currentInvoice.invoice_number
+          ? `View Invoice (${currentInvoice.invoice_number})`
+          : 'View Draft Invoice';
+        icon.className = 'fas fa-file-invoice';
+      } else {
+        label.textContent = 'Create Invoice';
+        icon.className = 'fas fa-file-invoice';
+      }
+      btn.style.display = 'inline-flex';
+    }
+
+    function handleInvoiceAction() {
+      if (!currentOrder) return;
+      if (currentInvoice) {
+        window.location.href = 'invoice-view.html?id=' + encodeURIComponent(currentInvoice.id);
+      } else {
+        window.location.href = 'invoice-edit.html?from_order=' + encodeURIComponent(currentOrder.id);
+      }
+    }
+
+    function renderOrderModal() {
+      const o = currentOrder;
+      const pm = PAY_METHOD_ICONS[o.payment_method] || { label: o.payment_method || '—' };
+
+      const itemsHtml = currentOrderItems.length > 0
+        ? currentOrderItems.map(item => `
+            <div class="item-row">
+              ${item.product_image
+                ? `<img src="${escapeHtml(item.product_image)}" alt="${escapeHtml(item.product_name)}" onerror="this.style.display='none'">`
+                : `<div style="width:52px;height:52px;border-radius:10px;background:var(--bg-light);display:flex;align-items:center;justify-content:center;color:#cbd5e0;"><i class='fas fa-box'></i></div>`}
+              <div class="info">
+                <h4>${escapeHtml(item.product_name)}</h4>
+                <small>${fmtKES(item.price_per_unit)} × ${item.quantity}${item.quality ? ' · ' + escapeHtml(item.quality) : ''}</small>
+              </div>
+              <div class="amt">${fmtKES(item.subtotal)}</div>
+            </div>
+          `).join('')
+        : `<p style="color:var(--text-muted);font-size:0.88rem;">No line items recorded for this order.</p>`;
+
+      const invoiceBlock = currentInvoice ? `
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-file-invoice"></i> Invoice</div>
+          <div class="existing-invoice">
+            <div class="ei-icon"><i class="fas fa-file-invoice"></i></div>
+            <div class="ei-info">
+              <strong>${escapeHtml(currentInvoice.invoice_number || 'DRAFT')}</strong>
+              <small>${escapeHtml(currentInvoice.status)} · ${fmtKES(currentInvoice.amount_paid)} of ${fmtKES(currentInvoice.total)} paid</small>
+            </div>
+            <a href="invoice-view.html?id=${encodeURIComponent(currentInvoice.id)}">Open</a>
+          </div>
+        </div>` : '';
+
+      document.getElementById('modalBody').innerHTML = `
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-user"></i> Customer</div>
+          <div class="detail-grid">
+            <div class="detail-row">
+              <span class="label">Full Name</span>
+              <span class="value">${escapeHtml(o.customer_name)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Phone</span>
+              <span class="value">${escapeHtml(o.customer_phone)}</span>
+            </div>
+            <div class="detail-row full">
+              <span class="label">Email</span>
+              <span class="value">${escapeHtml(o.customer_email)}</span>
+            </div>
+            <div class="detail-row full">
+              <span class="label">Delivery Address</span>
+              <span class="value">${escapeHtml(o.delivery_address)}</span>
+            </div>
+            ${o.instructions ? `
+            <div class="detail-row full">
+              <span class="label">Delivery Instructions</span>
+              <span class="value">${escapeHtml(o.instructions)}</span>
+            </div>` : ''}
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-credit-card"></i> Payment</div>
+          <div class="detail-grid">
+            <div class="detail-row">
+              <span class="label">Method</span>
+              <span class="value">${escapeHtml(pm.label)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Transaction Code</span>
+              <span class="value mono">${escapeHtml(o.transaction_code || '—')}</span>
+            </div>
+            ${o.mpesa_number ? `
+            <div class="detail-row">
+              <span class="label">M-Pesa Number</span>
+              <span class="value mono">${escapeHtml(o.mpesa_number)}</span>
+            </div>` : ''}
+            ${o.bank_reference ? `
+            <div class="detail-row">
+              <span class="label">Bank Reference</span>
+              <span class="value mono">${escapeHtml(o.bank_reference)}</span>
+            </div>` : ''}
+            ${o.payer_account ? `
+            <div class="detail-row">
+              <span class="label">Payer Account</span>
+              <span class="value mono">${escapeHtml(o.payer_account)}</span>
+            </div>` : ''}
+          </div>
+        </div>
+
+        ${invoiceBlock}
+
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-toggle-on"></i> Update Status</div>
+          <div class="status-controls">
+            <div>
+              <label>Payment Status</label>
+              <select id="modalPaymentStatus">
+                <option value="pending"  ${o.payment_status === 'pending'  ? 'selected' : ''}>Pending</option>
+                <option value="paid"     ${o.payment_status === 'paid'     ? 'selected' : ''}>Paid</option>
+                <option value="failed"   ${o.payment_status === 'failed'   ? 'selected' : ''}>Failed</option>
+                <option value="refunded" ${o.payment_status === 'refunded' ? 'selected' : ''}>Refunded</option>
+              </select>
+            </div>
+            <div>
+              <label>Order Status</label>
+              <select id="modalOrderStatus">
+                <option value="pending"    ${o.order_status === 'pending'    ? 'selected' : ''}>Pending</option>
+                <option value="processing" ${o.order_status === 'processing' ? 'selected' : ''}>Processing</option>
+                <option value="shipped"    ${o.order_status === 'shipped'    ? 'selected' : ''}>Shipped</option>
+                <option value="delivered"  ${o.order_status === 'delivered'  ? 'selected' : ''}>Delivered</option>
+                <option value="cancelled"  ${o.order_status === 'cancelled'  ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-box-open"></i> Items (${currentOrderItems.length})</div>
+          <div class="items-list">${itemsHtml}</div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-calculator"></i> Totals</div>
+          <div class="totals-block">
+            <div class="totals-row">
+              <span class="label">Subtotal</span>
+              <span class="value">${fmtKES(o.subtotal)}</span>
+            </div>
+            <div class="totals-row">
+              <span class="label">Delivery Fee</span>
+              <span class="value">${fmtKES(o.delivery_fee)}</span>
+            </div>
+            <div class="totals-row grand">
+              <span class="label">Total</span>
+              <span class="value">${fmtKES(o.total)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-info-circle"></i> Order Info</div>
+          <div class="detail-grid">
+            <div class="detail-row">
+              <span class="label">Placed</span>
+              <span class="value">${fmtDate(o.created_at)}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Last Updated</span>
+              <span class="value">${fmtDate(o.updated_at)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function closeModal() {
+      document.getElementById('orderModal').classList.remove('open');
+      document.body.style.overflow = '';
+      currentOrder = null;
+      currentOrderItems = [];
+      currentInvoice = null;
+      document.getElementById('invoiceBtn').style.display = 'none';
+    }
+    document.getElementById('orderModal').addEventListener('click', e => {
+      if (e.target.id === 'orderModal') closeModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('orderModal').classList.contains('open')) closeModal();
+        closeSidebar();
+      }
+    });
+
+    /* ============================================================
+       SAVE STATUS CHANGES
+       ============================================================ */
+    async function saveStatusChanges() {
+      if (!currentOrder) return;
+      const btn = document.getElementById('saveBtn');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+      const newPaymentStatus = document.getElementById('modalPaymentStatus').value;
+      const newOrderStatus = document.getElementById('modalOrderStatus').value;
+
+      try {
+        const { error } = await supabaseClient
+          .from('orders')
+          .update({
+            payment_status: newPaymentStatus,
+            order_status: newOrderStatus,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentOrder.id);
+        if (error) throw error;
+
+        const idx = allOrders.findIndex(o => o.id === currentOrder.id);
+        if (idx >= 0) {
+          allOrders[idx].payment_status = newPaymentStatus;
+          allOrders[idx].order_status = newOrderStatus;
+          allOrders[idx].updated_at = new Date().toISOString();
+        }
+        updateStats();
+        applyFilters();
+        closeModal();
+        showToast('Order updated successfully');
+      } catch (err) {
+        console.error('Update failed:', err);
+        showToast('Could not update order: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    }
+
+    /* ============================================================
+       EXPORT CSV
+       ============================================================ */
+    function exportCSV() {
+      if (filteredOrders.length === 0) { showToast('No orders to export', 'error'); return; }
+
+      const headers = [
+        'Order Number', 'Date', 'Customer Name', 'Phone', 'Email',
+        'Delivery Address', 'Payment Method', 'Payment Status', 'Order Status',
+        'Transaction Code', 'M-Pesa Number', 'Bank Reference', 'Payer Account',
+        'Subtotal', 'Delivery Fee', 'Total', 'Invoice Number', 'Invoice Status'
+      ];
+
+      const rows = filteredOrders.map(o => {
+        const inv = invoicesByOrderId[o.id];
+        return [
+          o.order_number, o.created_at, o.customer_name, o.customer_phone, o.customer_email,
+          o.delivery_address, o.payment_method, o.payment_status, o.order_status,
+          o.transaction_code || '', o.mpesa_number || '', o.bank_reference || '', o.payer_account || '',
+          o.subtotal, o.delivery_fee, o.total,
+          inv?.invoice_number || '', inv?.status || ''
+        ];
+      });
+
+      const csv = [headers, ...rows]
+        .map(row => row.map(cell => {
+          const s = String(cell ?? '');
+          return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        }).join(','))
+        .join('\n');
+
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rise-axis-orders-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast(`Exported ${filteredOrders.length} orders`);
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+      await loadOrders();
+    })();
+  </script>
+
+</body>
+</html>

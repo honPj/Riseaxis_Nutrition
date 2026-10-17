@@ -1,0 +1,2928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Reports | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="admin-sidebar.js"></script>
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC STYLES — reports.html
+       ============================================================ */
+
+    /* Filter panel */
+    .filter-panel {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+      padding: 20px 22px;
+      margin-bottom: 20px;
+    }
+    .fp-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .fp-title i { color: var(--red); }
+
+    /* Preset chips */
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .preset-btn {
+      padding: 8px 14px;
+      border-radius: 30px;
+      background: var(--bg-light);
+      border: 1.5px solid var(--border);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .preset-btn:hover {
+      border-color: var(--navy);
+      transform: translateY(-1px);
+    }
+    .preset-btn.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      border-color: var(--navy);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(29,59,115,0.25);
+    }
+
+    /* Date range inputs */
+    .date-range-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .date-range-row .dr-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-light);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 14px;
+      height: 46px;
+      flex: 1;
+      min-width: 220px;
+    }
+    .date-range-row .dr-input i {
+      color: var(--navy);
+      font-size: 0.9rem;
+    }
+    .date-range-row .dr-input input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.9rem;
+      color: var(--navy);
+      font-weight: 600;
+      flex: 1;
+      font-family: inherit;
+    }
+    .date-range-row .dr-sep {
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Report picker (left rail) */
+    .report-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .report-layout { grid-template-columns: 1fr; }
+    }
+
+    .report-rail {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+      padding: 14px 12px;
+      position: sticky;
+      top: 24px;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+    .report-rail::-webkit-scrollbar { width: 4px; }
+    .report-rail::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    .rail-section {
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 14px 10px 6px;
+    }
+    .rail-section:first-child { padding-top: 4px; }
+
+    .rail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--navy);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .rail-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: color 0.18s;
+    }
+    .rail-item:hover {
+      background: var(--navy-soft);
+      transform: translateX(2px);
+    }
+    .rail-item:hover i { color: var(--navy); }
+    .rail-item.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(29,59,115,0.25);
+    }
+    .rail-item.active i { color: #fff; }
+    .rail-item.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Report content area */
+    .report-content {
+      min-width: 0;
+    }
+
+    /* KPI strip */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 16px 18px;
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(29,59,115,0.1);
+    }
+    .kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 3px;
+      background: var(--navy);
+    }
+    .kpi.kpi-green::before { background: var(--green); }
+    .kpi.kpi-red::before   { background: var(--red); }
+
+    .kpi .kpi-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .kpi .kpi-label i {
+      font-size: 0.75rem;
+      color: var(--navy);
+    }
+    .kpi.kpi-green .kpi-label i { color: var(--green); }
+    .kpi.kpi-red   .kpi-label i { color: var(--red); }
+
+    .kpi .kpi-value {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi.kpi-green .kpi-value { color: var(--green-deep); }
+    .kpi.kpi-red   .kpi-value { color: var(--red); }
+    .kpi .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Report table */
+    .report-table-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+      margin-bottom: 20px;
+    }
+    .rtc-title {
+      padding: 16px 20px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rtc-title i { color: var(--red); }
+    .rtc-title .rtc-count {
+      margin-left: auto;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-light);
+      padding: 3px 10px;
+      border-radius: 30px;
+    }
+
+    .report-table-wrap { overflow-x: auto; }
+    table.report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 700px;
+    }
+    .report-table thead th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafbff;
+      color: var(--navy);
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .report-table thead th.num { text-align: right; }
+    .report-table tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .report-table tbody tr:hover { background: #fafbff; }
+    .report-table tbody tr:last-child td { border-bottom: none; }
+    .report-table tbody td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .report-table tbody td.green { color: var(--green-deep); font-weight: 700; }
+    .report-table tbody td.red   { color: var(--red); font-weight: 700; }
+    .report-table tbody td.muted { color: var(--text-muted); }
+    .report-table tbody td.mono {
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+    }
+    .report-table tfoot td {
+      padding: 14px 16px;
+      background: #fafbff;
+      font-weight: 900;
+      color: var(--navy);
+      border-top: 2px solid var(--border);
+      font-size: 0.85rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .report-table tfoot td.num { text-align: right; }
+
+    /* Chart wrap */
+    .chart-wrap {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+    }
+    .chart-wrap .chart-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chart-wrap .chart-title i { color: var(--red); }
+    .chart-wrap canvas {
+      max-height: 340px;
+    }
+
+    /* Empty state within report content */
+    .report-empty {
+      padding: 60px 30px;
+      text-align: center;
+      color: var(--text-muted);
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+    .report-empty .re-icon {
+      font-size: 2.5rem;
+      color: var(--navy);
+      opacity: 0.4;
+      margin-bottom: 14px;
+    }
+    .report-empty .re-title {
+      font-size: 1rem;
+      color: var(--navy);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .report-empty .re-sub {
+      font-size: 0.85rem;
+    }
+
+    /* Banner (filters line above report) */
+    .report-banner {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--red);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+    }
+    .report-banner .rb-icon {
+      font-size: 1.3rem;
+      color: var(--navy);
+    }
+    .report-banner .rb-info { flex: 1; min-width: 200px; }
+    .report-banner .rb-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .report-banner .rb-filters {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: 'Courier New', monospace;
+    }
+    .report-banner .rb-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Export bar */
+    .export-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    /* Compact buttons for this page */
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      border-radius: 10px;
+    }
+
+    /* ============================================================
+       MOBILE REPORT DROPDOWN (New Addition)
+       ============================================================ */
+    .mobile-report-dropdown-wrap {
+      display: none; /* Hidden on desktop */
+      position: relative;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .mobile-report-dropdown-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(31,58,110,0.04);
+      transition: border-color 0.2s;
+    }
+    .mobile-report-dropdown-trigger:active {
+      border-color: var(--navy);
+    }
+    .mobile-report-dropdown-trigger i.fa-chevron-down {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+    .mobile-report-dropdown-wrap.open .mobile-report-dropdown-trigger i.fa-chevron-down {
+      transform: rotate(180deg);
+    }
+
+    .mobile-report-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(15,23,41,0.15);
+      z-index: 100;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 6px;
+      animation: menuIn 0.2s ease;
+    }
+    .mobile-report-dropdown-wrap.open .mobile-report-dropdown-menu {
+      display: block;
+    }
+
+    .mobile-report-dropdown-menu .mrd-section {
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 12px 4px;
+    }
+
+    .mobile-report-dropdown-menu button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
+      background: none;
+      border-radius: 8px;
+      color: var(--navy);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .mobile-report-dropdown-menu button:hover,
+    .mobile-report-dropdown-menu button:active {
+      background: var(--bg-light);
+    }
+    .mobile-report-dropdown-menu button.active {
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+    }
+    .mobile-report-dropdown-menu button.active i {
+      color: #fff;
+    }
+    .mobile-report-dropdown-menu button i {
+      width: 20px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .period-bar .pb-range { margin-left: 0; width: 100%; }
+    }
+    @media (max-width: 900px) {
+      /* Stack the rail above content on tablet */
+      .report-layout { grid-template-columns: 1fr; gap: 14px; }
+      .report-rail {
+        position: static;
+        max-height: none;
+        padding: 10px 8px;
+      }
+      /* Make rail horizontal scrollable chips on tablet/mobile */
+      .report-rail {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 6px;
+      }
+      .report-rail .rail-section {
+        display: none;
+      }
+      .report-rail .rail-item {
+        flex-shrink: 0;
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        border-radius: 30px;
+        background: var(--bg-light);
+        width: auto;
+      }
+      .report-rail .rail-item.active {
+        background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      }
+      .report-rail .rail-item.disabled {
+        opacity: 0.55;
+      }
+      .report-rail .rail-item span[style*="SOON"] {
+        display: none;
+      }
+
+      /* Chart and side-by-side layouts stack */
+      .chart-wrap { padding: 16px; }
+      .chart-wrap canvas { max-height: 260px; }
+    }
+
+    @media (max-width: 768px) {
+      /* Hide desktop report rail and show mobile dropdown */
+      .report-rail {
+        display: none !important;
+      }
+      .mobile-report-dropdown-wrap {
+        display: block;
+      }
+
+      /* Hide KPI cards on mobile */
+      .kpi-strip {
+        display: none !important;
+      }
+
+      .report-banner {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px 16px;
+      }
+      .report-banner .rb-actions {
+        width: 100%;
+      }
+      .report-banner .rb-actions button {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .filter-panel { padding: 16px; }
+      .filter-panel .fp-title { margin-bottom: 12px; }
+
+      .preset-row {
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+      .preset-btn {
+        font-size: 0.72rem;
+        padding: 6px 10px;
+      }
+
+      .date-range-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .date-range-row .dr-sep {
+        text-align: center;
+        transform: rotate(90deg);
+      }
+      .date-range-row .dr-input {
+        min-width: 100%;
+        height: 42px;
+      }
+
+      .report-table {
+        font-size: 0.78rem;
+        min-width: 560px;
+      }
+      .report-table thead th {
+        padding: 10px 12px;
+        font-size: 0.6rem;
+      }
+      .report-table tbody td,
+      .report-table tfoot td {
+        padding: 10px 12px;
+      }
+
+      .rtc-title {
+        padding: 14px 16px;
+        font-size: 0.72rem;
+      }
+
+      .export-bar button,
+      .report-banner .rb-actions button {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.78rem;
+        padding: 8px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .preset-btn { font-size: 0.72rem; padding: 6px 10px; }
+      .date-range-row .dr-input { min-width: 100%; }
+      .report-table { min-width: 480px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    // Hide on DOMContentLoaded; fall back to load + 2s
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+  <!-- ACCESS DENIED -->
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">Your account does not have administrator privileges.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <div class="page-title-row">
+          <div>
+            <h1><i class="fas fa-chart-line"></i> Reports</h1>
+            <p>Sales, products, users, and financial reports filter and export.</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh btn-sm" onclick="reloadReport()">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- FILTER PANEL -->
+        <div class="filter-panel">
+          <div class="fp-title"><i class="fas fa-sliders-h"></i> Period</div>
+
+          <div class="preset-row" id="presetRow">
+            <button class="preset-btn" data-preset="today">Today</button>
+            <button class="preset-btn" data-preset="yesterday">Yesterday</button>
+            <button class="preset-btn active" data-preset="last7">Last 7 days</button>
+            <button class="preset-btn" data-preset="last30">Last 30 days</button>
+            <button class="preset-btn" data-preset="thisMonth">This month</button>
+            <button class="preset-btn" data-preset="lastMonth">Last month</button>
+            <button class="preset-btn" data-preset="thisYear">This year</button>
+            <button class="preset-btn" data-preset="custom">Custom</button>
+          </div>
+
+          <div class="date-range-row">
+            <div class="dr-input">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="date" id="dateFrom">
+            </div>
+            <span class="dr-sep">→</span>
+            <div class="dr-input">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="date" id="dateTo">
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORT LAYOUT -->
+        <div class="report-layout">
+
+          <!-- LEFT RAIL: report list (Desktop) -->
+          <aside class="report-rail" id="reportRail"></aside>
+
+          <!-- RIGHT: content -->
+          <div class="report-content">
+
+            <!-- Mobile Report Dropdown (New) -->
+            <div class="mobile-report-dropdown-wrap" id="mobileReportDropdown">
+              <button class="mobile-report-dropdown-trigger" onclick="toggleMobileReportDropdown()">
+                <span><i class="fas fa-chart-bar" style="margin-right:8px; color:var(--red);"></i> <span id="mobileReportLabel">Daily Sales</span></span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="mobile-report-dropdown-menu" id="mobileReportMenu">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- Banner showing current report + active filters -->
+            <div class="report-banner" id="reportBanner" style="display: none;">
+              <div class="rb-icon" id="rbIcon"><i class="fas fa-chart-bar"></i></div>
+              <div class="rb-info">
+                <div class="rb-title" id="rbTitle">—</div>
+                <div class="rb-filters" id="rbFilters">—</div>
+              </div>
+              <div class="rb-actions">
+                <button class="btn-secondary btn-sm" onclick="exportCSV()">
+                  <i class="fas fa-file-csv"></i> Export CSV
+                </button>
+                <button class="btn-secondary btn-sm" onclick="window.print()">
+                  <i class="fas fa-print"></i> Print
+                </button>
+              </div>
+            </div>
+
+            <!-- Report body -->
+            <div id="reportBody">
+              <div class="report-empty">
+                <div class="re-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="re-title">Pick a report</div>
+                <div class="re-sub">Choose one from the list on the left to get started.</div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       REPORT CATALOG
+       ============================================================ */
+          const REPORTS = [
+      // Sales
+      { id: 'daily',   group: 'Sales',   icon: 'fa-calendar-day',   name: 'Daily Sales',        live: true, roles: ['admin','sales'] },
+      { id: 'weekly',  group: 'Sales',   icon: 'fa-calendar-week',  name: 'Weekly Sales',       live: true, roles: ['admin','sales'] },
+      { id: 'monthly', group: 'Sales',   icon: 'fa-calendar-alt',   name: 'Monthly Sales',      live: true, roles: ['admin','sales'] },
+      { id: 'yearly',  group: 'Sales',   icon: 'fa-calendar',       name: 'Yearly Sales',       live: true, roles: ['admin','sales'] },
+
+      // Products
+      { id: 'products-list',   group: 'Products', icon: 'fa-box',       name: 'Products List',        live: true, roles: ['admin'] },
+      { id: 'stock-value',     group: 'Products', icon: 'fa-coins',     name: 'Stock Value',          live: true, roles: ['admin'] },
+      { id: 'top-products',    group: 'Products', icon: 'fa-trophy',    name: 'Top Products',         live: true, roles: ['admin'] },
+      { id: 'product-volume',  group: 'Products', icon: 'fa-chart-bar', name: 'Product Sales Volume', live: true, roles: ['admin'] },
+      { id: 'stock-movements', group: 'Products', icon: 'fa-exchange-alt', name: 'Stock Movements',   live: true, roles: ['admin'] },
+
+      // Users
+      { id: 'user-statement',  group: 'Users', icon: 'fa-file-invoice-dollar', name: 'User Statement',    live: true, roles: ['admin'] },
+      { id: 'admin-perf',      group: 'Users', icon: 'fa-user-tie',            name: 'Admin Performance', live: true, roles: ['admin'] },
+
+      // Finances
+      { id: 'pl',                 group: 'Finances', icon: 'fa-balance-scale', name: 'Profit & Loss',     live: true, roles: ['admin'] },
+      { id: 'payment-breakdown',  group: 'Finances', icon: 'fa-credit-card',   name: 'Payment Breakdown', live: true, roles: ['admin','sales'] }
+    ];
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let activeReportId = 'daily';
+    let currentRange = { from: '', to: '', preset: 'last7' };
+    let lastReportData = null;      // cached rows for CSV export
+    let lastReportMeta = null;      // header/footer info for CSV
+    let currentChart = null;
+    let categoriesById = {};
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtKESWhole = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    const fmtNum = n => Number(n || 0).toLocaleString('en-KE');
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const todayISO = () => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    };
+    const addDays = (iso, n) => {
+      const d = new Date(iso + 'T00:00:00');
+      d.setDate(d.getDate() + n);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    };
+    const fmtDate = iso => {
+      if (!iso) return '—';
+      try {
+        return new Date(String(iso).slice(0,10) + 'T00:00:00').toLocaleDateString('en-KE', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        });
+      } catch { return iso; }
+    };
+    const fmtDateTime = iso => {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+             + ' · ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
+      } catch { return iso; }
+    };
+    const dayKey = iso => String(iso).slice(0, 10);
+    const monthKey = iso => String(iso).slice(0, 7);
+    const yearKey = iso => String(iso).slice(0, 4);
+    const weekStart = isoStr => {
+  if (!isoStr) return '';
+  // Accept both "2026-10-12" and "2026-10-12T14:23:11+00:00"
+  const datePart = String(isoStr).slice(0, 10);
+  const d = new Date(datePart + 'T00:00:00');
+  if (isNaN(d.getTime())) return '';
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  d.setDate(d.getDate() + diff);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+        /* ============================================================
+       AUTH — delegated to shared admin-sidebar.js
+       ============================================================ */
+    let userIsAdmin = false;
+
+    async function checkAdminAccess() {
+      const ok = await window.adminAuthCheck(['admin', 'sales']);
+      if (!ok) return false;
+      const info = window.adminGetProfile();
+      userIsAdmin = (info.role === 'admin');
+      return true;
+    }
+    function showAccessDenied(msg) {
+      document.getElementById('adminMain').style.display = 'none';
+      document.getElementById('accessDenied').style.display = 'flex';
+      if (msg) document.getElementById('accessDeniedMsg').textContent = msg;
+    }
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../index.html';
+    }
+
+    /* ============================================================
+       DATE PRESETS
+       ============================================================ */
+    function applyPreset(preset) {
+      const today = todayISO();
+      let from = today, to = today;
+
+      switch (preset) {
+        case 'today':     from = to = today; break;
+        case 'yesterday': from = to = addDays(today, -1); break;
+        case 'last7':     from = addDays(today, -6); to = today; break;
+        case 'last30':    from = addDays(today, -29); to = today; break;
+        case 'thisMonth': {
+          const d = new Date();
+          from = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
+          to = today;
+          break;
+        }
+        case 'lastMonth': {
+          const d = new Date();
+          d.setDate(1);
+          d.setMonth(d.getMonth() - 1);
+          const first = new Date(d);
+          const last = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+          from = `${first.getFullYear()}-${String(first.getMonth()+1).padStart(2,'0')}-01`;
+          to = `${last.getFullYear()}-${String(last.getMonth()+1).padStart(2,'0')}-${String(last.getDate()).padStart(2,'0')}`;
+          break;
+        }
+        case 'thisYear': {
+          const y = new Date().getFullYear();
+          from = `${y}-01-01`;
+          to = today;
+          break;
+        }
+        default: /* custom — leave current values */ break;
+      }
+
+      currentRange.preset = preset;
+      currentRange.from = from;
+      currentRange.to = to;
+      document.getElementById('dateFrom').value = from;
+      document.getElementById('dateTo').value = to;
+      document.querySelectorAll('#presetRow .preset-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.preset === preset);
+      });
+    }
+
+    document.getElementById('presetRow').addEventListener('click', e => {
+      const btn = e.target.closest('.preset-btn');
+      if (!btn) return;
+      applyPreset(btn.dataset.preset);
+      loadReport();
+    });
+
+    document.getElementById('dateFrom').addEventListener('change', e => {
+      currentRange.from = e.target.value;
+      currentRange.preset = 'custom';
+      document.querySelectorAll('#presetRow .preset-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.preset === 'custom');
+      });
+      loadReport();
+    });
+    document.getElementById('dateTo').addEventListener('change', e => {
+      currentRange.to = e.target.value;
+      currentRange.preset = 'custom';
+      document.querySelectorAll('#presetRow .preset-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.preset === 'custom');
+      });
+      loadReport();
+    });
+
+    /* ============================================================
+       REPORT RAIL (Desktop) & MOBILE DROPDOWN (New)
+       ============================================================ */
+    function renderRail() {
+      const rail = document.getElementById('reportRail');
+      const role = userIsAdmin ? 'admin' : 'sales';
+      const groups = ['Sales', 'Products', 'Users', 'Finances'];
+      let html = '';
+      for (const g of groups) {
+        const items = REPORTS.filter(r => r.group === g && (r.roles || ['admin']).includes(role));
+        if (!items.length) continue;
+        html += `<div class="rail-section">${escapeHtml(g)}</div>`;
+        html += items.map(r => `
+          <button type="button" class="rail-item ${r.id === activeReportId ? 'active' : ''} ${r.live ? '' : 'disabled'}"
+            onclick="selectReport('${escapeHtml(r.id)}')">
+            <i class="fas ${escapeHtml(r.icon)}"></i>
+            <span>${escapeHtml(r.name)}</span>
+            ${r.live ? '' : '<span style="margin-left:auto;font-size:0.6rem;font-weight:800;color:var(--text-muted);letter-spacing:0.8px;">SOON</span>'}
+          </button>
+        `).join('');
+      }
+      rail.innerHTML = html;
+    }
+
+    // New: Mobile Report Dropdown
+    function renderMobileReportMenu() {
+      const menu = document.getElementById('mobileReportMenu');
+      const groups = ['Sales', 'Products', 'Users', 'Finances'];
+      let html = '';
+      for (const g of groups) {
+        const items = REPORTS.filter(r => r.group === g);
+        if (!items.length) continue;
+        html += `<div class="mrd-section">${escapeHtml(g)}</div>`;
+        html += items.map(r => `
+          <button type="button" class="${r.id === activeReportId ? 'active' : ''} ${r.live ? '' : 'disabled'}"
+            onclick="selectReport('${escapeHtml(r.id)}')">
+            <i class="fas ${escapeHtml(r.icon)}"></i>
+            <span>${escapeHtml(r.name)}</span>
+          </button>
+        `).join('');
+      }
+      menu.innerHTML = html;
+    }
+
+    function toggleMobileReportDropdown() {
+      document.getElementById('mobileReportDropdown').classList.toggle('open');
+    }
+
+    // Close mobile dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const wrap = document.getElementById('mobileReportDropdown');
+      if (wrap && !e.target.closest('#mobileReportDropdown')) {
+        wrap.classList.remove('open');
+      }
+    });
+
+    function selectReport(id) {
+      const def = REPORTS.find(r => r.id === id);
+      if (!def || !def.live) {
+        showToast(`${def?.name || 'This report'} is coming in the next update`, 'error');
+        return;
+      }
+      activeReportId = id;
+      renderRail();
+      loadReport();
+      adminCloseSidebar(); 
+    
+      // Update mobile label
+      document.getElementById('mobileReportLabel').textContent = def.name;
+      
+      // Close mobile dropdown
+      document.getElementById('mobileReportDropdown').classList.remove('open');
+      
+      loadReport();
+    }
+
+    /* ============================================================
+       LOAD DATA
+       ============================================================ */
+    async function fetchInvoicesForRange(from, to) {
+      // Only invoiced (issued, partial, paid) — exclude drafts and void
+      const { data, error } = await supabaseClient
+        .from('invoices')
+        .select(`
+          id, invoice_number, status, issue_date, due_date,
+          customer_user_id, customer_name, customer_phone, customer_email,
+          subtotal, line_discount_total, invoice_discount, net_amount,
+          vat_total, delivery_total, total, amount_paid,
+          created_by, created_at
+        `)
+        .gte('issue_date', from)
+        .lte('issue_date', to)
+        .in('status', ['issued', 'partial', 'paid'])
+        .order('issue_date', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function fetchInvoiceItems(invoiceIds) {
+      if (!invoiceIds.length) return [];
+      const { data, error } = await supabaseClient
+        .from('invoice_items')
+        .select('id, invoice_id, product_id, pack_label, description, quantity, unit_price, line_discount, vat_rate, is_custom')
+        .in('invoice_id', invoiceIds);
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function fetchPaymentsForRange(from, to) {
+      // payments.paid_at is a timestamptz
+      const fromTs = from + 'T00:00:00';
+      const toTs = to + 'T23:59:59';
+      const { data, error } = await supabaseClient
+        .from('payments')
+        .select('id, invoice_id, amount, method, reference, paid_at, received_by, notes')
+        .gte('paid_at', fromTs)
+        .lte('paid_at', toTs)
+        .order('paid_at', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function fetchProductsMap() {
+      const { data, error } = await supabaseClient
+        .from('products')
+        .select('id, name, cost_price, price');
+      if (error) throw error;
+      const map = {};
+      (data || []).forEach(p => { map[p.id] = p; });
+      return map;
+    }
+
+    /* ============================================================
+       LOAD + RENDER
+       ============================================================ */
+    async function loadReport() {
+      const def = REPORTS.find(r => r.id === activeReportId);
+      if (!def || !def.live) return;
+
+      // Sanity check the date range
+      if (!currentRange.from || !currentRange.to) return;
+      if (currentRange.from > currentRange.to) {
+        showToast('Start date cannot be after end date', 'error');
+        return;
+      }
+
+      // Banner
+      document.getElementById('reportBanner').style.display = 'flex';
+      document.getElementById('rbTitle').textContent = def.name;
+      document.getElementById('rbFilters').textContent = `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`;
+
+      // Loading state
+      document.getElementById('reportBody').innerHTML = `
+        <div class="report-empty">
+          <div class="re-icon"><i class="fas fa-circle-notch fa-spin"></i></div>
+          <div class="re-title">Loading report...</div>
+          <div class="re-sub">Fetching data for ${escapeHtml(def.name)}.</div>
+        </div>`;
+
+      try {
+               // Common data
+        const invoices = await fetchInvoicesForRange(currentRange.from, currentRange.to);
+        const invoiceIds = invoices.map(i => i.id);
+        const [items, payments, productsMap, productsFull, profilesMap, stockMovements] = await Promise.all([
+          fetchInvoiceItems(invoiceIds),
+          fetchPaymentsForRange(currentRange.from, currentRange.to),
+          fetchProductsMap(),
+          fetchProductsFull(),
+          fetchProfilesMap(),
+          fetchStockMovementsForRange(currentRange.from, currentRange.to)
+        ]);
+
+        const ctx = {
+          invoices, items, payments, productsMap, productsFull, profilesMap, stockMovements,
+          from: currentRange.from, to: currentRange.to,
+          categoriesById
+        };
+
+               switch (activeReportId) {
+          case 'daily':               return renderTimeSeries(ctx, 'day');
+          case 'weekly':              return renderTimeSeries(ctx, 'week');
+          case 'monthly':             return renderTimeSeries(ctx, 'month');
+          case 'yearly':              return renderTimeSeries(ctx, 'year');
+          case 'products-list':       return renderProductsList(ctx);
+          case 'stock-value':         return renderStockValue(ctx);
+          case 'top-products':        return renderTopProducts(ctx);
+           case 'product-volume':      return renderProductVolume(ctx);
+          case 'stock-movements':     return renderStockMovements(ctx);
+          case 'user-statement':      return renderUserStatement(ctx);
+          case 'admin-perf':          return renderAdminPerformance(ctx);
+          case 'pl':                  return renderProfitLoss(ctx);
+          case 'payment-breakdown':   return renderPaymentBreakdown(ctx);
+          default:
+            return renderPlaceholder(def);
+        }
+      } catch (err) {
+        console.error('Report load failed:', err);
+        document.getElementById('reportBody').innerHTML = `
+          <div class="report-empty">
+            <div class="re-icon"><i class="fas fa-exclamation-triangle" style="color:var(--red);"></i></div>
+            <div class="re-title">Could not load report</div>
+            <div class="re-sub">${escapeHtml(err.message || 'Please try again.')}</div>
+          </div>`;
+        showToast('Failed to load report', 'error');
+      }
+    }
+
+    function reloadReport() {
+      loadReport();
+    }
+
+    function renderPlaceholder(def) {
+      document.getElementById('reportBody').innerHTML = `
+        <div class="report-empty">
+          <div class="re-icon"><i class="fas ${escapeHtml(def.icon)}"></i></div>
+          <div class="re-title">${escapeHtml(def.name)}</div>
+          <div class="re-sub">This report is being built. Coming in the next update.</div>
+        </div>`;
+    }
+
+    /* ============================================================
+       RENDER: TIME SERIES (Daily / Weekly / Monthly / Yearly)
+       ============================================================ */
+    function renderTimeSeries(ctx, granularity) {
+      const { invoices, payments, items, productsMap } = ctx;
+      const labelMap = { day: 'Day', week: 'Week', month: 'Month', year: 'Year' };
+
+      // Group invoices (by issue_date) and payments (by paid_at) into buckets
+      const buckets = {};   // key -> { invoicedCount, invoicedTotal, invoicedVat, collectedTotal, unitsSold, costOfGoods }
+
+      const ensure = k => {
+        if (!buckets[k]) buckets[k] = {
+          key: k, invoicedCount: 0, invoicedTotal: 0, invoicedVat: 0,
+          collectedTotal: 0, unitsSold: 0, costOfGoods: 0
+        };
+        return buckets[k];
+      };
+
+    const bucketKey = iso => {
+  if (!iso) return null;
+  const s = String(iso);
+  if (s.length < 7) return null;
+  if (granularity === 'day')   return dayKey(s);
+  if (granularity === 'week')  return weekStart(s);
+  if (granularity === 'month') return monthKey(s);
+  return yearKey(s);
+};
+
+     invoices.forEach(inv => {
+  const k = bucketKey(inv.issue_date);
+  if (!k) return;
+  const b = ensure(k);
+  b.invoicedCount += 1;
+  b.invoicedTotal += Number(inv.total) || 0;
+  b.invoicedVat   += Number(inv.vat_total) || 0;
+});
+
+payments.forEach(p => {
+  const k = bucketKey(p.paid_at);
+  if (!k) return;
+  const b = ensure(k);
+  b.collectedTotal += Number(p.amount) || 0;
+});
+
+items.forEach(it => {
+  if (it.is_custom) return;
+  const inv = invoices.find(i => i.id === it.invoice_id);
+  if (!inv) return;
+  const k = bucketKey(inv.issue_date);
+  if (!k) return;
+  const b = ensure(k);
+  // ... rest unchanged
+});
+      // Sort keys ascending
+      const sortedKeys = Object.keys(buckets).sort();
+
+      // Totals
+      const totalInvoiced = sortedKeys.reduce((s, k) => s + buckets[k].invoicedTotal, 0);
+      const totalCollected = sortedKeys.reduce((s, k) => s + buckets[k].collectedTotal, 0);
+      const totalVat = sortedKeys.reduce((s, k) => s + buckets[k].invoicedVat, 0);
+      const totalInvCount = sortedKeys.reduce((s, k) => s + buckets[k].invoicedCount, 0);
+      const totalUnits = sortedKeys.reduce((s, k) => s + buckets[k].unitsSold, 0);
+      const totalCogs = sortedKeys.reduce((s, k) => s + buckets[k].costOfGoods, 0);
+      const grossProfit = totalInvoiced - totalVat - totalCogs;    // exclude VAT from margin
+      const marginPct = (totalInvoiced - totalVat) > 0 ? (grossProfit / (totalInvoiced - totalVat)) * 100 : 0;
+
+      // Render
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-file-invoice"></i> Invoices Issued</div>
+            <div class="kpi-value">${fmtNum(totalInvCount)}</div>
+            <div class="kpi-sub">${labelMap[granularity]}s in range: ${fmtNum(sortedKeys.length)}</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Invoiced</div>
+            <div class="kpi-value">${fmtKESWhole(totalInvoiced)}</div>
+            <div class="kpi-sub">Incl. VAT ${fmtKESWhole(totalVat)}</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-check-circle"></i> Collected</div>
+            <div class="kpi-value">${fmtKESWhole(totalCollected)}</div>
+            <div class="kpi-sub">${totalInvoiced > 0 ? Math.round((totalCollected / totalInvoiced) * 100) : 0}% of invoiced</div>
+          </div>
+          <div class="kpi kpi-red">
+            <div class="kpi-label"><i class="fas fa-hourglass-half"></i> Outstanding</div>
+            <div class="kpi-value">${fmtKESWhole(totalInvoiced - totalCollected)}</div>
+            <div class="kpi-sub">Not yet collected</div>
+          </div>
+          ${totalCogs > 0 ? `
+            <div class="kpi kpi-green">
+              <div class="kpi-label"><i class="fas fa-chart-line"></i> Gross Margin</div>
+              <div class="kpi-value">${fmtKESWhole(grossProfit)}</div>
+              <div class="kpi-sub">${marginPct.toFixed(1)}% of net revenue</div>
+            </div>` : ''}
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-box"></i> Units Sold</div>
+            <div class="kpi-value">${fmtNum(totalUnits)}</div>
+            <div class="kpi-sub">Across all invoices</div>
+          </div>
+        </div>`;
+
+      // Chart — dual line: invoiced vs collected
+      const chartHtml = sortedKeys.length ? `
+        <div class="chart-wrap">
+          <div class="chart-title"><i class="fas fa-chart-area"></i> Invoiced vs Collected</div>
+          <canvas id="tsChart"></canvas>
+        </div>` : '';
+
+      // Table
+      const rowsHtml = sortedKeys.map(k => {
+        const b = buckets[k];
+        const diff = b.invoicedTotal - b.collectedTotal;
+        return `
+          <tr>
+            <td><strong>${escapeHtml(k)}</strong></td>
+            <td class="num mono">${fmtNum(b.invoicedCount)}</td>
+            <td class="num">${fmtKES(b.invoicedTotal)}</td>
+            <td class="num">${fmtKES(b.invoicedVat)}</td>
+            <td class="num green">${fmtKES(b.collectedTotal)}</td>
+            <td class="num ${diff > 0.01 ? 'red' : 'green'}">${fmtKES(diff)}</td>
+            <td class="num">${fmtNum(b.unitsSold)}</td>
+          </tr>`;
+      }).join('');
+
+      const totalDiff = totalInvoiced - totalCollected;
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        ${chartHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-table"></i> Breakdown by ${labelMap[granularity]}
+            <span class="rtc-count">${sortedKeys.length} ${labelMap[granularity].toLowerCase()}${sortedKeys.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>${labelMap[granularity]}</th>
+                  <th class="num">Invoices</th>
+                  <th class="num">Invoiced</th>
+                  <th class="num">VAT</th>
+                  <th class="num">Collected</th>
+                  <th class="num">Balance</th>
+                  <th class="num">Units</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml || `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No invoices in this period.</td></tr>`}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="num">${fmtNum(totalInvCount)}</td>
+                  <td class="num">${fmtKES(totalInvoiced)}</td>
+                  <td class="num">${fmtKES(totalVat)}</td>
+                  <td class="num">${fmtKES(totalCollected)}</td>
+                  <td class="num">${fmtKES(totalDiff)}</td>
+                  <td class="num">${fmtNum(totalUnits)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      // Cache for CSV export
+      lastReportData = {
+        columns: [labelMap[granularity], 'Invoices', 'Invoiced', 'VAT', 'Collected', 'Balance', 'Units'],
+        rows: sortedKeys.map(k => {
+          const b = buckets[k];
+          return [
+            k,
+            b.invoicedCount,
+            b.invoicedTotal,
+            b.invoicedVat,
+            b.collectedTotal,
+            b.invoicedTotal - b.collectedTotal,
+            b.unitsSold
+          ];
+        }),
+        totals: [
+          'TOTAL',
+          totalInvCount,
+          totalInvoiced,
+          totalVat,
+          totalCollected,
+          totalDiff,
+          totalUnits
+        ]
+      };
+      lastReportMeta = {
+        title: `${REPORTS.find(r => r.id === activeReportId).name}`,
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+
+      // Chart
+      if (currentChart) { currentChart.destroy(); currentChart = null; }
+      if (sortedKeys.length) {
+        const ctxCanvas = document.getElementById('tsChart');
+        const style = getComputedStyle(document.documentElement);
+        const navy = style.getPropertyValue('--navy').trim() || '#1D3B73';
+        const green = style.getPropertyValue('--green').trim() || '#17B052';
+
+        currentChart = new Chart(ctxCanvas, {
+          type: 'line',
+          data: {
+            labels: sortedKeys,
+            datasets: [
+              {
+                label: 'Invoiced',
+                data: sortedKeys.map(k => buckets[k].invoicedTotal),
+                borderColor: navy,
+                backgroundColor: 'rgba(29,59,115,0.08)',
+                tension: 0.3,
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 3
+              },
+              {
+                label: 'Collected',
+                data: sortedKeys.map(k => buckets[k].collectedTotal),
+                borderColor: green,
+                backgroundColor: 'rgba(23,176,82,0.08)',
+                tension: 0.3,
+                fill: true,
+                borderWidth: 2,
+                pointRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  label: c => `${c.dataset.label}: ${fmtKES(c.parsed.y)}`
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: v => 'KES ' + Number(v).toLocaleString('en-KE')
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    /* ============================================================
+       EXPORT CSV
+       ============================================================ */
+    function exportCSV() {
+      if (!lastReportData || !lastReportMeta) {
+        showToast('Run a report first', 'error');
+        return;
+      }
+      const { columns, rows, totals } = lastReportData;
+      const esc = v => {
+        const s = String(v ?? '');
+        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const meta = [];
+      meta.push([lastReportMeta.title]);
+      meta.push([`Period: ${lastReportMeta.period}`]);
+      meta.push([`Generated: ${new Date().toLocaleString('en-KE')}`]);
+      meta.push([]);
+      meta.push(columns);
+      rows.forEach(r => meta.push(r));
+      if (totals) meta.push(totals);
+
+      const csv = meta.map(row => row.map(esc).join(',')).join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rise-axis-${activeReportId}-${currentRange.from}-to-${currentRange.to}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('CSV downloaded');
+    }
+    /* ============================================================
+       EXTRA DATA FETCHERS (Part 2)
+       ============================================================ */
+    async function fetchProductsFull() {
+      const { data, error } = await supabaseClient
+        .from('products')
+        .select('id, name, slug, category_id, price, cost_price, stock, vat_applicable, image_url, is_active');
+      if (error) throw error;
+      return data || [];
+    }
+
+    async function fetchProfilesMap() {
+      // Best-effort: profiles may or may not have a phone column.
+      // Try full fetch, fall back to minimal if it errors.
+      let { data, error } = await supabaseClient
+        .from('profiles')
+        .select('id, first_name, last_name, email, role');
+      if (error) {
+        // Try without role (in case schema differs)
+        const fallback = await supabaseClient
+          .from('profiles')
+          .select('id, first_name, last_name, email');
+        data = fallback.data || [];
+      }
+      const map = {};
+      (data || []).forEach(p => {
+        map[p.id] = {
+          id: p.id,
+          name: [p.first_name, p.last_name].filter(Boolean).join(' ') || p.email || 'User',
+          email: p.email || '',
+          role: p.role || ''
+        };
+      });
+      return map;
+    }
+    async function fetchStockMovementsForRange(from, to) {
+      // stock_movements.created_at is a timestamptz
+      const fromTs = from + 'T00:00:00';
+      const toTs = to + 'T23:59:59';
+      const { data, error } = await supabaseClient
+        .from('stock_movements')
+        .select('*')
+        .gte('created_at', fromTs)
+        .lte('created_at', toTs)
+        .order('created_at', { ascending: false })
+        .limit(1000);
+      if (error) {
+        console.warn('Stock movements fetch failed:', error);
+        return [];
+      }
+      return data || [];
+    }
+    /* ============================================================
+       RENDER: PRODUCTS LIST
+       ============================================================ */
+    function renderProductsList(ctx) {
+      const { productsFull, categoriesById } = ctx;
+
+      const active = productsFull.filter(p => p.is_active).length;
+      const outOfStock = productsFull.filter(p => Number(p.stock) === 0).length;
+      const lowStock = productsFull.filter(p => Number(p.stock) > 0 && Number(p.stock) <= 10).length;
+      const vatExempt = productsFull.filter(p => p.vat_applicable === false).length;
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-box"></i> Products</div>
+            <div class="kpi-value">${fmtNum(productsFull.length)}</div>
+            <div class="kpi-sub">${active} active</div>
+          </div>
+          <div class="kpi kpi-red">
+            <div class="kpi-label"><i class="fas fa-ban"></i> Out of Stock</div>
+            <div class="kpi-value">${fmtNum(outOfStock)}</div>
+            <div class="kpi-sub">Need reorder</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-exclamation-triangle"></i> Low Stock</div>
+            <div class="kpi-value">${fmtNum(lowStock)}</div>
+            <div class="kpi-sub">≤ 10 units</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-percent"></i> VAT Exempt</div>
+            <div class="kpi-value">${fmtNum(vatExempt)}</div>
+            <div class="kpi-sub">of ${productsFull.length}</div>
+          </div>
+        </div>`;
+
+      const rows = productsFull.slice().sort((a, b) => a.name.localeCompare(b.name));
+      const rowsHtml = rows.map(p => {
+        const stock = Number(p.stock) || 0;
+        const statusBadge = !p.is_active
+          ? '<span class="badge badge-inactive">Inactive</span>'
+          : stock === 0
+            ? '<span class="badge badge-out">Out</span>'
+            : stock <= 10
+              ? `<span class="badge badge-low">Low: ${stock}</span>`
+              : '<span class="badge badge-ok">In stock</span>';
+        const vatBadge = p.vat_applicable === false
+          ? '<span class="badge badge-draft">Exempt</span>'
+          : '<span class="badge badge-issued">16%</span>';
+        const catName = categoriesById[p.category_id] || '—';
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(p.name)}</strong>
+              ${p.slug ? `<div class="muted mono" style="font-size:0.72rem;">${escapeHtml(p.slug)}</div>` : ''}
+            </td>
+            <td class="muted">${escapeHtml(catName)}</td>
+            <td class="num">${fmtKES(p.price)}</td>
+            <td class="num">${p.cost_price != null ? fmtKES(p.cost_price) : '<span class="muted">—</span>'}</td>
+            <td class="num">${fmtNum(stock)}</td>
+            <td>${statusBadge}</td>
+            <td>${vatBadge}</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-box"></i> Catalogue
+            <span class="rtc-count">${productsFull.length} products</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th class="num">Price</th>
+                  <th class="num">Cost</th>
+                  <th class="num">Stock</th>
+                  <th>Status</th>
+                  <th>VAT</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No products.</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['Product', 'Slug', 'Category', 'Price', 'Cost', 'Stock', 'Status', 'VAT'],
+        rows: rows.map(p => [
+          p.name,
+          p.slug || '',
+          categoriesById[p.category_id] || '',
+          Number(p.price) || 0,
+          p.cost_price != null ? Number(p.cost_price) : '',
+          Number(p.stock) || 0,
+          p.is_active ? 'Active' : 'Inactive',
+          p.vat_applicable === false ? 'Exempt' : '16%'
+        ]),
+        totals: null
+      };
+      lastReportMeta = {
+        title: 'Products List',
+        period: 'Current snapshot'
+      };
+    }
+
+    /* ============================================================
+       RENDER: STOCK VALUE
+       ============================================================ */
+    function renderStockValue(ctx) {
+      const { productsFull, categoriesById } = ctx;
+
+      let totalCostValue = 0, totalRetailValue = 0, totalUnits = 0;
+      const withCost = [];
+
+      productsFull.forEach(p => {
+        const stock = Number(p.stock) || 0;
+        const cost = Number(p.cost_price) || 0;
+        const price = Number(p.price) || 0;
+        totalCostValue += stock * cost;
+        totalRetailValue += stock * price;
+        totalUnits += stock;
+        if (cost > 0) withCost.push({ p, stock, cost, price });
+      });
+
+      const potentialProfit = totalRetailValue - totalCostValue;
+      const marginPct = totalRetailValue > 0 ? (potentialProfit / totalRetailValue) * 100 : 0;
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-boxes"></i> Total Units</div>
+            <div class="kpi-value">${fmtNum(totalUnits)}</div>
+            <div class="kpi-sub">across ${productsFull.length} products</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Cost Value</div>
+            <div class="kpi-value">${fmtKESWhole(totalCostValue)}</div>
+            <div class="kpi-sub">What you paid</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-tag"></i> Retail Value</div>
+            <div class="kpi-value">${fmtKESWhole(totalRetailValue)}</div>
+            <div class="kpi-sub">If sold at list price</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-chart-line"></i> Potential Profit</div>
+            <div class="kpi-value">${fmtKESWhole(potentialProfit)}</div>
+            <div class="kpi-sub">${marginPct.toFixed(1)}% margin</div>
+          </div>
+        </div>`;
+
+      const rows = productsFull
+        .filter(p => Number(p.stock) > 0)
+        .sort((a, b) => (Number(b.stock) * Number(b.cost_price || 0)) - (Number(a.stock) * Number(a.cost_price || 0)));
+
+      const rowsHtml = rows.map(p => {
+        const stock = Number(p.stock) || 0;
+        const cost = Number(p.cost_price) || 0;
+        const price = Number(p.price) || 0;
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(p.name)}</strong>
+              <div class="muted" style="font-size:0.72rem;">${escapeHtml(categoriesById[p.category_id] || '—')}</div>
+            </td>
+            <td class="num">${fmtNum(stock)}</td>
+            <td class="num">${cost > 0 ? fmtKES(cost) : '<span class="muted">—</span>'}</td>
+            <td class="num">${fmtKES(price)}</td>
+            <td class="num">${cost > 0 ? fmtKES(stock * cost) : '<span class="muted">—</span>'}</td>
+            <td class="num green">${fmtKES(stock * price)}</td>
+            <td class="num ${(price - cost) >= 0 ? 'green' : 'red'}">${cost > 0 ? fmtKES(stock * (price - cost)) : '<span class="muted">—</span>'}</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-coins"></i> Stock Valuation
+            <span class="rtc-count">${rows.length} products with stock</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="num">Units</th>
+                  <th class="num">Cost/Unit</th>
+                  <th class="num">Retail/Unit</th>
+                  <th class="num">Cost Value</th>
+                  <th class="num">Retail Value</th>
+                  <th class="num">Potential Margin</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No products with stock.</td></tr>'}</tbody>
+              <tfoot>
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="num">${fmtNum(totalUnits)}</td>
+                  <td></td>
+                  <td></td>
+                  <td class="num">${fmtKES(totalCostValue)}</td>
+                  <td class="num">${fmtKES(totalRetailValue)}</td>
+                  <td class="num">${fmtKES(potentialProfit)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['Product', 'Category', 'Units', 'Cost/Unit', 'Retail/Unit', 'Cost Value', 'Retail Value', 'Potential Margin'],
+        rows: rows.map(p => {
+          const stock = Number(p.stock) || 0;
+          const cost = Number(p.cost_price) || 0;
+          const price = Number(p.price) || 0;
+          return [
+            p.name,
+            categoriesById[p.category_id] || '',
+            stock,
+            cost,
+            price,
+            stock * cost,
+            stock * price,
+            stock * (price - cost)
+          ];
+        }),
+        totals: [
+          'TOTAL', '', totalUnits, '', '',
+          totalCostValue, totalRetailValue, potentialProfit
+        ]
+      };
+      lastReportMeta = {
+        title: 'Stock Value',
+        period: 'Current snapshot'
+      };
+    }
+
+    /* ============================================================
+       RENDER: TOP PRODUCTS
+       ============================================================ */
+    function renderTopProducts(ctx) {
+      const { invoices, items, productsMap } = ctx;
+
+      // Only count items on non-void invoices (already filtered)
+      const invoiceIds = new Set(invoices.map(i => i.id));
+      const byProduct = {};
+
+      items.forEach(it => {
+        if (it.is_custom) return;
+        if (!invoiceIds.has(it.invoice_id)) return;
+        const pid = it.product_id || `custom:${it.description}`;
+        if (!byProduct[pid]) byProduct[pid] = {
+          id: it.product_id || null,
+          name: it.product_id ? (productsMap[it.product_id]?.name || it.description || 'Unknown') : (it.description || 'Custom line'),
+          qty: 0, revenue: 0, cogs: 0, orders: new Set()
+        };
+        const qty = Number(it.quantity) || 0;
+        const unit = Number(it.unit_price) || 0;
+        const cost = productsMap[it.product_id]?.cost_price;
+        byProduct[pid].qty += qty;
+        byProduct[pid].revenue += qty * unit;
+        if (cost != null) byProduct[pid].cogs += Number(cost) * qty;
+        byProduct[pid].orders.add(it.invoice_id);
+      });
+
+      const rows = Object.values(byProduct).map(r => ({
+        ...r,
+        orders: r.orders.size,
+        margin: r.revenue - r.cogs
+      })).sort((a, b) => b.revenue - a.revenue).slice(0, 50);
+
+      const totalQty = rows.reduce((s, r) => s + r.qty, 0);
+      const totalRev = rows.reduce((s, r) => s + r.revenue, 0);
+      const totalCogs = rows.reduce((s, r) => s + r.cogs, 0);
+      const totalMargin = totalRev - totalCogs;
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-box"></i> Products Sold</div>
+            <div class="kpi-value">${fmtNum(rows.length)}</div>
+            <div class="kpi-sub">Top 50</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-cubes"></i> Units</div>
+            <div class="kpi-value">${fmtNum(totalQty)}</div>
+            <div class="kpi-sub">across all orders</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Revenue</div>
+            <div class="kpi-value">${fmtKESWhole(totalRev)}</div>
+            <div class="kpi-sub">Gross of VAT</div>
+          </div>
+          ${totalCogs > 0 ? `
+            <div class="kpi kpi-green">
+              <div class="kpi-label"><i class="fas fa-chart-line"></i> Gross Margin</div>
+              <div class="kpi-value">${fmtKESWhole(totalMargin)}</div>
+              <div class="kpi-sub">${totalRev > 0 ? ((totalMargin / totalRev) * 100).toFixed(1) : 0}% of revenue</div>
+            </div>` : ''}
+        </div>`;
+
+      const chartHtml = rows.length ? `
+        <div class="chart-wrap">
+          <div class="chart-title"><i class="fas fa-chart-bar"></i> Top 10 by Revenue</div>
+          <canvas id="tpChart"></canvas>
+        </div>` : '';
+
+      const rowsHtml = rows.map((r, i) => `
+        <tr>
+          <td class="mono" style="width:36px;">${i + 1}</td>
+          <td><strong>${escapeHtml(r.name)}</strong></td>
+          <td class="num">${fmtNum(r.qty)}</td>
+          <td class="num">${fmtNum(r.orders)}</td>
+          <td class="num green">${fmtKES(r.revenue)}</td>
+          <td class="num">${r.cogs > 0 ? fmtKES(r.margin) : '<span class="muted">—</span>'}</td>
+        </tr>`).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        ${chartHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-trophy"></i> Products Sold
+            <span class="rtc-count">${rows.length} products</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th class="num">Units</th>
+                  <th class="num">Orders</th>
+                  <th class="num">Revenue</th>
+                  <th class="num">Gross Margin</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No product sales in this period.</td></tr>'}</tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2">TOTAL</td>
+                  <td class="num">${fmtNum(totalQty)}</td>
+                  <td></td>
+                  <td class="num">${fmtKES(totalRev)}</td>
+                  <td class="num">${totalCogs > 0 ? fmtKES(totalMargin) : '—'}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['Rank', 'Product', 'Units', 'Orders', 'Revenue', 'Gross Margin'],
+        rows: rows.map((r, i) => [i + 1, r.name, r.qty, r.orders, r.revenue, r.cogs > 0 ? r.margin : '']),
+        totals: ['', 'TOTAL', totalQty, '', totalRev, totalCogs > 0 ? totalMargin : '']
+      };
+      lastReportMeta = {
+        title: 'Top Products',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+
+      if (currentChart) { currentChart.destroy(); currentChart = null; }
+      if (rows.length) {
+        const top = rows.slice(0, 10);
+        const style = getComputedStyle(document.documentElement);
+        const navy = style.getPropertyValue('--navy').trim() || '#1D3B73';
+        currentChart = new Chart(document.getElementById('tpChart'), {
+          type: 'bar',
+          data: {
+            labels: top.map(r => r.name.length > 22 ? r.name.slice(0, 22) + '…' : r.name),
+            datasets: [{
+              label: 'Revenue',
+              data: top.map(r => r.revenue),
+              backgroundColor: navy,
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: c => fmtKES(c.parsed.x) }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                ticks: { callback: v => 'KES ' + Number(v).toLocaleString('en-KE') }
+              }
+            }
+          }
+        });
+      }
+    }
+        /* ============================================================
+       RENDER: STOCK MOVEMENTS
+       ============================================================ */
+    function renderStockMovements(ctx) {
+      const { stockMovements, productsFull, productsMap } = ctx;
+
+      // Build product name map from productsFull
+      const productNames = {};
+      (productsFull || []).forEach(p => { productNames[p.id] = p.name; });
+
+      // Summary by type
+      const byType = {};
+      let totalIn = 0, totalOut = 0;
+      stockMovements.forEach(m => {
+        const t = m.movement_type || 'unknown';
+        if (!byType[t]) byType[t] = { count: 0, in: 0, out: 0 };
+        byType[t].count += 1;
+        if (m.quantity_change > 0) {
+          byType[t].in += m.quantity_change;
+          totalIn += m.quantity_change;
+        } else {
+          byType[t].out += Math.abs(m.quantity_change);
+          totalOut += Math.abs(m.quantity_change);
+        }
+      });
+
+      // Distinct products touched
+      const productSet = new Set(stockMovements.map(m => m.product_id));
+      const productsTouched = productSet.size;
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-exchange-alt"></i> Movements</div>
+            <div class="kpi-value">${fmtNum(stockMovements.length)}</div>
+            <div class="kpi-sub">in this period</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-arrow-down"></i> Units In</div>
+            <div class="kpi-value">${fmtNum(totalIn)}</div>
+            <div class="kpi-sub">purchases, returns, reversals</div>
+          </div>
+          <div class="kpi kpi-red">
+            <div class="kpi-label"><i class="fas fa-arrow-up"></i> Units Out</div>
+            <div class="kpi-value">${fmtNum(totalOut)}</div>
+            <div class="kpi-sub">sales, adjustments</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-box"></i> Products Touched</div>
+            <div class="kpi-value">${fmtNum(productsTouched)}</div>
+            <div class="kpi-sub">distinct products</div>
+          </div>
+        </div>`;
+
+      const typeLabels = {
+        opening:    { label: 'Opening',    icon: 'fa-flag' },
+        sale:       { label: 'Sale',       icon: 'fa-shopping-cart' },
+        purchase:   { label: 'Purchase',   icon: 'fa-truck' },
+        adjustment: { label: 'Adjustment', icon: 'fa-sliders-h' },
+        return:     { label: 'Return',     icon: 'fa-undo' },
+        reversal:   { label: 'Reversal',   icon: 'fa-redo' }
+      };
+
+      const rowsHtml = stockMovements.map(m => {
+        const t = typeLabels[m.movement_type] || { label: m.movement_type, icon: 'fa-circle' };
+        const productName = productNames[m.product_id] || (productsMap[m.product_id]?.name) || 'Unknown';
+        const qtyClass = m.quantity_change > 0 ? 'green' : 'red';
+        const qtySign = m.quantity_change > 0 ? '+' : '';
+        const when = new Date(m.created_at).toLocaleString('en-KE', {
+          day: '2-digit', month: 'short', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+          <tr>
+            <td class="muted" style="font-size:0.78rem;white-space:nowrap;">${escapeHtml(when)}</td>
+            <td>
+              <span class="badge badge-${m.movement_type === 'sale' ? 'partial' : m.movement_type === 'purchase' ? 'paid' : 'issued'}">
+                <i class="fas ${t.icon}"></i> ${escapeHtml(t.label)}
+              </span>
+            </td>
+            <td><strong>${escapeHtml(productName)}</strong></td>
+            <td class="num ${qtyClass}"><strong>${qtySign}${m.quantity_change}</strong></td>
+            <td class="num muted">${m.stock_before}</td>
+            <td class="num">${m.stock_after}</td>
+            <td class="muted">${escapeHtml(m.reference_number || '—')}</td>
+            <td class="muted">${escapeHtml(m.notes || '—')}</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+
+        <div class="report-table-card" style="margin-bottom:20px;">
+          <div class="rtc-title">
+            <i class="fas fa-chart-pie"></i> Summary by Movement Type
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th class="num">Movements</th>
+                  <th class="num">Units In</th>
+                  <th class="num">Units Out</th>
+                  <th class="num">Net</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${Object.keys(typeLabels).filter(k => byType[k]).map(k => {
+                  const v = byType[k];
+                  const net = v.in - v.out;
+                  return `
+                    <tr>
+                      <td><strong>${escapeHtml(typeLabels[k].label)}</strong></td>
+                      <td class="num">${fmtNum(v.count)}</td>
+                      <td class="num green">${v.in > 0 ? '+' + fmtNum(v.in) : '—'}</td>
+                      <td class="num red">${v.out > 0 ? '−' + fmtNum(v.out) : '—'}</td>
+                      <td class="num ${net > 0 ? 'green' : net < 0 ? 'red' : ''}">${net > 0 ? '+' : ''}${fmtNum(net)}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No movements in this period.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-list"></i> All Movements
+            <span class="rtc-count">${stockMovements.length} ${stockMovements.length === 1 ? 'row' : 'rows'}</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Type</th>
+                  <th>Product</th>
+                  <th class="num">Qty</th>
+                  <th class="num">Before</th>
+                  <th class="num">After</th>
+                  <th>Reference</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml || '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">No stock movements in this period.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['When', 'Type', 'Product', 'Qty Change', 'Before', 'After', 'Reference', 'Notes'],
+        rows: stockMovements.map(m => {
+          const t = typeLabels[m.movement_type] || { label: m.movement_type };
+          const productName = productNames[m.product_id] || '';
+          return [
+            new Date(m.created_at).toLocaleString('en-KE'),
+            t.label,
+            productName,
+            m.quantity_change,
+            m.stock_before,
+            m.stock_after,
+            m.reference_number || '',
+            m.notes || ''
+          ];
+        }),
+        totals: null
+      };
+      lastReportMeta = {
+        title: 'Stock Movements',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+    }
+
+    /* ============================================================
+       RENDER: PRODUCT SALES VOLUME (movement-style)
+       ============================================================ */
+      function renderProductVolume(ctx) {
+      const { invoices, items, productsMap, productsFull, stockMovements } = ctx;
+      const invoiceIds = new Set(invoices.map(i => i.id));
+
+      // Sales aggregation (existing)
+      const salesByProduct = {};
+      items.forEach(it => {
+        if (it.is_custom) return;
+        if (!invoiceIds.has(it.invoice_id)) return;
+        const pid = it.product_id || `custom:${it.description}`;
+        if (!salesByProduct[pid]) salesByProduct[pid] = {
+          id: it.product_id || null,
+          name: it.product_id ? (productsMap[it.product_id]?.name || 'Unknown') : (it.description || 'Custom line'),
+          qty: 0, revenue: 0, orders: new Set()
+        };
+        salesByProduct[pid].qty += Number(it.quantity) || 0;
+        salesByProduct[pid].revenue += (Number(it.quantity) || 0) * (Number(it.unit_price) || 0);
+        salesByProduct[pid].orders.add(it.invoice_id);
+      });
+
+      // Ledger aggregation (new)
+      const ledgerByProduct = {};
+      (stockMovements || []).forEach(m => {
+        const pid = m.product_id;
+        if (!pid) return;
+        if (!ledgerByProduct[pid]) ledgerByProduct[pid] = {
+          opening: 0, purchased: 0, sold: 0, adjusted: 0, reversed: 0, returned: 0
+        };
+        const q = Number(m.quantity_change) || 0;
+        switch (m.movement_type) {
+          case 'opening':     ledgerByProduct[pid].opening   += q; break;
+          case 'purchase':    ledgerByProduct[pid].purchased += q; break;
+          case 'sale':        ledgerByProduct[pid].sold      += Math.abs(q); break;
+          case 'adjustment':  ledgerByProduct[pid].adjusted  += q; break;
+          case 'reversal':    ledgerByProduct[pid].reversed  += q; break;
+          case 'return':      ledgerByProduct[pid].returned  += q; break;
+        }
+      });
+
+      // Merge rows — anything that shows up in either source
+      const allIds = new Set([...Object.keys(salesByProduct), ...Object.keys(ledgerByProduct)]);
+      const rows = [...allIds].map(pid => {
+        const s = salesByProduct[pid] || null;
+        const l = ledgerByProduct[pid] || null;
+        const product = productsFull.find(p => p.id === pid);
+        const name = s?.name || product?.name || 'Unknown';
+        const qty = s?.qty || 0;
+        const orders = s ? s.orders.size : 0;
+        const revenue = s?.revenue || 0;
+        const opening = l?.opening || 0;
+        const purchased = l?.purchased || 0;
+        const sold = l?.sold || 0;
+        const adjusted = l?.adjusted || 0;
+        const reversed = l?.reversed || 0;
+        const returned = l?.returned || 0;
+        const netChange = purchased + reversed + returned - sold + adjusted;
+        return {
+          id: pid, name, qty, orders, revenue,
+          opening, purchased, sold, adjusted, reversed, returned, netChange,
+          closing: Number(product?.stock || 0)
+        };
+      }).sort((a, b) => b.qty - a.qty);
+
+      const days = Math.max(1, Math.round((new Date(currentRange.to) - new Date(currentRange.from)) / 86400000) + 1);
+
+      const totalQty = rows.reduce((s, r) => s + r.qty, 0);
+      const totalRev = rows.reduce((s, r) => s + r.revenue, 0);
+      const avgPerDay = totalQty / days;
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-box"></i> Products Moved</div>
+            <div class="kpi-value">${fmtNum(rows.length)}</div>
+            <div class="kpi-sub">distinct products</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-cubes"></i> Total Units Sold</div>
+            <div class="kpi-value">${fmtNum(totalQty)}</div>
+            <div class="kpi-sub">over ${days} days</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-tachometer-alt"></i> Avg/Day</div>
+            <div class="kpi-value">${avgPerDay.toFixed(1)}</div>
+            <div class="kpi-sub">units per day</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Revenue</div>
+            <div class="kpi-value">${fmtKESWhole(totalRev)}</div>
+            <div class="kpi-sub">Gross of VAT</div>
+          </div>
+        </div>`;
+
+      const rowsHtml = rows.map((r, i) => `
+        <tr>
+          <td class="mono" style="width:36px;">${i + 1}</td>
+          <td><strong>${escapeHtml(r.name)}</strong></td>
+          <td class="num"><strong>${fmtNum(r.qty)}</strong></td>
+          <td class="num">${fmtNum(r.orders)}</td>
+          <td class="num">${r.opening > 0 ? fmtNum(r.opening) : '—'}</td>
+          <td class="num green">${r.purchased > 0 ? '+' + fmtNum(r.purchased) : '—'}</td>
+          <td class="num red">${r.sold > 0 ? '−' + fmtNum(r.sold) : '—'}</td>
+          <td class="num ${r.netChange > 0 ? 'green' : r.netChange < 0 ? 'red' : ''}">
+            ${r.netChange > 0 ? '+' : ''}${fmtNum(r.netChange)}
+          </td>
+          <td class="num"><strong>${fmtNum(r.closing)}</strong></td>
+          <td class="num green">${fmtKES(r.revenue)}</td>
+        </tr>`).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-chart-bar"></i> Volume by Product (with stock flow)
+            <span class="rtc-count">${rows.length} products</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table" style="min-width:1100px;">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th class="num">Sold</th>
+                  <th class="num">Orders</th>
+                  <th class="num">Opening</th>
+                  <th class="num">+ Purchased</th>
+                  <th class="num">− Sold</th>
+                  <th class="num">Net Δ</th>
+                  <th class="num">Closing</th>
+                  <th class="num">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);">No product movements in this period.</td></tr>'}</tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2">TOTAL</td>
+                  <td class="num">${fmtNum(totalQty)}</td>
+                  <td></td>
+                  <td class="num">${fmtNum(rows.reduce((s, r) => s + r.opening, 0))}</td>
+                  <td class="num">${fmtNum(rows.reduce((s, r) => s + r.purchased, 0))}</td>
+                  <td class="num">${fmtNum(rows.reduce((s, r) => s + r.sold, 0))}</td>
+                  <td class="num">${fmtNum(rows.reduce((s, r) => s + r.netChange, 0))}</td>
+                  <td class="num">${fmtNum(rows.reduce((s, r) => s + r.closing, 0))}</td>
+                  <td class="num">${fmtKES(totalRev)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['#', 'Product', 'Sold', 'Orders', 'Opening', '+ Purchased', '- Sold', 'Net Change', 'Closing', 'Revenue'],
+        rows: rows.map((r, i) => [
+          i + 1, r.name, r.qty, r.orders,
+          r.opening, r.purchased, r.sold, r.netChange, r.closing, r.revenue
+        ]),
+        totals: [
+          '', 'TOTAL', totalQty, '',
+          rows.reduce((s, r) => s + r.opening, 0),
+          rows.reduce((s, r) => s + r.purchased, 0),
+          rows.reduce((s, r) => s + r.sold, 0),
+          rows.reduce((s, r) => s + r.netChange, 0),
+          rows.reduce((s, r) => s + r.closing, 0),
+          totalRev
+        ]
+      };
+      lastReportMeta = {
+        title: 'Product Sales Volume',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+    }
+    /* ============================================================
+       RENDER: USER STATEMENT
+       ============================================================ */
+    function renderUserStatement(ctx) {
+      const { invoices, payments, profilesMap } = ctx;
+
+      // Group by customer_user_id
+      const byUser = {};
+      invoices.forEach(inv => {
+        const uid = inv.customer_user_id || `walkin:${inv.customer_name}`;
+        if (!byUser[uid]) byUser[uid] = {
+          id: inv.customer_user_id || null,
+          name: inv.customer_name || profilesMap[inv.customer_user_id]?.name || 'Walk-in',
+          phone: inv.customer_phone || '',
+          email: inv.customer_email || profilesMap[inv.customer_user_id]?.email || '',
+          invoices: 0, invoiced: 0, paid: 0, paidOnRange: 0
+        };
+        const u = byUser[uid];
+        u.invoices += 1;
+        u.invoiced += Number(inv.total) || 0;
+        u.paid += Number(inv.amount_paid) || 0;
+      });
+
+      // Payments in range — attribute by invoice's customer
+      const invoiceById = {};
+      invoices.forEach(i => { invoiceById[i.id] = i; });
+
+      payments.forEach(p => {
+        const inv = invoiceById[p.invoice_id];
+        if (!inv) return;
+        const uid = inv.customer_user_id || `walkin:${inv.customer_name}`;
+        if (!byUser[uid]) return;
+        byUser[uid].paidOnRange += Number(p.amount) || 0;
+      });
+
+      const rows = Object.values(byUser).sort((a, b) => b.invoiced - a.invoiced);
+      const totalInvoiced = rows.reduce((s, r) => s + r.invoiced, 0);
+      const totalPaid = rows.reduce((s, r) => s + r.paid, 0);
+      const totalOutstanding = totalInvoiced - totalPaid;
+      const totalPaidOnRange = rows.reduce((s, r) => s + r.paidOnRange, 0);
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-users"></i> Customers</div>
+            <div class="kpi-value">${fmtNum(rows.length)}</div>
+            <div class="kpi-sub">issued invoices in range</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Invoiced</div>
+            <div class="kpi-value">${fmtKESWhole(totalInvoiced)}</div>
+            <div class="kpi-sub">across all customers</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-check-circle"></i> Paid (of these invoices)</div>
+            <div class="kpi-value">${fmtKESWhole(totalPaid)}</div>
+            <div class="kpi-sub">lifetime, not range</div>
+          </div>
+          <div class="kpi kpi-red">
+            <div class="kpi-label"><i class="fas fa-hourglass-half"></i> Outstanding</div>
+            <div class="kpi-value">${fmtKESWhole(totalOutstanding)}</div>
+            <div class="kpi-sub">still owed</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-money-bill-wave"></i> Received in Range</div>
+            <div class="kpi-value">${fmtKESWhole(totalPaidOnRange)}</div>
+            <div class="kpi-sub">payments this period</div>
+          </div>
+        </div>`;
+
+            const rowsHtml = rows.map(r => {
+        const outstanding = r.invoiced - r.paid;
+        const uidArg   = r.id ? `'${r.id}'` : 'null';
+        const nameArg  = `'${String(r.name || '').replace(/'/g, "\\'")}'`;
+        const phoneArg = `'${String(r.phone || '').replace(/'/g, "\\'")}'`;
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(r.name)}</strong>
+              ${r.phone ? `<div class="muted mono" style="font-size:0.72rem;">${escapeHtml(r.phone)}</div>` : ''}
+              ${r.email ? `<div class="muted" style="font-size:0.72rem;">${escapeHtml(r.email)}</div>` : ''}
+            </td>
+            <td class="num">${fmtNum(r.invoices)}</td>
+            <td class="num">${fmtKES(r.invoiced)}</td>
+            <td class="num green">${fmtKES(r.paid)}</td>
+            <td class="num ${outstanding > 0.01 ? 'red' : 'green'}">${fmtKES(outstanding)}</td>
+            <td class="num">${fmtKES(r.paidOnRange)}</td>
+            <td style="text-align:right;white-space:nowrap;">
+              <button class="btn-secondary btn-sm" style="padding:6px 12px;font-size:0.72rem;margin-right:4px;"
+                onclick="openStatement(${uidArg}, ${nameArg}, ${phoneArg}, false)">
+                <i class="fas fa-eye"></i> View
+              </button>
+              <button class="btn-secondary btn-sm" style="padding:6px 12px;font-size:0.72rem;"
+                onclick="openStatement(${uidArg}, ${nameArg}, ${phoneArg}, true)"
+                title="Download PDF">
+                <i class="fas fa-file-pdf"></i>
+              </button>
+            </td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-file-invoice-dollar"></i> Customer Statement
+            <span class="rtc-count">${rows.length} customers</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+                            <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th class="num">Invoices</th>
+                  <th class="num">Invoiced</th>
+                  <th class="num">Paid</th>
+                  <th class="num">Outstanding</th>
+                  <th class="num">Received in Range</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No invoices in this period.</td></tr>'}</tbody>
+                            <tfoot>
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="num"></td>
+                  <td class="num">${fmtKES(totalInvoiced)}</td>
+                  <td class="num">${fmtKES(totalPaid)}</td>
+                  <td class="num">${fmtKES(totalOutstanding)}</td>
+                  <td class="num">${fmtKES(totalPaidOnRange)}</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['Customer', 'Phone', 'Email', 'Invoices', 'Invoiced', 'Paid', 'Outstanding', 'Received in Range'],
+        rows: rows.map(r => [
+          r.name, r.phone, r.email, r.invoices, r.invoiced, r.paid,
+          r.invoiced - r.paid, r.paidOnRange
+        ]),
+        totals: [
+          'TOTAL', '', '',
+          totalInvoiced, totalPaid, totalOutstanding, totalPaidOnRange
+        ]
+      };
+            lastReportMeta = {
+        title: 'User Statement',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+    }
+
+       /* ============================================================
+       OPEN CUSTOMER STATEMENT
+       
+       ============================================================ */
+    function openStatement(uid, name, phone, autoprint) {
+      const params = new URLSearchParams();
+      if (uid)   params.set('uid', uid);
+      if (name)  params.set('name', name);
+      if (phone) params.set('phone', phone);
+      params.set('from', currentRange.from);
+      params.set('to', currentRange.to);
+
+      if (autoprint) {
+        // Background download via hidden iframe — no tab, no dialog
+        params.set('autoprint', '1');
+        params.set('bg', '1');
+        const url = 'statement-print.html?' + params.toString();
+
+        // Show a toast so the user knows something is happening
+        showToast(`Preparing statement for ${name || 'customer'}...`);
+
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;width:0;height:0;border:0;visibility:hidden;';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+
+        // Clean up the iframe after enough time for the PDF to be generated
+        setTimeout(() => {
+          if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        }, 30000);
+
+        return;
+      }
+
+      // View in new tab
+      const url = 'statement-print.html?' + params.toString();
+      window.open(url, '_blank');
+    }
+    /* ============================================================
+       RENDER: ADMIN PERFORMANCE
+       ============================================================ */
+    function renderAdminPerformance(ctx) {
+      const { invoices, payments, profilesMap } = ctx;
+
+      const byAdmin = {};
+
+      const ensure = id => {
+        const key = id || '__unknown__';
+        if (!byAdmin[key]) byAdmin[key] = {
+          id: key,
+          name: key === '__unknown__' ? 'Unknown' : (profilesMap[key]?.name || 'Unknown'),
+          invoicesIssued: 0, invoiced: 0,
+          paymentsRecorded: 0, paymentsAmount: 0
+        };
+        return byAdmin[key];
+      };
+
+      invoices.forEach(inv => {
+        const a = ensure(inv.created_by);
+        a.invoicesIssued += 1;
+        a.invoiced += Number(inv.total) || 0;
+      });
+
+      payments.forEach(p => {
+        const a = ensure(p.received_by);
+        a.paymentsRecorded += 1;
+        a.paymentsAmount += Number(p.amount) || 0;
+      });
+
+      const rows = Object.values(byAdmin).sort((a, b) => b.invoiced - a.invoiced);
+      const totalInv = rows.reduce((s, r) => s + r.invoicesIssued, 0);
+      const totalInvoicedAmt = rows.reduce((s, r) => s + r.invoiced, 0);
+      const totalPayments = rows.reduce((s, r) => s + r.paymentsRecorded, 0);
+      const totalPaymentsAmt = rows.reduce((s, r) => s + r.paymentsAmount, 0);
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-user-tie"></i> Admins Active</div>
+            <div class="kpi-value">${fmtNum(rows.length)}</div>
+            <div class="kpi-sub">who touched invoices/payments</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-file-invoice"></i> Invoices Issued</div>
+            <div class="kpi-value">${fmtNum(totalInv)}</div>
+            <div class="kpi-sub">across all admins</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Total Invoiced</div>
+            <div class="kpi-value">${fmtKESWhole(totalInvoicedAmt)}</div>
+            <div class="kpi-sub">from these invoices</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-money-bill-wave"></i> Payments Recorded</div>
+            <div class="kpi-value">${fmtNum(totalPayments)}</div>
+            <div class="kpi-sub">${fmtKESWhole(totalPaymentsAmt)} in range</div>
+          </div>
+        </div>`;
+
+      const rowsHtml = rows.map(r => `
+        <tr>
+          <td><strong>${escapeHtml(r.name)}</strong></td>
+          <td class="num">${fmtNum(r.invoicesIssued)}</td>
+          <td class="num">${fmtKES(r.invoiced)}</td>
+          <td class="num">${fmtNum(r.paymentsRecorded)}</td>
+          <td class="num green">${fmtKES(r.paymentsAmount)}</td>
+        </tr>`).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-user-tie"></i> Admin Activity
+            <span class="rtc-count">${rows.length} admins</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Admin</th>
+                  <th class="num">Invoices Issued</th>
+                  <th class="num">Invoiced Amount</th>
+                  <th class="num">Payments Recorded</th>
+                  <th class="num">Payments Amount</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No activity in this period.</td></tr>'}</tbody>
+              <tfoot>
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="num">${fmtNum(totalInv)}</td>
+                  <td class="num">${fmtKES(totalInvoicedAmt)}</td>
+                  <td class="num">${fmtNum(totalPayments)}</td>
+                  <td class="num">${fmtKES(totalPaymentsAmt)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['Admin', 'Invoices Issued', 'Invoiced Amount', 'Payments Recorded', 'Payments Amount'],
+        rows: rows.map(r => [r.name, r.invoicesIssued, r.invoiced, r.paymentsRecorded, r.paymentsAmount]),
+        totals: ['TOTAL', totalInv, totalInvoicedAmt, totalPayments, totalPaymentsAmt]
+      };
+      lastReportMeta = {
+        title: 'Admin Performance',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+    }
+
+    /* ============================================================
+       RENDER: PROFIT & LOSS
+       ============================================================ */
+    function renderProfitLoss(ctx) {
+      const { invoices, items, productsMap } = ctx;
+
+      const invoiceIds = new Set(invoices.map(i => i.id));
+
+      // Revenue components from invoices
+      const revenue = invoices.reduce((s, i) => s + (Number(i.total) || 0), 0);
+      const vatOut = invoices.reduce((s, i) => s + (Number(i.vat_total) || 0), 0);
+      const discountTotal = invoices.reduce((s, i) =>
+        s + (Number(i.line_discount_total) || 0) + (Number(i.invoice_discount) || 0), 0);
+      const delivery = invoices.reduce((s, i) => s + (Number(i.delivery_total) || 0), 0);
+      const netRevenue = revenue - vatOut;
+
+      // COGS from cost_price
+      let cogs = 0, cogsKnown = 0, cogsUnknown = 0, cogsQty = 0;
+      items.forEach(it => {
+        if (it.is_custom) return;
+        if (!invoiceIds.has(it.invoice_id)) return;
+        const qty = Number(it.quantity) || 0;
+        const cost = productsMap[it.product_id]?.cost_price;
+        if (cost != null) { cogs += Number(cost) * qty; cogsKnown += qty; }
+        else { cogsUnknown += qty; }
+        cogsQty += qty;
+      });
+
+      const grossProfit = netRevenue - cogs;
+      const grossMargin = netRevenue > 0 ? (grossProfit / netRevenue) * 100 : 0;
+      const cogsCoverage = cogsQty > 0 ? (cogsKnown / cogsQty) * 100 : 100;
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Net Revenue</div>
+            <div class="kpi-value">${fmtKESWhole(netRevenue)}</div>
+            <div class="kpi-sub">Excludes VAT ${fmtKESWhole(vatOut)}</div>
+          </div>
+          <div class="kpi kpi-red">
+            <div class="kpi-label"><i class="fas fa-shopping-cart"></i> Cost of Goods</div>
+            <div class="kpi-value">${fmtKESWhole(cogs)}</div>
+            <div class="kpi-sub">${cogsCoverage.toFixed(0)}% of units have cost known</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-chart-line"></i> Gross Profit</div>
+            <div class="kpi-value">${fmtKESWhole(grossProfit)}</div>
+            <div class="kpi-sub">${grossMargin.toFixed(1)}% margin</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-percent"></i> VAT Output</div>
+            <div class="kpi-value">${fmtKESWhole(vatOut)}</div>
+            <div class="kpi-sub">Collected on behalf of KRA</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-tag"></i> Discounts Given</div>
+            <div class="kpi-value">${fmtKESWhole(discountTotal)}</div>
+            <div class="kpi-sub">Line + invoice level</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-truck"></i> Delivery Income</div>
+            <div class="kpi-value">${fmtKESWhole(delivery)}</div>
+            <div class="kpi-sub">From custom lines</div>
+          </div>
+        </div>`;
+
+      const plTable = `
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-balance-scale"></i> Income Statement
+            <span class="rtc-count">${invoices.length} invoices</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <tbody>
+                <tr><td><strong>Gross Revenue (with VAT)</strong></td><td class="num green">${fmtKES(revenue)}</td></tr>
+                <tr><td style="padding-left:32px;">Less: VAT Output</td><td class="num red">− ${fmtKES(vatOut)}</td></tr>
+                <tr style="background:#fafbff;"><td><strong>Net Revenue</strong></td><td class="num green"><strong>${fmtKES(netRevenue)}</strong></td></tr>
+                <tr><td style="padding-left:32px;">Less: Cost of Goods Sold</td><td class="num red">− ${fmtKES(cogs)}</td></tr>
+                <tr style="background:#fafbff;"><td><strong>Gross Profit</strong></td><td class="num green"><strong>${fmtKES(grossProfit)}</strong></td></tr>
+                <tr><td colspan="2" style="padding-top:20px;font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:800;">For reference</td></tr>
+                <tr><td style="padding-left:32px;">Discounts given (already deducted above)</td><td class="num muted">${fmtKES(discountTotal)}</td></tr>
+                <tr><td style="padding-left:32px;">Delivery income (already included)</td><td class="num muted">${fmtKES(delivery)}</td></tr>
+                <tr><td style="padding-left:32px;">Units with unknown cost</td><td class="num muted">${fmtNum(cogsUnknown)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+
+      document.getElementById('reportBody').innerHTML = kpiHtml + plTable;
+
+      lastReportData = {
+        columns: ['Line', 'Amount'],
+        rows: [
+          ['Gross Revenue (incl. VAT)', revenue],
+          ['VAT Output', -vatOut],
+          ['Net Revenue', netRevenue],
+          ['Cost of Goods Sold', -cogs],
+          ['Gross Profit', grossProfit],
+          ['Discounts Given', discountTotal],
+          ['Delivery Income', delivery],
+          ['Units with unknown cost', cogsUnknown]
+        ],
+        totals: null
+      };
+      lastReportMeta = {
+        title: 'Profit & Loss',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+    }
+
+    /* ============================================================
+       RENDER: PAYMENT BREAKDOWN
+       ============================================================ */
+    function renderPaymentBreakdown(ctx) {
+      const { payments } = ctx;
+
+      const byMethod = {};
+      payments.forEach(p => {
+        const m = p.method || 'other';
+        if (!byMethod[m]) byMethod[m] = { method: m, count: 0, total: 0 };
+        byMethod[m].count += 1;
+        byMethod[m].total += Number(p.amount) || 0;
+      });
+
+      const rows = Object.values(byMethod).sort((a, b) => b.total - a.total);
+      const grandTotal = rows.reduce((s, r) => s + r.total, 0);
+      const grandCount = rows.reduce((s, r) => s + r.count, 0);
+
+      const labelOf = m => ({
+        cash: 'Cash', mpesa: 'M-Pesa', bank: 'Bank Transfer',
+        cheque: 'Cheque', card: 'Card', other: 'Other'
+      }[m] || m);
+
+      const kpiHtml = `
+        <div class="kpi-strip">
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-receipt"></i> Payments</div>
+            <div class="kpi-value">${fmtNum(grandCount)}</div>
+            <div class="kpi-sub">in this period</div>
+          </div>
+          <div class="kpi kpi-green">
+            <div class="kpi-label"><i class="fas fa-coins"></i> Total Collected</div>
+            <div class="kpi-value">${fmtKESWhole(grandTotal)}</div>
+            <div class="kpi-sub">across all methods</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label"><i class="fas fa-credit-card"></i> Methods Used</div>
+            <div class="kpi-value">${fmtNum(rows.length)}</div>
+            <div class="kpi-sub">distinct channels</div>
+          </div>
+        </div>`;
+
+      const chartHtml = rows.length ? `
+        <div class="chart-wrap">
+          <div class="chart-title"><i class="fas fa-chart-pie"></i> Share by Method</div>
+          <canvas id="pbChart"></canvas>
+        </div>` : '';
+
+      const rowsHtml = rows.map(r => {
+        const pct = grandTotal > 0 ? (r.total / grandTotal) * 100 : 0;
+        return `
+          <tr>
+            <td><strong>${escapeHtml(labelOf(r.method))}</strong></td>
+            <td class="num">${fmtNum(r.count)}</td>
+            <td class="num">${fmtKES(r.total)}</td>
+            <td class="num">${pct.toFixed(1)}%</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('reportBody').innerHTML = `
+        ${kpiHtml}
+        ${chartHtml}
+        <div class="report-table-card">
+          <div class="rtc-title">
+            <i class="fas fa-credit-card"></i> Collected by Method
+            <span class="rtc-count">${rows.length} methods</span>
+          </div>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th class="num">Payments</th>
+                  <th class="num">Total</th>
+                  <th class="num">Share</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHtml || '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">No payments in this period.</td></tr>'}</tbody>
+              <tfoot>
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="num">${fmtNum(grandCount)}</td>
+                  <td class="num">${fmtKES(grandTotal)}</td>
+                  <td class="num">100.0%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>`;
+
+      lastReportData = {
+        columns: ['Method', 'Payments', 'Total'],
+        rows: rows.map(r => [labelOf(r.method), r.count, r.total]),
+        totals: ['TOTAL', grandCount, grandTotal]
+      };
+      lastReportMeta = {
+        title: 'Payment Breakdown',
+        period: `${fmtDate(currentRange.from)} → ${fmtDate(currentRange.to)}`
+      };
+
+      if (currentChart) { currentChart.destroy(); currentChart = null; }
+      if (rows.length) {
+        const style = getComputedStyle(document.documentElement);
+        const navy = style.getPropertyValue('--navy').trim() || '#1D3B73';
+        const navyDeep = style.getPropertyValue('--navy-deep').trim() || '#0f2557';
+        const green = style.getPropertyValue('--green').trim() || '#17B052';
+        const greenDeep = style.getPropertyValue('--green-deep').trim() || '#0d7a38';
+        const red = style.getPropertyValue('--red').trim() || '#C81E27';
+        const redDeep = style.getPropertyValue('--red-deep').trim() || '#a30d25';
+        const palette = [navy, green, red, navyDeep, greenDeep, redDeep];
+
+        currentChart = new Chart(document.getElementById('pbChart'), {
+          type: 'doughnut',
+          data: {
+            labels: rows.map(r => labelOf(r.method)),
+            datasets: [{
+              data: rows.map(r => r.total),
+              backgroundColor: rows.map((_, i) => palette[i % palette.length]),
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  label: c => `${c.label}: ${fmtKES(c.parsed)}`
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    
+    /* ============================================================
+       INIT
+       ============================================================ */
+       (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+
+      // Load categories for later use (Products reports)
+      try {
+        const { data } = await supabaseClient.from('categories').select('id, name');
+        (data || []).forEach(c => { categoriesById[c.id] = c.name; });
+      } catch (e) { /* ignore */ }
+
+      // Guard: if the active report isn't allowed for the current role, fall back
+      const role = userIsAdmin ? 'admin' : 'sales';
+      const allowed = REPORTS.filter(r => (r.roles || ['admin']).includes(role));
+      if (!allowed.some(r => r.id === activeReportId)) {
+        activeReportId = allowed[0]?.id || 'daily';
+      }
+
+      applyPreset('last7');
+      renderRail();
+      // Set initial mobile label
+      const initialDef = REPORTS.find(r => r.id === activeReportId);
+      if (initialDef) {
+        document.getElementById('mobileReportLabel').textContent = initialDef.name;
+      }
+
+      await loadReport();
+    })();
+  </script>
+<script src="pwa.js"></script>
+</body>
+</html>

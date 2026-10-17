@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Invoice Editor | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin-sidebar.js"></script>
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC STYLES — invoice-edit.html
+       ============================================================ */
+
+    /* Editor layout: main column + totals rail */
+    .editor-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .editor-layout { grid-template-columns: 1fr; }
+      .totals-rail { position: static !important; }
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--navy); }
+
+    /* Identity card */
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title i { color: var(--orange); }
+
+    /* Customer picker */
+    .customer-tabs {
+      display: inline-flex;
+      background: var(--bg-light);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 16px;
+    }
+    .customer-tabs button {
+      border: none;
+      background: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .customer-tabs button.active {
+      background: #fff;
+      color: var(--navy);
+      box-shadow: 0 2px 6px rgba(31,58,110,0.08);
+    }
+
+    .customer-search-wrap { position: relative; }
+    .customer-search-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .customer-search-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(30,83,180,0.1); }
+
+    .customer-results {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(15,23,41,0.12);
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .customer-results.open { display: block; }
+    .customer-result {
+      padding: 12px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s;
+    }
+    .customer-result:last-child { border-bottom: none; }
+    .customer-result:hover { background: var(--bg-light); }
+    .customer-result strong { display: block; color: var(--navy); font-size: 0.88rem; font-weight: 700; }
+    .customer-result small { color: var(--text-muted); font-size: 0.78rem; }
+    .customer-results .empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Selected customer chip */
+    .selected-customer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-light);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .selected-customer .avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-deep));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .selected-customer .info { flex: 1; min-width: 0; }
+    .selected-customer .info strong {
+      display: block;
+      color: var(--navy);
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+    .selected-customer .info small {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .selected-customer button {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .selected-customer button:hover { background: #fef2f2; }
+
+    /* Line items */
+    .items-card { padding: 0; overflow: visible; }
+    .items-card .card-title {
+      padding: 22px 24px 0;
+      margin-bottom: 12px;
+    }
+
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .items-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #fafbff;
+      color: var(--navy);
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .items-table tbody td {
+      padding: 8px 8px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .items-table tbody tr:last-child td { border-bottom: none; }
+    .items-table input,
+    .items-table textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .items-table input:focus,
+    .items-table textarea:focus { border-color: var(--navy); }
+    .items-table input.num { text-align: right; }
+    .items-table .line-total-cell {
+      font-weight: 800;
+      color: var(--navy);
+      text-align: right;
+      white-space: nowrap;
+      padding-right: 14px;
+    }
+    .items-table .btn-remove-line {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(200,16,46,0.1);
+      color: var(--red);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    .items-table .btn-remove-line:hover { background: var(--red); color: #fff; }
+
+    /* Product search inside the first cell */
+    .product-cell-wrap { position: relative; min-width: 200px; }
+    .product-search-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .product-search-input:focus { border-color: var(--navy); }
+    .product-results {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 320px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(15,23,41,0.12);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 200;
+      display: none;
+    }
+    .product-results.open { display: block; }
+    .product-result {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s;
+    }
+    .product-result:last-child { border-bottom: none; }
+    .product-result:hover { background: var(--bg-light); }
+    .product-result img {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--bg-light);
+      flex-shrink: 0;
+    }
+    .product-result .ph {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f0f4fa, #e6ecf5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy);
+      flex-shrink: 0;
+      font-size: 0.8rem;
+    }
+    .product-result .info { flex: 1; min-width: 0; }
+    .product-result .info strong {
+      display: block;
+      color: var(--navy);
+      font-size: 0.85rem;
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .product-result .info small {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+    .product-result .price {
+      color: var(--red);
+      font-weight: 800;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .items-actions {
+      padding: 14px 24px 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-add-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--bg-light);
+      color: var(--navy);
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-add-item:hover { border-color: var(--navy); border-style: solid; }
+    .btn-add-item.custom { color: var(--orange); }
+    .btn-add-item.custom:hover { border-color: var(--orange); }
+
+    /* Totals rail */
+    .totals-rail {
+      position: sticky;
+      top: 24px;
+    }
+    .totals-block {
+      background: linear-gradient(135deg, #f7fafd, #eef4fb);
+      border-radius: 16px;
+      padding: 22px 24px;
+      border: 1px solid rgba(30,83,180,0.1);
+      margin-bottom: 16px;
+    }
+    .totals-block h3 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .totals-block h3 i { color: var(--orange); }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      font-size: 0.9rem;
+    }
+    .totals-row .label { color: var(--text-muted); font-weight: 600; }
+    .totals-row .value { color: var(--navy); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .totals-row .discount-input {
+      width: 110px;
+      padding: 6px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      text-align: right;
+      outline: none;
+      font-weight: 700;
+      color: var(--navy);
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+    .totals-row .discount-input:focus { border-color: var(--navy); }
+
+    .totals-row.grand {
+      border-top: 2px dashed rgba(30,83,180,0.2);
+      margin-top: 10px;
+      padding-top: 14px;
+      font-size: 1.1rem;
+    }
+    .totals-row.grand .label { color: var(--navy); font-weight: 900; font-size: 0.9rem; }
+    .totals-row.grand .value { color: var(--red); font-weight: 900; font-size: 1.35rem; letter-spacing: -0.5px; }
+
+    .totals-hint {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    /* Bottom action bar */
+    .editor-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+    }
+    .editor-actions .left { display: flex; gap: 10px; flex-wrap: wrap; }
+    .editor-actions .right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* Locked banner */
+    .locked-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      color: var(--red-dark);
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .locked-banner i { color: var(--red); font-size: 1.1rem; }
+    .locked-banner strong { font-weight: 800; }
+
+    /* Notes textarea */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .notes-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Invoice # display when editing */
+    .invoice-num-display {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--navy);
+      background: var(--bg-light);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-left: 8px;
+    }
+
+    /* Compact status pill next to page title */
+    .page-title-row h1 .status-pill {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.8px;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-weight: 800;
+      text-transform: uppercase;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .items-table thead th:nth-child(4),
+      .items-table tbody td:nth-child(4),
+      .items-table thead th:nth-child(5),
+      .items-table tbody td:nth-child(5) {
+        display: none;
+      }
+      .editor-actions { flex-direction: column; align-items: stretch; }
+      .editor-actions .left,
+      .editor-actions .right { width: 100%; }
+      .editor-actions button { flex: 1; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    // Hide on DOMContentLoaded; fall back to load + 2s
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+
+
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">Your account does not have administrator privileges.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <a href="invoices.html" class="back-link">
+          <i class="fas fa-arrow-left"></i> Back to Invoices
+        </a>
+
+        <div class="page-title-row">
+          <div>
+            <h1 id="pageTitle">
+              <i class="fas fa-file-invoice"></i>
+              <span id="pageTitleText">Create New Invoice</span>
+              <span id="pageInvoiceNum" class="invoice-num-display" style="display:none;"></span>
+              <span id="pageStatusPill" class="status-pill" style="display:none;"></span>
+            </h1>
+            <p id="pageSubtitle">Fill in customer details and line items. Monetary values are calculated in real time.</p>
+          </div>
+        </div>
+
+        <div id="lockedBannerWrap"></div>
+
+        <div class="editor-layout">
+          <!-- LEFT COLUMN -->
+          <div>
+
+            <!-- Identity card -->
+            <div class="card">
+              <div class="card-title"><i class="fas fa-user"></i> Customer &amp; Invoice Details</div>
+
+              <div class="customer-tabs">
+                <button id="tabExisting" class="active" onclick="switchCustomerTab('existing')">Existing Customer</button>
+                <button id="tabWalkin" onclick="switchCustomerTab('walkin')">Walk-in Customer</button>
+              </div>
+
+              <!-- Existing customer search -->
+              <div id="existingCustomerPane">
+                <div class="customer-search-wrap">
+                  <input type="text" id="customerSearch"
+                         class="customer-search-input"
+                         placeholder="Search by name, email, or phone..."
+                         autocomplete="off">
+                  <div class="customer-results" id="customerResults"></div>
+                </div>
+                <div id="selectedCustomerWrap"></div>
+              </div>
+
+              <!-- Walk-in customer fields -->
+              <div id="walkinCustomerPane" style="display:none;">
+                <div class="form-grid">
+                  <div class="form-field full">
+                    <label>Customer Name <span class="req">*</span></label>
+                    <input type="text" id="walkinName" placeholder="e.g. Joseph Kamau">
+                  </div>
+                  <div class="form-field">
+                    <label>Phone</label>
+                    <input type="text" id="walkinPhone" placeholder="+254...">
+                  </div>
+                  <div class="form-field">
+                    <label>Email</label>
+                    <input type="email" id="walkinEmail" placeholder="name@example.com">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-grid" style="margin-top:20px;">
+                <div class="form-field">
+                  <label>Issue Date <span class="req">*</span></label>
+                  <input type="date" id="issueDate">
+                </div>
+                <div class="form-field">
+                  <label>Due Date <span class="req">*</span></label>
+                  <input type="date" id="dueDate">
+                </div>
+                <div class="form-field full">
+                  <label>Reference (optional)</label>
+                  <input type="text" id="reference" placeholder="e.g. PO number, WhatsApp ref, order #">
+                </div>
+              </div>
+            </div>
+
+            <!-- Line items -->
+            <div class="card items-card">
+              <div class="card-title"><i class="fas fa-list"></i> Invoice Line Items</div>
+
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th style="min-width:220px;">Catalogue Item</th>
+                    <th style="min-width:180px;">Description / Details</th>
+                    <th style="width:80px;">Qty</th>
+                    <th style="width:110px;">Unit Price</th>
+                    <th style="width:100px;">Discount</th>
+                    <th style="width:70px;">VAT %</th>
+                    <th style="width:120px; text-align:right; padding-right:14px;">Line Total</th>
+                    <th style="width:38px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="itemsTbody"></tbody>
+              </table>
+
+              <div class="items-actions">
+                <button class="btn-add-item" onclick="addBlankLine()">
+                  <i class="fas fa-plus"></i> Add Item
+                </button>
+                <button class="btn-add-item custom" onclick="addCustomLine()">
+                  <i class="fas fa-plus"></i> Add Custom Line (Delivery, Fee)
+                </button>
+              </div>
+            </div>
+
+            <!-- Notes and terms -->
+            <div class="card">
+              <div class="card-title"><i class="fas fa-comment-alt"></i> Notes &amp; Terms</div>
+              <div class="notes-grid">
+                <div class="form-field">
+                  <label>Customer Notes</label>
+                  <textarea id="customerNotes" rows="4" placeholder="e.g. Thanks for your business! Delivery via courier."></textarea>
+                </div>
+                <div class="form-field">
+                  <label>Terms &amp; Conditions</label>
+                  <textarea id="terms" rows="4" placeholder="Thank you for partnering with us. Please quote your invoice number when sending payments."></textarea>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN: totals rail -->
+          <div class="totals-rail">
+            <div class="totals-block">
+              <h3><i class="fas fa-calculator"></i> Summary</h3>
+
+              <div class="totals-row">
+                <span class="label">Subtotal</span>
+                <span class="value" id="tSubtotal">KES 0.00</span>
+              </div>
+              <div class="totals-row">
+                <span class="label">Line Discounts</span>
+                <span class="value" id="tLineDiscount">− KES 0.00</span>
+              </div>
+              <div class="totals-row">
+                <span class="label">Invoice Discount</span>
+                <input type="number" step="0.01" min="0" id="invoiceDiscount" class="discount-input" value="0" placeholder="0">
+              </div>
+              <div class="totals-row">
+                <span class="label">Net Amount</span>
+                <span class="value" id="tNet">KES 0.00</span>
+              </div>
+              <div class="totals-row">
+                <span class="label">VAT</span>
+                <span class="value" id="tVat">KES 0.00</span>
+              </div>
+              <div class="totals-row grand">
+                <span class="label">Grand Total</span>
+                <span class="value" id="tGrand">KES 0.00</span>
+              </div>
+
+              <div class="totals-hint">
+                VAT is calculated per line. Items marked VAT-exempt contribute 0.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom actions -->
+        <div class="editor-actions">
+          <div class="left">
+            <button class="btn-secondary" onclick="cancelEditor()">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+          <div class="right">
+            <button class="btn-secondary" id="saveDraftBtn" onclick="saveDraft()">
+              <i class="fas fa-save"></i> Save Draft
+            </button>
+            <button class="btn-primary" id="finalizeBtn" onclick="finalizeInvoice()">
+              <i class="fas fa-paper-plane"></i> Finalize &amp; Issue
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Hidden file template for new product rows -->
+  <template id="productRowTemplate">
+    <tr class="item-row">
+      <td>
+        <div class="product-cell-wrap">
+          <input type="text" class="product-search-input" placeholder="Type to search products..." autocomplete="off">
+          <div class="product-results"></div>
+        </div>
+      </td>
+      <td>
+        <textarea rows="2" class="line-description" placeholder="Item description or service..."></textarea>
+      </td>
+      <td><input type="number" class="line-qty num" min="0" step="0.01" value="1"></td>
+      <td><input type="number" class="line-unit-price num" min="0" step="0.01" value="0"></td>
+      <td><input type="number" class="line-discount num" min="0" step="0.01" value="0"></td>
+      <td><input type="number" class="line-vat num" min="0" step="0.01" value="16"></td>
+      <td class="line-total-cell"><span class="line-total">0.00</span></td>
+      <td>
+        <button type="button" class="btn-remove-line" title="Remove">
+          <i class="fas fa-times"></i>
+        </button>
+      </td>
+    </tr>
+  </template>
+
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE CLIENT
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    let editingId = null;
+    let existingInvoice = null;
+    let settings = {};
+    let products = [];
+    let categoriesById = {};
+    let customerTab = 'existing';
+    let selectedCustomer = null;      // { user_id, name, phone, email } or null
+    let customersCache = [];           // for the search dropdown
+    let userIsAdmin = false;
+    let locked = false;                // true if invoice has payments or is paid/void
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const todayISO = () => new Date().toISOString().slice(0, 10);
+    const addDays = (iso, days) => {
+      const d = new Date(iso + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      return d.toISOString().slice(0, 10);
+    };
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+  
+
+     /* ============================================================
+       AUTH — delegated to shared admin-sidebar.js
+       ============================================================ */
+    async function checkAdminAccess() {
+      const ok = await window.adminAuthCheck(['admin', 'sales']);
+      if (!ok) return false;
+      const info = window.adminGetProfile();
+      userIsAdmin = (info.role === 'admin');
+      return true;
+    }
+
+    function showAccessDenied(msg) {
+      document.getElementById('adminMain').style.display = 'none';
+      document.getElementById('accessDenied').style.display = 'flex';
+      if (msg) document.getElementById('accessDeniedMsg').textContent = msg;
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = '../index.html';
+    }
+
+    /* ============================================================
+       LOAD INITIAL DATA
+       ============================================================ */
+    async function loadSettings() {
+      const { data, error } = await supabaseClient.from('settings').select('*').eq('id', 1).single();
+      if (error) { console.warn('settings load failed', error); return; }
+      settings = data || {};
+    }
+
+    async function loadProducts() {
+      const { data, error } = await supabaseClient
+        .from('products')
+        .select('id, name, sku_slug:slug, price, image_url, vat_applicable, packs, category_id')
+        .eq('is_active', true)
+        .order('name');
+      if (error) { console.warn('products load failed', error); return; }
+      products = data || [];
+    }
+
+    async function loadCategories() {
+      const { data, error } = await supabaseClient.from('categories').select('id, name');
+      if (error) return;
+      categoriesById = {};
+      (data || []).forEach(c => { categoriesById[c.id] = c.name; });
+    }
+
+    async function loadCustomersForSearch() {
+      // Registered users are in profiles + auth.users. We'll pull from profiles
+      // which typically has name info. Falls back to empty list.
+      const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('id, first_name, last_name, email, phone')
+        .limit(500);
+      if (error) { console.warn('customers load failed', error); return; }
+      customersCache = (data || []).map(p => ({
+        user_id: p.id,
+        name: [p.first_name, p.last_name].filter(Boolean).join(' ') || p.email || 'Customer',
+        email: p.email || '',
+        phone: p.phone || ''
+      }));
+    }
+
+    /* ============================================================
+       LOAD INVOICE (edit mode)
+       ============================================================ */
+    async function loadInvoice(invoiceId) {
+      const { data: inv, error: invErr } = await supabaseClient
+        .from('invoices')
+        .select('*')
+        .eq('id', invoiceId)
+        .single();
+      if (invErr || !inv) throw new Error('Invoice not found');
+
+      existingInvoice = inv;
+
+      // Load items
+      const { data: items, error: itemsErr } = await supabaseClient
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoiceId)
+        .order('position', { ascending: true });
+      if (itemsErr) throw itemsErr;
+
+      // Lock if issued+paid, or void, or paid
+      locked = (inv.status === 'paid' || inv.status === 'void')
+            || (inv.amount_paid > 0 && inv.status !== 'draft');
+
+      // Fill header fields
+      document.getElementById('issueDate').value = inv.issue_date || todayISO();
+      document.getElementById('dueDate').value = inv.due_date || addDays(todayISO(), settings.default_payment_terms_days || 14);
+      document.getElementById('reference').value = inv.reference || '';
+      document.getElementById('customerNotes').value = inv.customer_notes || '';
+      document.getElementById('terms').value = inv.terms || '';
+      document.getElementById('invoiceDiscount').value = Number(inv.invoice_discount || 0);
+
+      // Customer
+      if (inv.customer_user_id) {
+        customerTab = 'existing';
+        selectedCustomer = {
+          user_id: inv.customer_user_id,
+          name: inv.customer_name || '',
+          phone: inv.customer_phone || '',
+          email: inv.customer_email || ''
+        };
+      } else {
+        customerTab = 'walkin';
+        document.getElementById('walkinName').value = inv.customer_name || '';
+        document.getElementById('walkinPhone').value = inv.customer_phone || '';
+        document.getElementById('walkinEmail').value = inv.customer_email || '';
+      }
+      applyCustomerTab();
+
+      // Line items
+      const tbody = document.getElementById('itemsTbody');
+      tbody.innerHTML = '';
+      (items || []).forEach(it => addLineFromRecord(it));
+
+      // If invoice had no items at all (edge case), add a blank row so user can type
+      if (!items || items.length === 0) addBlankLine();
+
+      // Page header
+      document.getElementById('pageTitleText').textContent = 'Edit Invoice';
+      if (inv.invoice_number) {
+        document.getElementById('pageInvoiceNum').style.display = '';
+        document.getElementById('pageInvoiceNum').textContent = inv.invoice_number;
+      }
+      renderStatusPill(inv.status);
+
+      // Locked banner + hide finalize
+      if (locked) {
+        document.getElementById('lockedBannerWrap').innerHTML = `
+          <div class="locked-banner">
+            <i class="fas fa-lock"></i>
+            <div><strong>This invoice is locked.</strong> It's ${inv.status === 'void' ? 'voided' : 'been paid (fully or partially)'}. To make changes, void it and issue a new one.</div>
+          </div>`;
+        applyLockUI();
+      }
+      if (inv.status !== 'draft') {
+        document.getElementById('finalizeBtn').style.display = 'none';
+        document.getElementById('saveDraftBtn').innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      }
+    }
+
+    function applyLockUI() {
+      document.querySelectorAll('#adminMain input, #adminMain textarea, #adminMain select, #adminMain button')
+        .forEach(el => {
+          if (el.classList.contains('btn-secondary') || el.classList.contains('admin-mobile-toggle')) return;
+          if (el.tagName === 'BUTTON' && el.onclick && el.onclick.toString().includes('cancelEditor')) return;
+          el.disabled = true;
+        });
+      document.getElementById('saveDraftBtn').disabled = true;
+      document.getElementById('saveDraftBtn').style.opacity = '0.5';
+      document.getElementById('saveDraftBtn').style.cursor = 'not-allowed';
+      document.getElementById('finalizeBtn').disabled = true;
+      document.getElementById('finalizeBtn').style.opacity = '0.5';
+      document.getElementById('finalizeBtn').style.cursor = 'not-allowed';
+    }
+
+    function renderStatusPill(status) {
+      const pill = document.getElementById('pageStatusPill');
+      pill.style.display = '';
+      const map = {
+        draft:   ['badge-draft',   'Draft'],
+        issued:  ['badge-issued',  'Issued'],
+        partial: ['badge-partial', 'Partial'],
+        paid:    ['badge-paid',    'Paid'],
+        void:    ['badge-void',    'Void']
+      };
+      const [cls, label] = map[status] || ['badge-draft', status];
+      pill.className = 'status-pill badge ' + cls;
+      pill.textContent = label;
+    }
+
+    /* ============================================================
+       CUSTOMER TAB
+       ============================================================ */
+    function switchCustomerTab(tab) {
+      customerTab = tab;
+      applyCustomerTab();
+    }
+
+    function applyCustomerTab() {
+      document.getElementById('tabExisting').classList.toggle('active', customerTab === 'existing');
+      document.getElementById('tabWalkin').classList.toggle('active', customerTab === 'walkin');
+      document.getElementById('existingCustomerPane').style.display = customerTab === 'existing' ? '' : 'none';
+      document.getElementById('walkinCustomerPane').style.display = customerTab === 'walkin' ? '' : 'none';
+      renderSelectedCustomer();
+    }
+
+    function renderSelectedCustomer() {
+      const wrap = document.getElementById('selectedCustomerWrap');
+      if (!selectedCustomer) { wrap.innerHTML = ''; return; }
+      const initials = (selectedCustomer.name || 'C').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      wrap.innerHTML = `
+        <div class="selected-customer">
+          <div class="avatar">${escapeHtml(initials)}</div>
+          <div class="info">
+            <strong>${escapeHtml(selectedCustomer.name)}</strong>
+            <small>${escapeHtml(selectedCustomer.email || selectedCustomer.phone || '—')}</small>
+          </div>
+          <button type="button" onclick="clearSelectedCustomer()">
+            <i class="fas fa-times"></i> Change
+          </button>
+        </div>`;
+    }
+
+    function clearSelectedCustomer() {
+      selectedCustomer = null;
+      renderSelectedCustomer();
+      document.getElementById('customerSearch').value = '';
+      document.getElementById('customerSearch').focus();
+    }
+
+    /* Customer search */
+    const customerSearchEl = document.getElementById('customerSearch');
+    const customerResultsEl = document.getElementById('customerResults');
+    let customerSearchTimer = null;
+
+    customerSearchEl.addEventListener('input', e => {
+      clearTimeout(customerSearchTimer);
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) { customerResultsEl.classList.remove('open'); return; }
+      customerSearchTimer = setTimeout(() => runCustomerSearch(q), 180);
+    });
+
+    function runCustomerSearch(q) {
+      const results = customersCache.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        (c.email || '').toLowerCase().includes(q) ||
+        (c.phone || '').toLowerCase().includes(q)
+      ).slice(0, 12);
+
+      if (results.length === 0) {
+        customerResultsEl.innerHTML = `<div class="empty">No customers found for "${escapeHtml(q)}"</div>`;
+      } else {
+        customerResultsEl.innerHTML = results.map(c => `
+          <div class="customer-result" onclick='pickCustomer(${JSON.stringify(c).replace(/'/g, "&#39;")})'>
+            <strong>${escapeHtml(c.name)}</strong>
+            <small>${escapeHtml([c.email, c.phone].filter(Boolean).join(' · ') || '—')}</small>
+          </div>`).join('');
+      }
+      customerResultsEl.classList.add('open');
+    }
+
+    function pickCustomer(c) {
+      selectedCustomer = { user_id: c.user_id, name: c.name, phone: c.phone || '', email: c.email || '' };
+      customerResultsEl.classList.remove('open');
+      customerSearchEl.value = '';
+      renderSelectedCustomer();
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.customer-search-wrap')) {
+        customerResultsEl.classList.remove('open');
+      }
+    });
+
+    /* ============================================================
+       LINE ITEMS
+       ============================================================ */
+    function addBlankLine() {
+      const tpl = document.getElementById('productRowTemplate');
+      const row = tpl.content.firstElementChild.cloneNode(true);
+      wireLineRow(row);
+      document.getElementById('itemsTbody').appendChild(row);
+      recalcTotals();
+      return row;
+    }
+
+    function addCustomLine() {
+      const row = addBlankLine();
+      row.querySelector('.product-search-input').style.display = 'none';
+      row.dataset.custom = '1';
+      // Prefill a hint
+      const desc = row.querySelector('.line-description');
+      desc.value = '';
+      desc.placeholder = 'e.g. Delivery fee, Installation, Adjustment';
+      desc.focus();
+      recalcTotals();
+    }
+
+    function addLineFromRecord(it) {
+      const row = addBlankLine();
+      const isCustom = !!it.is_custom || !it.product_id;
+
+      if (isCustom) {
+        row.querySelector('.product-search-input').style.display = 'none';
+        row.dataset.custom = '1';
+        row.dataset.customLabel = it.pack_label || 'Custom';
+      } else {
+        // Try to find the product to show its name
+        const prod = products.find(p => p.id === it.product_id);
+        if (prod) {
+          row.querySelector('.product-search-input').value = prod.name;
+          row.dataset.productId = prod.id;
+        } else {
+          row.querySelector('.product-search-input').value = it.description || '';
+        }
+      }
+
+      row.querySelector('.line-description').value = it.description || '';
+      row.querySelector('.line-qty').value = it.quantity ?? 1;
+      row.querySelector('.line-unit-price').value = it.unit_price ?? 0;
+      row.querySelector('.line-discount').value = it.line_discount ?? 0;
+      row.querySelector('.line-vat').value = it.vat_rate ?? 16;
+      row.dataset.packId = it.pack_id || '';
+      row.dataset.packLabel = it.pack_label || '';
+      recalcTotals();
+    }
+
+    function wireLineRow(row) {
+      // Remove button
+      row.querySelector('.btn-remove-line').addEventListener('click', () => {
+        row.remove();
+        recalcTotals();
+      });
+
+      // Product search
+      const searchInput = row.querySelector('.product-search-input');
+      const resultsEl = row.querySelector('.product-results');
+      let timer = null;
+
+      searchInput.addEventListener('input', e => {
+        clearTimeout(timer);
+        const q = e.target.value.trim().toLowerCase();
+        row.dataset.productId = '';
+        if (!q) { resultsEl.classList.remove('open'); return; }
+        timer = setTimeout(() => {
+          const matches = products.filter(p =>
+            p.name.toLowerCase().includes(q)
+          ).slice(0, 10);
+          if (!matches.length) {
+            resultsEl.innerHTML = `<div class="empty" style="padding:14px;color:var(--text-muted);font-size:0.85rem;">No products found</div>`;
+          } else {
+            resultsEl.innerHTML = matches.map(p => `
+              <div class="product-result" data-product-id="${escapeHtml(p.id)}">
+                ${p.image_url
+                  ? `<img src="${escapeHtml(p.image_url)}" alt="" onerror="this.outerHTML='<div class=&quot;ph&quot;><i class=&quot;fas fa-box&quot;></i></div>'">`
+                  : `<div class="ph"><i class="fas fa-box"></i></div>`}
+                <div class="info">
+                  <strong>${escapeHtml(p.name)}</strong>
+                  <small>${escapeHtml(categoriesById[p.category_id] || 'Product')}</small>
+                </div>
+                <div class="price">${fmtKES(p.price)}</div>
+              </div>
+            `).join('');
+          }
+          resultsEl.classList.add('open');
+        }, 120);
+      });
+
+      resultsEl.addEventListener('click', e => {
+        const item = e.target.closest('.product-result');
+        if (!item) return;
+        const pid = item.dataset.productId;
+        const prod = products.find(p => p.id === pid);
+        if (!prod) return;
+        selectProduct(row, prod);
+        resultsEl.classList.remove('open');
+      });
+
+      // Recalculate on any input in the row
+      row.querySelectorAll('input, textarea').forEach(el => {
+        el.addEventListener('input', recalcTotals);
+        el.addEventListener('change', recalcTotals);
+      });
+
+      // Close dropdown on outside click
+      document.addEventListener('click', e => {
+        if (!row.contains(e.target)) resultsEl.classList.remove('open');
+      });
+    }
+
+    function selectProduct(row, prod) {
+      row.dataset.productId = prod.id;
+      row.querySelector('.product-search-input').value = prod.name;
+      row.querySelector('.line-description').value = prod.name;
+      row.querySelector('.line-unit-price').value = Number(prod.price || 0).toFixed(2);
+      row.querySelector('.line-qty').value = 1;
+      // VAT from product default
+      row.querySelector('.line-vat').value = prod.vat_applicable === false ? 0 : 16;
+      // Default pack — if product has packs, use first one
+      if (Array.isArray(prod.packs) && prod.packs.length) {
+        const first = prod.packs[0];
+        row.dataset.packId = first.id || '';
+        row.dataset.packLabel = first.label || '';
+      } else {
+        row.dataset.packId = '';
+        row.dataset.packLabel = '';
+      }
+      recalcTotals();
+    }
+
+    /* ============================================================
+       TOTALS
+       ============================================================ */
+    function recalcTotals() {
+      const rows = Array.from(document.querySelectorAll('#itemsTbody .item-row'));
+      let subtotal = 0;
+      let lineDiscounts = 0;
+      let vat = 0;
+
+      rows.forEach(row => {
+        const qty = Number(row.querySelector('.line-qty').value) || 0;
+        const price = Number(row.querySelector('.line-unit-price').value) || 0;
+        const disc = Number(row.querySelector('.line-discount').value) || 0;
+        const vatRate = Number(row.querySelector('.line-vat').value) || 0;
+        const isCustom = row.dataset.custom === '1';
+
+        const gross = qty * price;
+        const lineNet = Math.max(0, gross - disc);
+        const lineVat = isCustom ? 0 : lineNet * (vatRate / 100);
+
+        row.querySelector('.line-total').textContent = (lineNet + lineVat).toFixed(2);
+
+        subtotal += gross;
+        lineDiscounts += disc;
+        vat += lineVat;
+      });
+
+      const invoiceDiscount = Number(document.getElementById('invoiceDiscount').value) || 0;
+
+      // Net applies line discount then invoice discount
+      let net = subtotal - lineDiscounts - invoiceDiscount;
+      if (net < 0) net = 0;
+
+      // VAT recomputed on discounted net per line is complex; v1 keeps per-line VAT as computed
+      const grand = net + vat;
+
+      document.getElementById('tSubtotal').textContent = fmtKES(subtotal);
+      document.getElementById('tLineDiscount').textContent = '− ' + fmtKES(lineDiscounts);
+      document.getElementById('tNet').textContent = fmtKES(net);
+      document.getElementById('tVat').textContent = fmtKES(vat);
+      document.getElementById('tGrand').textContent = fmtKES(grand);
+    }
+
+    document.getElementById('invoiceDiscount').addEventListener('input', recalcTotals);
+
+    /* ============================================================
+       SAVE
+       ============================================================ */
+    function collectHeader() {
+      const issue = document.getElementById('issueDate').value;
+      const due = document.getElementById('dueDate').value;
+
+      let customerName = '';
+      let customerPhone = '';
+      let customerEmail = '';
+      let customerUserId = null;
+
+      if (customerTab === 'existing') {
+        if (selectedCustomer) {
+          customerName = selectedCustomer.name || '';
+          customerPhone = selectedCustomer.phone || '';
+          customerEmail = selectedCustomer.email || '';
+          customerUserId = selectedCustomer.user_id || null;
+        }
+      } else {
+        customerName = (document.getElementById('walkinName').value || '').trim();
+        customerPhone = (document.getElementById('walkinPhone').value || '').trim();
+        customerEmail = (document.getElementById('walkinEmail').value || '').trim();
+      }
+
+      return {
+        issue_date: issue || todayISO(),
+        due_date: due || addDays(issue || todayISO(), 14),
+        reference: (document.getElementById('reference').value || '').trim() || null,
+        customer_name: customerName,
+        customer_phone: customerPhone || null,
+        customer_email: customerEmail || null,
+        customer_user_id: customerUserId,
+        customer_notes: (document.getElementById('customerNotes').value || '').trim() || null,
+        terms: (document.getElementById('terms').value || '').trim() || null,
+        invoice_discount: Number(document.getElementById('invoiceDiscount').value) || 0
+      };
+    }
+
+    function collectItems() {
+      const rows = Array.from(document.querySelectorAll('#itemsTbody .item-row'));
+      const items = [];
+      rows.forEach((row, idx) => {
+        const isCustom = row.dataset.custom === '1';
+        const description = (row.querySelector('.line-description').value || '').trim();
+        const qty = Number(row.querySelector('.line-qty').value) || 0;
+        const unitPrice = Number(row.querySelector('.line-unit-price').value) || 0;
+        const lineDiscount = Number(row.querySelector('.line-discount').value) || 0;
+        const vatRate = isCustom ? 0 : (Number(row.querySelector('.line-vat').value) || 0);
+        const productId = row.dataset.productId || null;
+
+        // Skip fully blank rows
+        if (!description && !productId && qty === 0 && unitPrice === 0) return;
+
+        items.push({
+          position: idx,
+          product_id: productId,
+          pack_id: row.dataset.packId || null,
+          pack_label: row.dataset.packLabel || null,
+          description: description || (productId ? 'Product' : 'Line item'),
+          quantity: qty || 1,
+          unit_price: unitPrice,
+          line_discount: lineDiscount,
+          vat_rate: vatRate,
+          is_custom: isCustom,
+          line_total: 0 // recomputed server-side
+        });
+      });
+      return items;
+    }
+
+    function validateHeader(h, items) {
+      if (!h.customer_name) {
+        showToast('Please select a customer or enter their name', 'error');
+        return false;
+      }
+      if (!h.issue_date || !h.due_date) {
+        showToast('Issue date and due date are required', 'error');
+        return false;
+      }
+      if (new Date(h.due_date) < new Date(h.issue_date)) {
+        showToast('Due date cannot be earlier than issue date', 'error');
+        return false;
+      }
+      if (items.length === 0) {
+        showToast('Add at least one line item', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    async function persistInvoice() {
+      const header = collectHeader();
+      const items = collectItems();
+
+      if (!validateHeader(header, items)) return null;
+
+      if (editingId) {
+        // Update invoice
+        const { error: hErr } = await supabaseClient
+          .from('invoices')
+          .update(header)
+          .eq('id', editingId);
+        if (hErr) throw hErr;
+
+        // Wipe old items and reinsert — simple and correct for v1
+        const { error: delErr } = await supabaseClient
+          .from('invoice_items')
+          .delete()
+          .eq('invoice_id', editingId);
+        if (delErr) throw delErr;
+
+        if (items.length) {
+          const payload = items.map(it => ({ ...it, invoice_id: editingId }));
+          const { error: insErr } = await supabaseClient
+            .from('invoice_items')
+            .insert(payload);
+          if (insErr) throw insErr;
+        }
+        return editingId;
+      } else {
+        // Insert new invoice as draft
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        const { data: created, error: insErr } = await supabaseClient
+          .from('invoices')
+          .insert({
+            ...header,
+            status: 'draft',
+            created_by: user?.id || null
+          })
+          .select('id')
+          .single();
+        if (insErr) throw insErr;
+        editingId = created.id;
+
+        if (items.length) {
+          const payload = items.map(it => ({ ...it, invoice_id: editingId }));
+          const { error: itemsErr } = await supabaseClient
+            .from('invoice_items')
+            .insert(payload);
+          if (itemsErr) throw itemsErr;
+        }
+        return editingId;
+      }
+    }
+
+    async function saveDraft() {
+      if (locked) return;
+      const btn = document.getElementById('saveDraftBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
+
+      try {
+        const id = await persistInvoice();
+        if (!id) return;
+
+        // If this was a new invoice, update URL and page state
+        if (!existingInvoice) {
+          window.history.replaceState({}, '', `invoice-edit.html?id=${id}`);
+          // Reload to reflect server-computed totals + status
+          await loadInvoice(id);
+          document.getElementById('pageTitleText').textContent = 'Edit Invoice';
+        } else {
+          // Refresh local copy (totals may have changed)
+          await loadInvoice(id);
+        }
+
+        showToast('Draft saved');
+      } catch (err) {
+        console.error('Save failed:', err);
+        showToast('Could not save: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
+
+    async function finalizeInvoice() {
+      if (locked) return;
+      const btn = document.getElementById('finalizeBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Finalizing...';
+
+      try {
+        const id = await persistInvoice();
+        if (!id) return;
+
+        // Flip to issued — the DB trigger assigns the invoice number
+        const { error } = await supabaseClient
+          .from('invoices')
+          .update({ status: 'issued' })
+          .eq('id', id);
+        if (error) throw error;
+
+        showToast('Invoice finalized');
+        // Small delay to let the toast show, then navigate
+        setTimeout(() => {
+          window.location.href = 'invoice-view.html?id=' + encodeURIComponent(id);
+        }, 500);
+      } catch (err) {
+        console.error('Finalize failed:', err);
+        showToast('Could not finalize: ' + (err.message || 'Unknown error'), 'error');
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
+
+    function cancelEditor() {
+      if (editingId && !locked) {
+        // Optional: warn about unsaved changes. For v1, just confirm.
+        // (We don't track dirty state precisely; trusting the user.)
+      }
+      window.location.href = 'invoices.html';
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+
+      await Promise.all([
+        loadSettings(),
+        loadProducts(),
+        loadCategories(),
+        loadCustomersForSearch()
+      ]);
+
+      // Defaults for a new invoice
+      document.getElementById('issueDate').value = todayISO();
+      document.getElementById('dueDate').value = addDays(todayISO(), settings.default_payment_terms_days || 14);
+      document.getElementById('terms').value = settings.invoice_footer_note || '';
+
+      // Check URL params
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const fromOrder = params.get('from_order');
+
+      if (id) {
+        try {
+          await loadInvoice(id);
+        } catch (err) {
+          console.error('Load invoice failed:', err);
+          showToast('Invoice not found', 'error');
+          document.getElementById('pageTitleText').textContent = 'Invoice not found';
+        }
+      } else {
+        // New invoice — start with one blank line
+        addBlankLine();
+        if (fromOrder) {
+          await prefillFromOrder(fromOrder);
+        }
+      }
+
+      recalcTotals();
+    })();
+
+    /* ============================================================
+       PREFILL FROM ORDER
+       ============================================================ */
+    async function prefillFromOrder(orderId) {
+      try {
+        const { data: order, error: oErr } = await supabaseClient
+          .from('orders').select('*').eq('id', orderId).single();
+        if (oErr) throw oErr;
+
+        const { data: items } = await supabaseClient
+          .from('order_items').select('*').eq('order_id', orderId);
+
+        // Fill customer (walk-in if no user_id link — we just fill name/phone/email)
+        customerTab = 'walkin';
+        applyCustomerTab();
+        document.getElementById('walkinName').value = order.customer_name || '';
+        document.getElementById('walkinPhone').value = order.customer_phone || '';
+        document.getElementById('walkinEmail').value = order.customer_email || '';
+        document.getElementById('reference').value = 'From order ' + (order.order_number || '');
+
+        // Fill line items
+        document.getElementById('itemsTbody').innerHTML = '';
+        (items || []).forEach(oi => {
+          const row = addBlankLine();
+          row.dataset.productId = oi.product_id || '';
+          row.querySelector('.line-description').value = oi.product_name || '';
+          row.querySelector('.line-qty').value = oi.quantity ?? 1;
+          row.querySelector('.line-unit-price').value = oi.price_per_unit ?? 0;
+          row.querySelector('.line-vat').value = 16; // default; product may override
+          row.dataset.packLabel = oi.quality || '';
+          if (oi.product_id) {
+            const prod = products.find(p => p.id === oi.product_id);
+            if (prod) {
+              row.querySelector('.product-search-input').value = prod.name;
+              row.querySelector('.line-vat').value = prod.vat_applicable === false ? 0 : 16;
+            }
+          }
+        });
+        if (!items || items.length === 0) addBlankLine();
+        recalcTotals();
+      } catch (err) {
+        console.warn('Prefill from order failed:', err);
+        showToast('Could not prefill from order', 'error');
+        addBlankLine();
+      }
+    }
+  </script>
+<script src="pwa.js"></script>
+</body>
+</html>
