@@ -34,6 +34,8 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- html2pdf for Statement Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
@@ -450,6 +452,32 @@
     .section-head-row h2 i { color: var(--orange); }
     .section-head-row p { font-size: 0.85rem; color: var(--text-muted); }
 
+    /* STATEMENT STYLES */
+    .statement-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(31,58,110,0.04);
+    }
+    .stat-box .label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stat-box .value { font-size: 1.4rem; font-weight: 900; color: var(--navy); }
+    .stat-box .value.text-red { color: var(--red); }
+    .stat-box .value.text-green { color: var(--green); }
+
+    .statement-table-wrap { background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 14px rgba(31,58,110,0.04); }
+    .statement-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .statement-table th { text-align: left; padding: 14px 20px; background: #fafbff; color: var(--navy); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .statement-table td { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; color: var(--text-dark); }
+    .statement-table tbody tr:hover { background: #fafbff; }
+
     /* LATEST ORDER */
     .latest-order { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 26px 28px; box-shadow: 0 6px 20px rgba(31,58,110,0.05); margin-bottom: 22px; position: relative; overflow: hidden; }
     .latest-order::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(180deg, var(--navy), var(--red), var(--orange)); }
@@ -499,7 +527,7 @@
     .latest-order-footer .total strong { font-size: 1.5rem; font-weight: 900; color: var(--red); letter-spacing: -0.5px; }
     .latest-order-footer .actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    .btn-primary-sm, .btn-outline-sm, .btn-ghost-sm {
+    .btn-primary-sm, .btn-outline-sm, .btn-ghost-sm, .btn-success-sm {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 11px 20px; border-radius: 10px;
       font-weight: 700; font-size: 0.85rem;
@@ -624,6 +652,7 @@
       .mobile-nav-actions { display: flex; }
       .main-nav .container { min-height: 72px; }
       .profile-grid { grid-template-columns: 1fr; }
+      .statement-stats { grid-template-columns: 1fr; }
     }
     @media (max-width: 900px) {
       .account-hero-inner { grid-template-columns: 1fr; }
@@ -646,6 +675,7 @@
       .order-card { padding: 18px; }
       .latest-order { padding: 22px 20px; }
       .notif-panel { width: 340px; }
+      .statement-table th, .statement-table td { padding: 10px 14px; }
     }
     @media (max-width: 480px) {
       .account-hero { padding: 24px 18px; }
@@ -901,6 +931,7 @@
       <div class="account-tabs">
         <button class="account-tab active" data-tab="overview"><i class="fas fa-chart-line"></i> Overview</button>
         <button class="account-tab" data-tab="orders"><i class="fas fa-box"></i> All Orders</button>
+        <button class="account-tab" data-tab="statement"><i class="fas fa-file-invoice-dollar"></i> Statement</button>
         <button class="account-tab" data-tab="profile"><i class="fas fa-user"></i> Profile</button>
       </div>
 
@@ -945,6 +976,28 @@
         </div>
 
         <div class="orders-list" id="allOrdersWrap"></div>
+      </section>
+
+      <!-- NEW STATEMENT TAB -->
+      <section class="tab-panel" id="tab-statement">
+        <div class="section-head-row">
+          <div>
+            <h2><i class="fas fa-file-invoice-dollar"></i> My Statement</h2>
+            <p>View your total balances, paid invoices, and outstanding amounts.</p>
+          </div>
+          <div>
+             <button class="btn-primary-sm" id="downloadStmtBtn" onclick="downloadCustomerStatement()">
+                <i class="fas fa-download"></i> Download Statement
+             </button>
+          </div>
+        </div>
+
+        <div id="statementContent">
+          <div class="loading-skeleton">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <p>Loading statement data...</p>
+          </div>
+        </div>
       </section>
 
       <section class="tab-panel" id="tab-profile">
@@ -1034,6 +1087,12 @@
     let refreshInterval = null;
     let categories = [];
 
+    // Statement State
+    let customerInvoices = [];
+    let totalBilled = 0;
+    let totalPaid = 0;
+    let totalBalance = 0;
+
     const NOTIF_KEY = 'riseAxisNotifs';
     let notifications = [];
 
@@ -1057,7 +1116,7 @@
     /* ============================================================
        HELPERS
        ============================================================ */
-    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE');
+    const fmtKES = n => 'KES ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const fmtDate = iso => {
       if (!iso) return '—';
       const d = new Date(iso);
@@ -1504,6 +1563,11 @@
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        
+        // Lazy load statement if clicked
+        if (tab.dataset.tab === 'statement' && customerInvoices.length === 0) {
+           loadCustomerStatement();
+        }
       });
     });
 
@@ -2093,6 +2157,135 @@ async function reorderById(orderId, ev) {
     }
 
     /* ============================================================
+       STATEMENT LOGIC
+       ============================================================ */
+    async function loadCustomerStatement() {
+      const wrap = document.getElementById('statementContent');
+      wrap.innerHTML = `<div class="loading-skeleton"><i class="fas fa-circle-notch fa-spin"></i><p>Fetching your invoice records...</p></div>`;
+
+      try {
+        const { data: invoices, error } = await supabaseClient
+          .from('invoices')
+          .select('id, invoice_number, issue_date, due_date, total, amount_paid, status')
+          .eq('customer_user_id', currentUser.id)
+          .order('issue_date', { ascending: false });
+
+        if (error) throw error;
+
+        customerInvoices = invoices || [];
+        totalBilled = 0;
+        totalPaid = 0;
+        totalBalance = 0;
+
+        const rows = customerInvoices.map(inv => {
+          const amt = Number(inv.total) || 0;
+          const paid = Number(inv.amount_paid) || 0;
+          const bal = amt - paid;
+
+          totalBilled += amt;
+          totalPaid += paid;
+          totalBalance += bal;
+
+          let statusBadge = 'badge-draft';
+          if (inv.status === 'paid') statusBadge = 'badge-paid';
+          else if (inv.status === 'partial') statusBadge = 'badge-partial';
+          else if (inv.status === 'void') statusBadge = 'badge-void';
+
+          return `
+            <tr>
+              <td><strong>${escapeHtml(inv.invoice_number || 'DRAFT')}</strong></td>
+              <td>${inv.issue_date || '—'}</td>
+              <td>${inv.due_date || '—'}</td>
+              <td><span class="badge ${statusBadge}">${escapeHtml(inv.status)}</span></td>
+              <td>${fmtKES(amt)}</td>
+              <td>${fmtKES(paid)}</td>
+              <td style="font-weight:700;color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">
+                ${fmtKES(bal)}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        wrap.innerHTML = `
+          <div id="printableCustomerStatement" style="background:#fff;">
+            <div class="statement-stats">
+              <div class="stat-box">
+                <div class="label">Total Billed</div>
+                <div class="value">${fmtKES(totalBilled)}</div>
+              </div>
+              <div class="stat-box">
+                <div class="label">Total Paid</div>
+                <div class="value text-green">${fmtKES(totalPaid)}</div>
+              </div>
+              <div class="stat-box">
+                <div class="label">Outstanding Balance</div>
+                <div class="value text-red">${fmtKES(totalBalance)}</div>
+              </div>
+            </div>
+
+            <div class="statement-table-wrap">
+              <table class="statement-table">
+                <thead>
+                  <tr>
+                    <th>Invoice #</th>
+                    <th>Issued</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows || '<tr><td colspan="7" style="text-align:center;padding:30px;">No invoices found for your account.</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+      } catch (err) {
+        console.error('Failed to load statement:', err);
+        wrap.innerHTML = `<div class="empty-state"><p>Error loading statement: ${escapeHtml(err.message)}</p></div>`;
+      }
+    }
+
+    function downloadCustomerStatement() {
+      const element = document.getElementById('printableCustomerStatement');
+      if (!element) {
+        showToast('Statement data is not loaded yet', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('downloadStmtBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating PDF...';
+
+      const name = document.getElementById('heroName').innerText.replace(/[^a-z0-9]/gi, '_');
+      const fileName = `My_Statement_${name}_${new Date().toISOString().slice(0,10)}.pdf`;
+
+      const opt = {
+        margin:       10,
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        showToast('Statement downloaded successfully');
+      }).catch(err => {
+        console.error('PDF generation failed:', err);
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        showToast('Failed to generate PDF', 'error');
+      });
+    }
+
+    /* ============================================================
        GLOBAL EXPOSE
        ============================================================ */
     window.openOrder = openOrder;
@@ -2105,6 +2298,8 @@ async function reorderById(orderId, ev) {
     window.markAllNotifsRead = markAllNotifsRead;
     window.openNotif = openNotif;
     window.doLogout = doLogout;
+    window.loadCustomerStatement = loadCustomerStatement;
+    window.downloadCustomerStatement = downloadCustomerStatement;
 
     console.log('%c RISE AXIS — Account Dashboard ', 'background: linear-gradient(90deg, #1e53b4, #C8102E); color: #fff; font-size: 16px; padding: 8px 16px; border-radius: 6px; font-weight: 800;');
   </script>

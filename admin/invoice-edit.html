@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
-    <link rel="stylesheet" href="splash.css">
+  <link rel="stylesheet" href="splash.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="admin-sidebar.js"></script>
   <style>
@@ -645,6 +645,10 @@
                 <button class="btn-add-item" onclick="addBlankLine()">
                   <i class="fas fa-plus"></i> Add Item
                 </button>
+                <!-- NEW BUTTON HERE -->
+                <button class="btn-add-item" style="color: var(--navy); border-color: var(--navy);" onclick="openNewProductModal()">
+                  <i class="fas fa-box-open"></i> Add New Product
+                </button>
                 <button class="btn-add-item custom" onclick="addCustomLine()">
                   <i class="fas fa-plus"></i> Add Custom Line (Delivery, Fee)
                 </button>
@@ -751,7 +755,71 @@
       </td>
     </tr>
   </template>
+  
+  <!-- NEW PRODUCT MODAL -->
+  <div class="modal-overlay" id="newProductModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2><i class="fas fa-box-open"></i> Quick Add Product</h2>
+          <p>Save a custom item to the database and add it to this invoice.</p>
+        </div>
+        <button class="modal-close" onclick="closeNewProductModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field full">
+            <label>Product Name <span class="req">*</span></label>
+            <input type="text" id="npName" placeholder="e.g. Custom Wiring Harness">
+          </div>
+          <div class="form-field full">
+            <label>Description (Optional)</label>
+            <input type="text" id="npDesc" placeholder="Item description for the invoice">
+          </div>
+          
+          <div class="form-field">
+            <label>Sales Price (KES) <span class="req">*</span></label>
+            <input type="number" id="npSalesPrice" min="0" step="0.01" value="0">
+          </div>
+          <div class="form-field">
+            <label>Cost Price (KES) <span class="req">*</span></label>
+            <input type="number" id="npCostPrice" min="0" step="0.01" value="0">
+          </div>
+          
+          <div class="form-field">
+            <label>Quantity <span class="req">*</span></label>
+            <input type="number" id="npQty" min="1" step="1" value="1">
+          </div>
+          <div class="form-field">
+            <label>Category</label>
+            <select id="npCategory"></select>
+          </div>
+          <div class="form-field">
+            <label>Initial Stock (For Ledger) <span class="req">*</span></label>
+            <input type="number" id="npStock" min="1" step="1" value="1">
+          </div>
+          <div class="form-field">
+            <label>Pack Label (Optional)</label>
+            <input type="text" id="npPackLabel" placeholder="e.g. Box of 12">
+          </div>
+          <div class="form-field">
+            <label>Pack Price (Optional)</label>
+            <input type="number" id="npPackPrice" min="0" step="0.01" placeholder="Leave blank for base price">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeNewProductModal()">Cancel</button>
+        <button class="btn-primary" id="npSaveBtn" onclick="saveNewProduct()">
+          <i class="fas fa-save"></i> Create & Add to Invoice
+        </button>
+      </div>
+    </div>
+  </div>
   <div class="toast-message" id="toastMessage">
     <i class="fas fa-check-circle" id="toastIcon"></i>
     <span id="toastText">Done</span>
@@ -778,6 +846,7 @@
     let customersCache = [];           // for the search dropdown
     let userIsAdmin = false;
     let locked = false;                // true if invoice has payments or is paid/void
+    let fromOrderId = null;            // order UUID if this invoice was created via "Create Invoice" on an order
 
     /* ============================================================
        HELPERS
@@ -808,9 +877,7 @@
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
     }
 
-  
-
-     /* ============================================================
+    /* ============================================================
        AUTH — delegated to shared admin-sidebar.js
        ============================================================ */
     async function checkAdminAccess() {
@@ -844,10 +911,13 @@
     async function loadProducts() {
       const { data, error } = await supabaseClient
         .from('products')
-        .select('id, name, sku_slug:slug, price, image_url, vat_applicable, packs, category_id')
-        .eq('is_active', true)
+        .select('id, name, slug, price, cost_price, image_url, vat_applicable, packs, category_id, is_active')
         .order('name');
-      if (error) { console.warn('products load failed', error); return; }
+      if (error) { 
+        console.warn('products load failed', error); 
+        showToast('Failed to load products', 'error');
+        return; 
+      }
       products = data || [];
     }
 
@@ -1238,7 +1308,6 @@
       let net = subtotal - lineDiscounts - invoiceDiscount;
       if (net < 0) net = 0;
 
-      // VAT recomputed on discounted net per line is complex; v1 keeps per-line VAT as computed
       const grand = net + vat;
 
       document.getElementById('tSubtotal').textContent = fmtKES(subtotal);
@@ -1289,20 +1358,24 @@
       };
     }
 
-    function collectItems() {
+        function collectItems() {
       const rows = Array.from(document.querySelectorAll('#itemsTbody .item-row'));
       const items = [];
       rows.forEach((row, idx) => {
-        const isCustom = row.dataset.custom === '1';
+        const isCustomRow = row.dataset.custom === '1';
         const description = (row.querySelector('.line-description').value || '').trim();
         const qty = Number(row.querySelector('.line-qty').value) || 0;
         const unitPrice = Number(row.querySelector('.line-unit-price').value) || 0;
         const lineDiscount = Number(row.querySelector('.line-discount').value) || 0;
-        const vatRate = isCustom ? 0 : (Number(row.querySelector('.line-vat').value) || 0);
+        const vatRate = isCustomRow ? 0 : (Number(row.querySelector('.line-vat').value) || 0);
         const productId = row.dataset.productId || null;
 
         // Skip fully blank rows
         if (!description && !productId && qty === 0 && unitPrice === 0) return;
+
+        // Check if this product is a hidden/custom product (is_active = false)
+        const prod = products.find(p => p.id === productId);
+        const isCustomProduct = prod ? (prod.is_active === false) : false;
 
         items.push({
           position: idx,
@@ -1314,7 +1387,9 @@
           unit_price: unitPrice,
           line_discount: lineDiscount,
           vat_rate: vatRate,
-          is_custom: isCustom,
+          // If it's a custom line OR a quick-added product, flag it as custom
+          // so the database trigger skips the stock check for it.
+          is_custom: isCustomRow || isCustomProduct, 
           line_total: 0 // recomputed server-side
         });
       });
@@ -1348,7 +1423,8 @@
       if (!validateHeader(header, items)) return null;
 
       if (editingId) {
-        // Update invoice
+        // Update invoice — NOTE: order_id is intentionally NOT included here.
+        // Once an invoice has been created, its order linkage is immutable.
         const { error: hErr } = await supabaseClient
           .from('invoices')
           .update(header)
@@ -1378,7 +1454,10 @@
           .insert({
             ...header,
             status: 'draft',
-            created_by: user?.id || null
+            created_by: user?.id || null,
+            // Only set order_id on brand-new invoices created from an order.
+            // The UPDATE branch above must never touch order_id.
+            order_id: fromOrderId || null
           })
           .select('id')
           .single();
@@ -1409,7 +1488,9 @@
 
         // If this was a new invoice, update URL and page state
         if (!existingInvoice) {
-          window.history.replaceState({}, '', `invoice-edit.html?id=${id}`);
+          // Preserve from_order in the URL so the linkage survives reloads
+          const keepOrder = fromOrderId ? `&from_order=${encodeURIComponent(fromOrderId)}` : '';
+          window.history.replaceState({}, '', `invoice-edit.html?id=${id}${keepOrder}`);
           // Reload to reflect server-computed totals + status
           await loadInvoice(id);
           document.getElementById('pageTitleText').textContent = 'Edit Invoice';
@@ -1436,24 +1517,40 @@
       btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Finalizing...';
 
       try {
+        // 1. Save the current state first (returns ID or null)
         const id = await persistInvoice();
-        if (!id) return;
+        if (!id) {
+          // If persistInvoice failed validation, it returns null. 
+          // The finally block will unlock the button.
+          return; 
+        }
 
-        // Flip to issued — the DB trigger assigns the invoice number
+        // 2. Flip to issued
+        console.log("Attempting to finalize invoice ID:", id);
+        
         const { error } = await supabaseClient
           .from('invoices')
           .update({ status: 'issued' })
           .eq('id', id);
-        if (error) throw error;
+          
+        if (error) {
+          console.error("Finalize DB Error:", error);
+          throw new Error(error.message || error.details || 'Database rejected finalize');
+        }
 
         showToast('Invoice finalized');
+        
         // Small delay to let the toast show, then navigate
         setTimeout(() => {
           window.location.href = 'invoice-view.html?id=' + encodeURIComponent(id);
         }, 500);
+
       } catch (err) {
         console.error('Finalize failed:', err);
         showToast('Could not finalize: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        // THIS IS CRITICAL: It ensures the button ALWAYS unlocks, 
+        // even if validation fails, the DB throws, or network times out.
         btn.disabled = false;
         btn.innerHTML = orig;
       }
@@ -1491,6 +1588,10 @@
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
       const fromOrder = params.get('from_order');
+
+      // Persist order linkage in module state so it survives
+      // history.replaceState() + loadInvoice() after the first save.
+      if (fromOrder) fromOrderId = fromOrder;
 
       if (id) {
         try {
@@ -1531,7 +1632,10 @@
         document.getElementById('walkinEmail').value = order.customer_email || '';
         document.getElementById('reference').value = 'From order ' + (order.order_number || '');
 
-        // Fill line items
+        // Order totals already include VAT (if any) in price_per_unit.
+        // For Model B we mirror the order exactly: no extra VAT, no extra discount.
+        document.getElementById('invoiceDiscount').value = 0;
+
         document.getElementById('itemsTbody').innerHTML = '';
         (items || []).forEach(oi => {
           const row = addBlankLine();
@@ -1539,13 +1643,13 @@
           row.querySelector('.line-description').value = oi.product_name || '';
           row.querySelector('.line-qty').value = oi.quantity ?? 1;
           row.querySelector('.line-unit-price').value = oi.price_per_unit ?? 0;
-          row.querySelector('.line-vat').value = 16; // default; product may override
+          row.querySelector('.line-discount').value = 0;
+          row.querySelector('.line-vat').value = 0;   // <-- no VAT added on order-derived invoices
           row.dataset.packLabel = oi.quality || '';
           if (oi.product_id) {
             const prod = products.find(p => p.id === oi.product_id);
             if (prod) {
               row.querySelector('.product-search-input').value = prod.name;
-              row.querySelector('.line-vat').value = prod.vat_applicable === false ? 0 : 16;
             }
           }
         });
@@ -1557,6 +1661,98 @@
         addBlankLine();
       }
     }
+
+    /* ============================================================
+       QUICK ADD PRODUCT
+       ============================================================ */
+    function openNewProductModal() {
+      // Reset form
+      document.getElementById('npName').value = '';
+      document.getElementById('npDesc').value = '';
+      document.getElementById('npSalesPrice').value = '0';
+      document.getElementById('npCostPrice').value = '0';
+      document.getElementById('npQty').value = '1';
+      document.getElementById('npStock').value = '1';
+      document.getElementById('npPackLabel').value = '';
+      document.getElementById('npPackPrice').value = '';
+
+      // Populate categories dropdown
+      const catSelect = document.getElementById('npCategory');
+      catSelect.innerHTML = '<option value="">— No Category —</option>';
+      Object.keys(categoriesById).forEach(id => {
+        catSelect.innerHTML += `<option value="${id}">${escapeHtml(categoriesById[id])}</option>`;
+      });
+
+      document.getElementById('newProductModal').classList.add('open');
+      document.getElementById('npName').focus();
+    }
+
+    function closeNewProductModal() {
+      document.getElementById('newProductModal').classList.remove('open');
+    }
+
+    async function saveNewProduct() {
+      const btn = document.getElementById('npSaveBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating...';
+
+      try {
+        const name = document.getElementById('npName').value.trim();
+        const desc = document.getElementById('npDesc').value.trim();
+        const salesPrice = Number(document.getElementById('npSalesPrice').value) || 0;
+        const costPrice = Number(document.getElementById('npCostPrice').value) || 0;
+        const qty = Number(document.getElementById('npQty').value) || 1;
+        const packLabel = document.getElementById('npPackLabel').value.trim();
+        const packPriceValue = document.getElementById('npPackPrice').value;
+        const categoryId = document.getElementById('npCategory').value || null;
+
+        if (!name) throw new Error('Product name is required');
+
+        const packs = packLabel ? [{
+          label: packLabel,
+          price: packPriceValue === '' ? salesPrice : Number(packPriceValue) || 0
+        }] : [];
+        const { data: newProd, error } = await supabaseClient
+          .from('products')
+          .insert({
+            name,
+            price: salesPrice,
+            cost_price: costPrice,
+            category_id: categoryId,
+            packs,
+            is_active: true
+          })
+          .select('id, name, price, cost_price, image_url, vat_applicable, packs, category_id, is_active')
+          .single();
+        if (error) throw error;
+
+        // 3. Add to local cache and invoice UI
+        products.push(newProd);
+
+        const row = addBlankLine();
+        row.dataset.productId = newProd.id;
+        row.dataset.custom = '1'; // <-- Treat this row as a custom line (no stock deduction)
+        row.querySelector('.product-search-input').value = newProd.name;
+        row.querySelector('.line-description').value = desc || newProd.name;
+        row.querySelector('.line-qty').value = qty;
+        row.querySelector('.line-unit-price').value = salesPrice;
+        row.querySelector('.line-vat').value = 0; 
+        row.dataset.packLabel = packLabel || '';
+
+        recalcTotals();
+        closeNewProductModal();
+        showToast('Product created and added to invoice');
+
+      } catch (err) {
+        console.error('Failed to create product:', err);
+        showToast('Error: ' + (err.message || 'Could not create product'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+      }
+    
   </script>
 <script src="pwa.js"></script>
 </body>

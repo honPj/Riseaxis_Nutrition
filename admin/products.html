@@ -344,6 +344,78 @@
       .img-upload { flex-direction: column; }
       .img-preview { width: 100%; height: 180px; }
     }
+        /* Cost price warning banner */
+    .cost-warning {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid var(--red);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .cost-warning .cw-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--red);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .cost-warning .cw-body { flex: 1; min-width: 200px; }
+    .cost-warning .cw-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--red-deep);
+      margin-bottom: 2px;
+    }
+    .cost-warning .cw-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .cost-warning .cw-action {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .cost-warning .cw-action:hover {
+      background: var(--red-deep);
+      transform: translateY(-1px);
+    }
+
+    /* No-cost badge on product rows */
+    .no-cost-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fef2f2;
+      color: var(--red);
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid #fecaca;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -389,19 +461,19 @@
     <main class="admin-main" id="adminMain" style="display: none;">
       <div class="container">
 
-        <div class="page-title-row">
+           <div class="page-title-row">
           <div>
             <h1><i class="fas fa-box"></i> Products Manager</h1>
             <p>Add, edit, or remove products from your catalogue</p>
           </div>
-                  <div class="title-actions">
-          <button class="btn-refresh" id="refreshBtn" onclick="loadProducts(true)">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
-          <button class="btn-add" id="addProductBtn" onclick="openProductModal()">
-            <i class="fas fa-plus"></i> Add Product
-          </button>
-        </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="refreshBtn" onclick="loadProducts(true)">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-add" id="addProductBtn" onclick="openProductModal()">
+              <i class="fas fa-plus"></i> Add Product
+            </button>
+          </div>
         </div>
 
         <div class="stats-grid">
@@ -425,6 +497,18 @@
             <div class="stat-value" id="statOut">—</div>
             <div class="stat-label">Out of Stock</div>
           </div>
+        </div>
+
+        <!-- Cost price warning banner -->
+        <div class="cost-warning" id="costWarning" style="display:none;">
+          <div class="cw-icon"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="cw-body">
+            <div class="cw-title">Some products are missing a cost price</div>
+            <div class="cw-sub" id="cwSub">Margins and Profit &amp; Loss reports will be incomplete.</div>
+          </div>
+          <button class="cw-action" onclick="filterMissingCost()">
+            <i class="fas fa-filter"></i> Show <span id="cwCount">0</span> products
+          </button>
         </div>
 
         <div class="filter-bar">
@@ -1002,6 +1086,7 @@
       }
     }
 
+    
     function updateStats() {
       const total = allProducts.length;
       const active = allProducts.filter(p => p.is_active).length;
@@ -1011,8 +1096,50 @@
       document.getElementById('statActive').textContent = active;
       document.getElementById('statLowStock').textContent = low;
       document.getElementById('statOut').textContent = out;
+
+      updateCostWarning();   // ← add this line
     }
 
+    /* ============================================================
+       COST PRICE WARNING
+       ============================================================ */
+    function updateCostWarning() {
+      const missing = allProducts.filter(p =>
+        p.is_active && (p.cost_price === null || p.cost_price === undefined)
+      );
+
+      const banner = document.getElementById('costWarning');
+      const sub = document.getElementById('cwSub');
+      const count = document.getElementById('cwCount');
+
+      if (missing.length === 0) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      banner.style.display = 'flex';
+      count.textContent = missing.length;
+      sub.textContent = missing.length === 1
+        ? '1 active product is missing a cost price. Margins and P&L will be incomplete.'
+        : `${missing.length} active products are missing a cost price. Margins and P&L will be incomplete.`;
+    }
+
+    function filterMissingCost() {
+      // Clear other filters, show only products missing cost
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterRoot').value = '';
+      document.getElementById('filterCategory').value = '';
+      document.getElementById('filterStatus').value = '';
+
+      filteredProducts = allProducts.filter(p =>
+        p.is_active && (p.cost_price === null || p.cost_price === undefined)
+      );
+
+      renderProducts();
+
+      // Scroll to the products list
+      document.querySelector('.products-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     function applyFilters() {
       const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
       const rootId = document.getElementById('filterRoot').value;
@@ -1096,7 +1223,9 @@
         const vatBadge = p.vat_applicable === false
           ? ' <span style="font-size:0.62rem;color:var(--text-muted);font-weight:700;">· Exempt</span>'
           : '';
-
+        const noCostBadge = (p.cost_price === null || p.cost_price === undefined)
+          ? '<span class="no-cost-badge"><i class="fas fa-exclamation-triangle"></i> No cost</span>'
+          : '';
         // Margin badge: only when cost_price is set and price > 0
         let marginBadge = '';
         if (p.cost_price != null && Number(p.price) > 0) {
@@ -1118,7 +1247,7 @@
               </div>
             </td>
             <td>${categoryBadge(p.category_id)}</td>
-            <td>${priceHtml}${vatBadge}${marginBadge}</td>
+                        <td>${priceHtml}${vatBadge}${noCostBadge}</td>
             <td>${stockBadge}</td>
             <td>${statusBadge}</td>
                           <td style="text-align:right;">
@@ -1724,6 +1853,16 @@
       if (!name) { showToast('Please enter a product name', 'error'); return; }
       if (!categoryId) { showToast('Please select a category', 'error'); return; }
       if (isNaN(price) || price < 0) { showToast('Please enter a valid price', 'error'); return; }
+            // Nudge: confirm when saving a product without cost
+      const costRaw = document.getElementById('fCostPrice').value.trim();
+      if (costRaw === '') {
+        const proceed = confirm(
+          'This product has no cost price.\n\n' +
+          'Margin calculations and Profit & Loss reports will not include this product\'s profit.\n\n' +
+          'Continue without cost price?'
+        );
+        if (!proceed) return;
+      }
       if (categoryHasChildren(categoryId)) {
         const c = categoryById(categoryId);
         if (!confirm(`"${c?.name}" is a parent category. Products are usually assigned to a leaf. Continue anyway?`)) {
@@ -1747,7 +1886,6 @@
         category_id: categoryId,
         description: document.getElementById('fDescription').value.trim() || null,
         long_description: document.getElementById('fLongDescription').value.trim() || null,
-        price,
         cost_price: parseNumOrNull(document.getElementById('fCostPrice').value),
                 price,
         sale_price: parseFloat(document.getElementById('fSalePrice').value) || null,

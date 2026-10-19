@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Manage Users | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="splash.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin-sidebar.js"></script>
+  <!-- html2pdf Library for downloading PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <style>
+    .users-card {
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(31,58,110,0.05);
+    }
+    .users-table-wrap { overflow-x: auto; }
+    table.users-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 900px;
+    }
+    .users-table thead th {
+      text-align: left;
+      padding: 16px 20px;
+      background: #fafbff;
+      color: var(--navy);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .users-table tbody td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .users-table tbody tr:hover { background: #fafbff; }
+    
+    .role-select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      background: #fff;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .role-select:focus { border-color: var(--navy); }
+    .role-select:disabled { background: var(--bg-light); cursor: not-allowed; opacity: 0.7; }
+    
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-badge.admin { background: #fee2e2; color: #991b1b; }
+    .role-badge.sales { background: #dbeafe; color: #1e40af; }
+    .role-badge.customer { background: #f3f4f6; color: #4b5563; }
+
+       /* Register Button */
+    .btn-register {
+      background: linear-gradient(135deg, var(--white), #f5f3f2) !important;
+      color: #086815 !important;
+      border: none !important;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(31, 158, 80, 0.3);
+    }
+    
+    .btn-register i {
+      color: #228d34 !important;
+    }
+
+    .btn-register:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(15, 112, 44, 0.45);
+      background: linear-gradient(135deg, #bdb7b5, #e4e2e1) !important;
+    }
+
+    /* Statement Button */
+    .btn-statement {
+      background: #e8eef8;
+      color: var(--navy);
+      border: 1px solid #dbe5f0;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-statement:hover {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+
+    /* Statement Modal Specifics */
+    .statement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px dashed var(--border);
+    }
+    .statement-header h2 { color: var(--navy); font-size: 1.4rem; margin-bottom: 4px; }
+    .statement-header p { color: var(--text-muted); font-size: 0.9rem; }
+    
+    .statement-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-box .label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stat-box .value { font-size: 1.2rem; font-weight: 900; color: var(--navy); }
+    .stat-box .value.text-red { color: var(--red); }
+    .stat-box .value.text-green { color: var(--green); }
+
+    .statement-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .statement-table th {
+      text-align: left;
+      padding: 12px;
+      background: #fafbff;
+      color: var(--navy);
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .statement-table td {
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-dark);
+    }
+    .statement-table tbody tr:hover { background: #f8fafc; }
+  </style>
+</head>
+<body>
+
+<div id="raxSplash">
+  <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+  <div class="splash-sub">Admin Panel</div>
+  <div class="splash-spinner"></div>
+</div>
+<script>
+  (function () {
+    function hide() {
+      const el = document.getElementById('raxSplash');
+      if (!el) return;
+      el.classList.add('fade-out');
+      setTimeout(() => el.remove(), 500);
+    }
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      setTimeout(hide, 300);
+    } else {
+      window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      window.addEventListener('load', () => setTimeout(hide, 300));
+    }
+  })();
+</script>
+
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">You must be an administrator to manage system users.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <div class="page-title-row">
+          <div>
+            <h1><i class="fas fa-users-cog"></i> Manage Users</h1>
+            <p>View registered accounts and manage system roles.</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="refreshBtn" onclick="loadUsers(true)">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="btn-register" onclick="openRegisterModal()">
+              <i class="fas fa-user-plus"></i> Register User
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar" style="margin-bottom: 20px;">
+          <div class="search-box" style="flex: 1; max-width: 400px;">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by name or email...">
+          </div>
+          <select class="filter-select" id="filterRole">
+            <option value="">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="sales">Sales</option>
+            <option value="customer">Customer</option>
+          </select>
+        </div>
+
+        <div class="users-card">
+          <div id="usersContent">
+            <div class="loading-skeleton">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <p>Loading users...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- USER STATEMENT MODAL -->
+  <div class="modal-overlay" id="statementModal">
+    <div class="modal wide">
+      <div class="modal-header">
+        <div>
+          <h2><i class="fas fa-file-invoice-dollar"></i> Customer Statement</h2>
+          <p id="stmtModalSubtitle">Loading...</p>
+        </div>
+        <button class="modal-close" onclick="closeStatementModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- The ID 'statementBody' is targeted by the PDF downloader -->
+      <div class="modal-body" id="statementBody">
+        <div class="loading-skeleton" style="padding:40px 20px;">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <p>Fetching customer records...</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="downloadStmtBtn" onclick="downloadStatement()">
+          <i class="fas fa-download"></i> Download Statement
+        </button>
+        <button class="btn-primary" onclick="closeStatementModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER MODAL -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2><i class="fas fa-user-plus"></i> Register New User</h2>
+          <p>Create a new account and assign a role.</p>
+        </div>
+        <button class="modal-close" onclick="closeRegisterModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" id="regFirstName" placeholder="John">
+          </div>
+          <div class="form-field">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" id="regLastName" placeholder="Doe">
+          </div>
+          <div class="form-field full">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" id="regEmail" placeholder="name@example.com">
+          </div>
+          <div class="form-field full">
+            <label>Temporary Password <span class="req">*</span></label>
+            <input type="text" id="regPassword" placeholder="e.g. RiseAxis2026!">
+            <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">
+              Provide this password to the user. They can change it later.
+            </small>
+          </div>
+          <div class="form-field full">
+            <label>Assign Role <span class="req">*</span></label>
+            <select id="regRole">
+              <option value="customer">Customer (Standard Access)</option>
+              <option value="sales">Sales (Invoices & Orders)</option>
+              <option value="admin">Admin (Full Access)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeRegisterModal()">Cancel</button>
+        <button class="btn-primary" id="regSubmitBtn" onclick="submitRegistration()">
+          <i class="fas fa-save"></i> Create Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allUsers = [];
+    let currentUserId = null;
+
+    let toastTimer = null;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    async function checkAdminAccess() {
+      const ok = await window.adminAuthCheck(['admin']);
+      if (!ok) return false;
+      const info = window.adminGetProfile();
+      currentUserId = info.id;
+      return true;
+    }
+
+    async function loadUsers(showSpinner = false) {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (showSpinner) {
+        refreshBtn.classList.add('spinning');
+        refreshBtn.disabled = true;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('id, first_name, last_name, email, role, created_at')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        allUsers = data || [];
+        applyFilters();
+      } catch (err) {
+        console.error('Failed to load users:', err);
+        document.getElementById('usersContent').innerHTML = `
+          <div class="empty-orders" style="padding:60px;">
+            <div class="icon" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>Could not load users</h3>
+            <p>${escapeHtml(err.message)}</p>
+          </div>`;
+        showToast('Failed to load users', 'error');
+      } finally {
+        if (showSpinner) {
+          setTimeout(() => {
+            refreshBtn.classList.remove('spinning');
+            refreshBtn.disabled = false;
+          }, 400);
+        }
+      }
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const roleFilter = document.getElementById('filterRole').value;
+
+      const filtered = allUsers.filter(u => {
+        if (roleFilter && u.role !== roleFilter) return false;
+        if (q) {
+          const name = [u.first_name, u.last_name].filter(Boolean).join(' ').toLowerCase();
+          const email = (u.email || '').toLowerCase();
+          if (!name.includes(q) && !email.includes(q)) return false;
+        }
+        return true;
+      });
+
+      renderUsers(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('filterRole').addEventListener('change', applyFilters);
+
+    function renderUsers(users) {
+      const wrap = document.getElementById('usersContent');
+
+      if (users.length === 0) {
+        wrap.innerHTML = `
+          <div class="empty-orders" style="padding:60px;">
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <h3>No users found</h3>
+            <p>Try adjusting your search or filters.</p>
+          </div>`;
+        return;
+      }
+
+      const rows = users.map(u => {
+        const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || '—';
+        const isMe = u.id === currentUserId;
+        const role = u.role || 'customer';
+        
+        const roles = ['admin', 'sales', 'customer'];
+        const roleOptions = roles.map(r => 
+          `<option value="${r}" ${role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`
+        ).join('');
+
+        return `
+          <tr>
+            <td>
+              <div class="customer-cell">
+                <strong>${escapeHtml(name)} ${isMe ? '<span style="color:var(--orange);font-size:0.7rem;">(You)</span>' : ''}</strong>
+                <small>${escapeHtml(u.email || 'No email')}</small>
+              </div>
+            </td>
+            <td>
+              <select class="role-select" 
+                      onchange="updateUserRole('${u.id}', this.value)"
+                      ${isMe ? 'disabled title="You cannot change your own role"' : ''}>
+                ${roleOptions}
+              </select>
+            </td>
+            <td>
+              <span class="role-badge ${role}">${role}</span>
+            </td>
+            <td style="white-space:nowrap;">
+              <button class="btn-statement" onclick="showUserStatement('${u.id}')">
+                <i class="fas fa-file-invoice"></i> Statement
+              </button>
+            </td>
+            <td class="date-cell">
+              ${u.created_at ? new Date(u.created_at).toLocaleDateString('en-KE', {day:'2-digit', month:'short', year:'numeric'}) : '—'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      wrap.innerHTML = `
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Change Role</th>
+                <th>Current Role</th>
+                <th>Actions</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    async function updateUserRole(userId, newRole) {
+      try {
+        const { error } = await supabaseClient
+          .from('profiles')
+          .update({ role: newRole })
+          .eq('id', userId);
+
+        if (error) throw error;
+
+        const userIndex = allUsers.findIndex(u => u.id === userId);
+        if (userIndex >= 0) allUsers[userIndex].role = newRole;
+
+        applyFilters();
+        showToast(`User role updated to ${newRole.toUpperCase()}`);
+      } catch (err) {
+        console.error('Failed to update role:', err);
+        showToast('Failed to update role: ' + err.message, 'error');
+        loadUsers(); 
+      }
+    }
+
+    /* ==========================================
+       USER STATEMENT LOGIC
+       ========================================== */
+    async function showUserStatement(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (!user) return;
+
+      const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Customer';
+      document.getElementById('stmtModalSubtitle').textContent = name + ' · ' + (user.email || 'No email');
+      document.getElementById('statementModal').classList.add('open');
+      
+      const body = document.getElementById('statementBody');
+      body.innerHTML = `
+        <div class="loading-skeleton" style="padding:40px 20px;">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <p>Fetching customer records...</p>
+        </div>`;
+
+      try {
+        // Fetch all invoices for this user
+        const { data: invoices, error } = await supabaseClient
+          .from('invoices')
+          .select('id, invoice_number, issue_date, due_date, total, amount_paid, status')
+          .eq('customer_user_id', user.id)
+          .order('issue_date', { ascending: false });
+
+        if (error) throw error;
+
+        // Calculate stats
+        let totalBilled = 0;
+        let totalPaid = 0;
+        let totalBalance = 0;
+
+        const invoiceRows = (invoices || []).map(inv => {
+          const amt = Number(inv.total) || 0;
+          const paid = Number(inv.amount_paid) || 0;
+          const bal = amt - paid;
+
+          totalBilled += amt;
+          totalPaid += paid;
+          totalBalance += bal;
+
+          let statusBadge = 'badge-draft';
+          if (inv.status === 'paid') statusBadge = 'badge-paid';
+          else if (inv.status === 'partial') statusBadge = 'badge-partial';
+          else if (inv.status === 'void') statusBadge = 'badge-void';
+
+          return `
+            <tr>
+              <td><strong>${escapeHtml(inv.invoice_number || 'DRAFT')}</strong></td>
+              <td>${inv.issue_date || '—'}</td>
+              <td>${inv.due_date || '—'}</td>
+              <td><span class="badge ${statusBadge}">${escapeHtml(inv.status)}</span></td>
+              <td>KES ${amt.toLocaleString('en-KE')}</td>
+              <td>KES ${paid.toLocaleString('en-KE')}</td>
+              <td style="font-weight:700;color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">
+                KES ${bal.toLocaleString('en-KE')}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        // We wrap the printable content in a div with a white background and padding
+        // so the downloaded PDF looks clean and doesn't inherit dark mode styles.
+        body.innerHTML = `
+          <div id="printableStatement" style="background:#fff; color:#000; padding: 20px; font-family: Arial, sans-serif;">
+            <div class="statement-header">
+              <div>
+                <h2 style="margin:0; color:#1D3B73;">${escapeHtml(name)}</h2>
+                <p style="margin:4px 0; color:#666;">${escapeHtml(user.email || '')} | Statement Date: ${new Date().toLocaleDateString('en-KE')}</p>
+                <p style="margin:0; color:#666; font-size:0.8rem;">Rise Axis Solutions Ltd</p>
+              </div>
+            </div>
+
+            <div class="statement-stats">
+              <div class="stat-box">
+                <div class="label">Total Billed</div>
+                <div class="value">KES ${totalBilled.toLocaleString('en-KE')}</div>
+              </div>
+              <div class="stat-box">
+                <div class="label">Total Paid</div>
+                <div class="value text-green">KES ${totalPaid.toLocaleString('en-KE')}</div>
+              </div>
+              <div class="stat-box">
+                <div class="label">Outstanding Balance</div>
+                <div class="value text-red">KES ${totalBalance.toLocaleString('en-KE')}</div>
+              </div>
+            </div>
+
+            <table class="statement-table" style="width:100%; border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Invoice #</th>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Issued</th>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Due Date</th>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Status</th>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Total</th>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Paid</th>
+                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${invoiceRows || '<tr><td colspan="7" style="text-align:center;padding:30px;">No invoices found for this customer.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      } catch (err) {
+        console.error('Failed to load statement:', err);
+        body.innerHTML = `<div class="empty-orders"><p>Error loading statement: ${escapeHtml(err.message)}</p></div>`;
+      }
+    }
+
+    function closeStatementModal() {
+      document.getElementById('statementModal').classList.remove('open');
+    }
+
+    /* ==========================================
+       DOWNLOAD PDF LOGIC
+       ========================================== */
+    function downloadStatement() {
+      const element = document.getElementById('printableStatement');
+      if (!element) {
+        showToast('Statement data is not loaded yet', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('downloadStmtBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating PDF...';
+
+      // Generate a filename using the user's name from the header
+      const userName = document.querySelector('#printableStatement h2').innerText.replace(/[^a-z0-9]/gi, '_');
+      const fileName = `Statement_${userName}_${new Date().toISOString().slice(0,10)}.pdf`;
+
+      // html2pdf options for a clean A4 document
+      const opt = {
+        margin:       10,
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      // Execute download
+      html2pdf().set(opt).from(element).save().then(() => {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        showToast('Statement downloaded successfully');
+      }).catch(err => {
+        console.error('PDF generation failed:', err);
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        showToast('Failed to generate PDF', 'error');
+      });
+    }
+
+    /* ==========================================
+       REGISTRATION LOGIC (NATIVE SUPABASE)
+       ========================================== */
+    function openRegisterModal() {
+      document.getElementById('regFirstName').value = '';
+      document.getElementById('regLastName').value = '';
+      document.getElementById('regEmail').value = '';
+      document.getElementById('regPassword').value = 'RiseAxis2026!'; // Provide a default
+      document.getElementById('regRole').value = 'customer';
+      
+      document.getElementById('registerModal').classList.add('open');
+      document.getElementById('regFirstName').focus();
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.remove('open');
+    }
+
+    async function submitRegistration() {
+      const btn = document.getElementById('regSubmitBtn');
+      const orig = btn.innerHTML;
+
+      const firstName = document.getElementById('regFirstName').value.trim();
+      const lastName = document.getElementById('regLastName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const role = document.getElementById('regRole').value;
+
+      if (!firstName || !lastName || !email || !password) {
+        return showToast('Please fill in all required fields', 'error');
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Creating...';
+
+      let adminSession = null;
+
+      try {
+        // 1. Save the Admin's current session
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        adminSession = session;
+
+        // 2. Register the user (this will NOT send an email if Confirm Email is OFF in dashboard)
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              role: role
+            }
+          }
+        });
+
+        if (authError) throw authError;
+        
+        // 3. Force the profile role update
+        if (authData.user) {
+          await new Promise(r => setTimeout(r, 1000)); // Wait for DB trigger
+          
+          const { error: updateError } = await supabaseClient
+            .from('profiles')
+            .update({ role: role, first_name: firstName, last_name: lastName })
+            .eq('id', authData.user.id);
+            
+          if (updateError) console.warn('Profile update warning:', updateError);
+        }
+
+        showToast('User registered successfully!');
+        closeRegisterModal();
+
+      } catch (err) {
+        console.error('Registration failed:', err);
+        showToast(err.message || 'Failed to create user', 'error');
+      } finally {
+        // 4. ALWAYS Restore the Admin's session
+        if (adminSession) {
+          await supabaseClient.auth.setSession({
+            access_token: adminSession.access_token,
+            refresh_token: adminSession.refresh_token
+          });
+        }
+        
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        await loadUsers(); 
+      }
+    }
+
+    (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+      await loadUsers();
+    })();
+  </script>
+  <script src="pwa.js"></script>
+</body>
+</html>

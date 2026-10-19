@@ -785,6 +785,7 @@
         const inv = invoicesByOrderId[o.id] || null;
 
         return `
+
           <tr onclick="openOrder('${o.id}')">
             <td><span class="order-num">${escapeHtml(o.order_number)}</span></td>
             <td>
@@ -837,7 +838,21 @@
           </table>
         </div>`;
     }
-
+    function getPaymentStatusLabel(order) {
+      // If the order has a linked invoice, use the invoice's status
+      if (currentInvoice) {
+        const labels = {
+          draft: 'Draft invoice',
+          issued: 'Invoiced (unpaid)',
+          partial: 'Partially paid',
+          paid: 'Paid',
+          void: 'Void'
+        };
+        return labels[currentInvoice.status] || 'Unknown';
+      }
+      // No invoice — the order can't be "paid" without one
+      return 'No invoice yet';
+    }
     /* ============================================================
        ORDER MODAL
        ============================================================ */
@@ -990,17 +1005,38 @@
 
         ${invoiceBlock}
 
-        <div class="detail-section">
-          <div class="detail-section-title"><i class="fas fa-toggle-on"></i> Update Status</div>
+               <div class="detail-section">
+          <div class="detail-section-title"><i class="fas fa-toggle-on"></i> Status</div>
           <div class="status-controls">
             <div>
-              <label>Payment Status</label>
-              <select id="modalPaymentStatus">
-                <option value="pending"  ${o.payment_status === 'pending'  ? 'selected' : ''}>Pending</option>
-                <option value="paid"     ${o.payment_status === 'paid'     ? 'selected' : ''}>Paid</option>
-                <option value="failed"   ${o.payment_status === 'failed'   ? 'selected' : ''}>Failed</option>
-                <option value="refunded" ${o.payment_status === 'refunded' ? 'selected' : ''}>Refunded</option>
-              </select>
+              <label>Payment Status
+                <span style="font-size:0.7rem;font-weight:600;color:var(--text-muted);text-transform:none;letter-spacing:0;margin-left:4px;">(from invoice)</span>
+              </label>
+              <div style="
+                padding:11px 14px;
+                border:1.5px solid var(--border);
+                border-radius:10px;
+                font-size:0.88rem;
+                font-weight:700;
+                background:var(--bg-light);
+                color:var(--navy);
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:10px;
+                min-height:44px;
+              ">
+                <span>${getPaymentStatusLabel(o)}</span>
+                ${currentInvoice
+                  ? `<a href="invoice-view.html?id=${escapeHtml(currentInvoice.id)}"
+                        style="font-size:0.78rem;font-weight:700;color:var(--navy);text-decoration:underline;"
+                        onclick="event.stopPropagation();"
+                        title="View invoice">${escapeHtml(currentInvoice.invoice_number || 'Draft')}</a>`
+                  : `<button type="button"
+                        onclick="event.stopPropagation(); handleInvoiceAction();"
+                        style="background:none;border:none;padding:0;font-size:0.78rem;font-weight:700;color:var(--navy);text-decoration:underline;cursor:pointer;font-family:inherit;"
+                        title="Create invoice">Create Invoice →</button>`}
+              </div>
             </div>
             <div>
               <label>Order Status</label>
@@ -1075,37 +1111,37 @@
     /* ============================================================
        SAVE STATUS CHANGES
        ============================================================ */
-    async function saveStatusChanges() {
+        async function saveStatusChanges() {
       if (!currentOrder) return;
       const btn = document.getElementById('saveBtn');
       const original = btn.innerHTML;
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-      const newPaymentStatus = document.getElementById('modalPaymentStatus').value;
+      // Payment status is now derived from the linked invoice.
+      // Only order_status (fulfillment) is editable here.
       const newOrderStatus = document.getElementById('modalOrderStatus').value;
 
       try {
         const { error } = await supabaseClient
           .from('orders')
           .update({
-            payment_status: newPaymentStatus,
             order_status: newOrderStatus,
             updated_at: new Date().toISOString()
           })
           .eq('id', currentOrder.id);
+
         if (error) throw error;
 
         const idx = allOrders.findIndex(o => o.id === currentOrder.id);
         if (idx >= 0) {
-          allOrders[idx].payment_status = newPaymentStatus;
           allOrders[idx].order_status = newOrderStatus;
           allOrders[idx].updated_at = new Date().toISOString();
         }
         updateStats();
         applyFilters();
         closeModal();
-        showToast('Order updated successfully');
+        showToast('Order status updated');
       } catch (err) {
         console.error('Update failed:', err);
         showToast('Could not update order: ' + (err.message || 'Unknown error'), 'error');
@@ -1114,7 +1150,6 @@
         btn.innerHTML = original;
       }
     }
-
     /* ============================================================
        EXPORT CSV
        ============================================================ */

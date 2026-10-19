@@ -32,13 +32,15 @@
 
   // ---------- Sidebar nav definition
   // Each item: { section, label, icon, href, roles }
-  const NAV_ITEMS = [
+   const NAV_ITEMS = [
     { section: 'Operations', label: 'Orders',   icon: 'fa-boxes-packing', href: 'orders.html',   roles: ['admin','sales'] },
     { section: 'Operations', label: 'Invoices', icon: 'fa-file-invoice',  href: 'invoices.html', roles: ['admin','sales'] },
     { section: 'Operations', label: 'Products', icon: 'fa-box',           href: 'products.html', roles: ['admin','sales'] },
     { section: 'Content',    label: 'Blog',     icon: 'fa-newspaper',     href: 'posts.html',    roles: ['admin'] },
     { section: 'Insights',   label: 'Reports',  icon: 'fa-chart-line',    href: 'reports.html',  roles: ['admin','sales'] },
+    { section: 'Insights',   label: 'Manage Users',icon: 'fa-users-cog',     href: 'users.html',    roles: ['admin'] },
     { section: 'Insights',   label: 'Analytics',icon: 'fa-bolt',          href: 'analytics.html',roles: ['admin'] },
+    { section: 'Insights',   label: 'Audit',    icon: 'fa-history',       href: 'audit.html',    roles: ['admin'] },
     { section: 'System',     label: 'Settings', icon: 'fa-cog',           href: 'settings.html', roles: ['admin'] }
   ];
 
@@ -81,7 +83,7 @@
         <div class="logo-mark"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
         <small>Admin Panel</small>
       </div>
-      <nav class="admin-sidebar-nav">
+      <nav class="admin-sidebar-nav" style="overflow-y: auto; flex: 1;">
         ${navHtml}
       </nav>
       <div class="admin-sidebar-footer">
@@ -125,6 +127,23 @@
       sidebar = document.createElement('aside');
       sidebar.id = 'adminSidebar';
       sidebar.className = 'admin-sidebar';
+      
+      // Inject scrollbar styles dynamically
+      sidebar.style.display = 'flex';
+      sidebar.style.flexDirection = 'column';
+      sidebar.style.height = '100vh';
+      sidebar.style.overflowY = 'auto';
+
+      // Custom scrollbar styling
+      const style = document.createElement('style');
+      style.innerHTML = `
+        #adminSidebar::-webkit-scrollbar { width: 6px; }
+        #adminSidebar::-webkit-scrollbar-track { background: transparent; }
+        #adminSidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        #adminSidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+      `;
+      document.head.appendChild(style);
+
       body.insertBefore(sidebar, mobileBar.nextSibling);
     }
     sidebar.innerHTML = buildSidebarHTML(role);

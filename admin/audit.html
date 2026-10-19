@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Audit Log | Rise Axis Solutions Ltd</title>
+  <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1D3B73">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="splash.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin-sidebar.js"></script>
+
+  <style>
+    /* ============================================================
+       PAGE-SPECIFIC STYLES — audit.html
+       ============================================================ */
+
+    .audit-stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 900px) {
+      .audit-stat-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .audit-stat-strip { grid-template-columns: 1fr; }
+    }
+
+    .audit-stat {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 16px 18px;
+      box-shadow: 0 4px 14px rgba(29,59,115,0.04);
+    }
+    .audit-stat .as-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 6px;
+    }
+    .audit-stat .as-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .audit-stat .as-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    /* Audit table rows */
+    .audit-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .audit-row:hover { background: #fafbff; }
+
+    .audit-row .ar-action-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .ar-action-badge.insert { background: var(--green-soft); color: var(--green-deep); }
+    .ar-action-badge.update { background: var(--navy-soft); color: var(--navy); }
+    .ar-action-badge.delete { background: var(--red-soft); color: var(--red); }
+
+    .audit-row .ar-table-name {
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .audit-row .ar-summary {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      max-width: 380px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .audit-row .ar-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: 'Courier New', monospace;
+      white-space: nowrap;
+    }
+
+    /* Detail modal */
+    .audit-detail-modal .modal { max-width: 900px; }
+    .audit-detail-modal .diff-section {
+      margin-bottom: 18px;
+    }
+    .audit-detail-modal .diff-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 8px;
+    }
+    .audit-detail-modal .diff-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .audit-detail-modal .diff-table th {
+      background: #fafbff;
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .audit-detail-modal .diff-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: top;
+    }
+    .audit-detail-modal .diff-table tr:last-child td { border-bottom: none; }
+    .audit-detail-modal .diff-table .field-name {
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      width: 180px;
+    }
+    .audit-detail-modal .diff-table .old-val {
+      color: var(--red);
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+    }
+    .audit-detail-modal .diff-table .new-val {
+      color: var(--green-deep);
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+    }
+    .audit-detail-modal .diff-raw {
+      background: #f7fafd;
+      border: 1px solid #dbe5f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    /* Filter bar */
+    .audit-filter-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .audit-filter-row .filter-select {
+      min-width: 150px;
+    }
+    .audit-date-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0 10px;
+      height: 46px;
+    }
+    .audit-date-group i {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .audit-date-group input {
+      border: none;
+      outline: none;
+      font-size: 0.85rem;
+      color: var(--navy);
+      font-weight: 600;
+      background: transparent;
+      font-family: inherit;
+      padding: 0 4px;
+    }
+
+    /* Pagination */
+    .audit-load-more {
+      text-align: center;
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .audit-row .ar-summary { display: none; }
+      .audit-date-group { flex: 1; min-width: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="raxSplash">
+    <div class="splash-logo"><span class="rise">RISE</span><span class="axis">AXIS</span></div>
+    <div class="splash-sub">Admin Panel</div>
+    <div class="splash-spinner"></div>
+  </div>
+  <script>
+    (function () {
+      function hide() {
+        const el = document.getElementById('raxSplash');
+        if (!el) return;
+        el.classList.add('fade-out');
+        setTimeout(() => el.remove(), 500);
+      }
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(hide, 300);
+      } else {
+        window.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+        window.addEventListener('load', () => setTimeout(hide, 300));
+      }
+    })();
+  </script>
+
+  <div class="access-denied" id="accessDenied" style="display: none;">
+    <div class="access-denied-card">
+      <div class="icon"><i class="fas fa-lock"></i></div>
+      <h2>Access Denied</h2>
+      <p id="accessDeniedMsg">Your account does not have administrator privileges.</p>
+      <button class="btn-primary" onclick="window.location.href='../index.html'">
+        <i class="fas fa-home"></i> Go to Homepage
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-shell">
+    <main class="admin-main" id="adminMain" style="display: none;">
+      <div class="container">
+
+        <div class="page-title-row">
+          <div>
+            <h1><i class="fas fa-history"></i> Audit Log</h1>
+            <p>Every change to invoices, payments, products, orders, and settings — who did it and when.</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="refreshBtn" onclick="loadAudit(true)">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="audit-stat-strip">
+          <div class="audit-stat">
+            <div class="as-label">Total Events</div>
+            <div class="as-value" id="statTotal">—</div>
+            <div class="as-sub">in current filter</div>
+          </div>
+          <div class="audit-stat">
+            <div class="as-label">Today</div>
+            <div class="as-value" id="statToday">—</div>
+            <div class="as-sub">events logged today</div>
+          </div>
+          <div class="audit-stat">
+            <div class="as-label">Distinct Actors</div>
+            <div class="as-value" id="statActors">—</div>
+            <div class="as-sub">in current filter</div>
+          </div>
+          <div class="audit-stat">
+            <div class="as-label">Distinct Tables</div>
+            <div class="as-value" id="statTables">—</div>
+            <div class="as-sub">in current filter</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+          <div class="audit-filter-row" style="width:100%;">
+            <select class="filter-select" id="filterTable" onchange="applyFilters()">
+              <option value="">All Tables</option>
+              <option value="invoices">Invoices</option>
+              <option value="invoice_items">Invoice Items</option>
+              <option value="payments">Payments</option>
+              <option value="orders">Orders</option>
+              <option value="products">Products</option>
+              <option value="profiles">Profiles</option>
+              <option value="settings">Settings</option>
+              <option value="user_sessions">Sessions</option>
+            </select>
+            <select class="filter-select" id="filterAction" onchange="applyFilters()">
+              <option value="">All Actions</option>
+              <option value="insert">Insert</option>
+              <option value="update">Update</option>
+              <option value="delete">Delete</option>
+            </select>
+            <select class="filter-select" id="filterActor" onchange="applyFilters()">
+              <option value="">All Actors</option>
+            </select>
+            <div class="audit-date-group">
+              <i class="fas fa-calendar-alt"></i>
+              <input type="date" id="filterFrom" onchange="applyFilters()">
+              <span style="color:var(--text-muted);">→</span>
+              <input type="date" id="filterTo" onchange="applyFilters()">
+            </div>
+            <div class="search-box" style="flex:1;min-width:200px;">
+              <i class="fas fa-search"></i>
+              <input type="text" id="searchInput" placeholder="Search record ID, value..." oninput="applyFilters()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="data-card">
+          <div id="auditContent">
+            <div class="loading-skeleton">
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <p>Loading audit log...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Load more -->
+        <div class="audit-load-more" id="loadMoreWrap" style="display:none;">
+          <button class="btn-secondary" onclick="loadMore()">
+            <i class="fas fa-arrow-down"></i> Load More
+          </button>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay audit-detail-modal" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2><i class="fas fa-search"></i> Event Detail</h2>
+          <p id="detailSubtitle">—</p>
+        </div>
+        <button class="modal-close" onclick="closeDetail()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeDetail()">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-message" id="toastMessage">
+    <i class="fas fa-check-circle" id="toastIcon"></i>
+    <span id="toastText">Done</span>
+  </div>
+
+  <script>
+    /* ============================================================
+       SUPABASE
+       ============================================================ */
+    const SUPABASE_URL = 'https://feurddyhflvnomakexxs.supabase.co'.trim();
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZldXJkZHloZmx2bm9tYWtleHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MTY5MTQsImV4cCI6MjEwNjE5MjkxNH0.1lA2I8KGwOJx309MbH5zU0HHGSZjzrv795FMqyubwi4'.trim();
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+    const PAGE_SIZE = 50;
+    let allEvents = [];        // current page's events
+    let totalEvents = 0;       // total matching events (for stats)
+    let offset = 0;
+    let hasMore = false;
+    let loading = false;
+    let allActors = [];        // for the actor filter dropdown
+    let currentEvents = [];    // cached events for detail lookup
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    const escapeHtml = s => String(s ?? '—')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const fmtDateTime = iso => {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+             + ' ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      } catch { return iso; }
+    };
+
+    const fmtTimeAgo = iso => {
+      if (!iso) return '—';
+      try {
+        const diff = Date.now() - new Date(iso).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return hours + 'h ago';
+        const days = Math.floor(hours / 24);
+        if (days < 7) return days + 'd ago';
+        return new Date(iso).toLocaleDateString('en-KE', { day: '2-digit', month: 'short' });
+      } catch { return iso; }
+    };
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.toggle('error', type === 'error');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      toast.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    /* ============================================================
+       AUTH
+       ============================================================ */
+    async function checkAdminAccess() {
+      return await window.adminAuthCheck(['admin']);
+    }
+
+    /* ============================================================
+       LOAD
+       ============================================================ */
+    function buildQuery() {
+      const table = document.getElementById('filterTable').value;
+      const action = document.getElementById('filterAction').value;
+      const actor = document.getElementById('filterActor').value;
+      const from = document.getElementById('filterFrom').value;
+      const to = document.getElementById('filterTo').value;
+      const q = (document.getElementById('searchInput').value || '').trim();
+
+      let query = supabaseClient
+        .from('audit_log_display')
+        .select('*', { count: 'exact' });
+
+      if (table) query = query.eq('table_name', table);
+      if (action) query = query.eq('action', action);
+      if (actor) query = query.eq('actor_name', actor);
+      if (from) query = query.gte('created_at', from + 'T00:00:00');
+      if (to) query = query.lte('created_at', to + 'T23:59:59');
+      if (q) {
+        // Search record_id or raw JSON string
+        query = query.or(`record_id.ilike.%${q}%,new_data::text.ilike.%${q}%,old_data::text.ilike.%${q}%`);
+      }
+      return query;
+    }
+
+    async function loadAudit(showSpinner = false, append = false) {
+      if (loading) return;
+      loading = true;
+
+      if (showSpinner) {
+        const btn = document.getElementById('refreshBtn');
+        btn.classList.add('spinning');
+        btn.disabled = true;
+      }
+
+      if (!append) {
+        offset = 0;
+        allEvents = [];
+      }
+
+      try {
+        const query = buildQuery()
+          .order('created_at', { ascending: false })
+          .range(offset, offset + PAGE_SIZE - 1);
+
+        const { data, error, count } = await query;
+        if (error) throw error;
+
+        totalEvents = count ?? 0;
+
+        if (append) {
+          allEvents = [...allEvents, ...(data || [])];
+        } else {
+          allEvents = data || [];
+        }
+
+        offset += (data || []).length;
+        hasMore = offset < totalEvents;
+        currentEvents = allEvents;
+
+        renderTable();
+        updateStats();
+      } catch (err) {
+        console.error('Load audit failed:', err);
+        document.getElementById('auditContent').innerHTML = `
+          <div class="empty-state">
+            <div class="icon"><i class="fas fa-exclamation-triangle" style="color:var(--red);"></i></div>
+            <h3>Could not load audit log</h3>
+            <p>${escapeHtml(err.message || 'Please try again.')}</p>
+          </div>`;
+      } finally {
+        loading = false;
+        if (showSpinner) {
+          const btn = document.getElementById('refreshBtn');
+          setTimeout(() => {
+            btn.classList.remove('spinning');
+            btn.disabled = false;
+          }, 400);
+        }
+      }
+    }
+
+    async function loadActorsForFilter() {
+      try {
+        const { data } = await supabaseClient
+          .from('audit_log_display')
+          .select('actor_name')
+          .not('actor_name', 'is', null);
+        if (!data) return;
+        const names = [...new Set(data.map(r => r.actor_name).filter(Boolean))].sort();
+        allActors = names;
+        const sel = document.getElementById('filterActor');
+        sel.innerHTML = '<option value="">All Actors</option>' +
+          names.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+      } catch (e) {
+        console.warn('Actor list failed:', e);
+      }
+    }
+
+    /* ============================================================
+       RENDER
+       ============================================================ */
+    function updateStats() {
+      document.getElementById('statTotal').textContent = totalEvents.toLocaleString();
+      const today = new Date().toISOString().slice(0, 10);
+      const todayCount = allEvents.filter(e => String(e.created_at).startsWith(today)).length;
+      document.getElementById('statToday').textContent = todayCount;
+      const distinctActors = new Set(allEvents.map(e => e.actor_name).filter(Boolean)).size;
+      document.getElementById('statActors').textContent = distinctActors;
+      const distinctTables = new Set(allEvents.map(e => e.table_name).filter(Boolean)).size;
+      document.getElementById('statTables').textContent = distinctTables;
+
+      document.getElementById('loadMoreWrap').style.display = hasMore ? 'block' : 'none';
+    }
+
+    function summarizeEvent(e) {
+      const d = e.new_data || e.old_data || {};
+      const keys = Object.keys(d).slice(0, 3);
+      return keys.map(k => `${k}: ${JSON.stringify(d[k])}`).join(' · ');
+    }
+
+    function renderTable() {
+      const wrap = document.getElementById('auditContent');
+
+      if (!allEvents.length) {
+        wrap.innerHTML = `
+          <div class="empty-state">
+            <div class="icon"><i class="fas fa-inbox"></i></div>
+            <h3>No events found</h3>
+            <p>Try adjusting the filters or search term.</p>
+          </div>`;
+        return;
+      }
+
+      const rows = allEvents.map((e, idx) => `
+        <tr class="audit-row" onclick="openDetail(${idx})">
+          <td><span class="ar-time">${escapeHtml(fmtTimeAgo(e.created_at))}</span></td>
+          <td><strong>${escapeHtml(e.actor_name || 'System')}</strong></td>
+          <td><span class="ar-table-name">${escapeHtml(e.table_name)}</span></td>
+          <td><span class="ar-action-badge ${escapeHtml(e.action)}">${escapeHtml(e.action)}</span></td>
+          <td class="ar-summary">${escapeHtml(summarizeEvent(e))}</td>
+        </tr>`).join('');
+
+      wrap.innerHTML = `
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Actor</th>
+                <th>Table</th>
+                <th>Action</th>
+                <th>Summary</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    /* ============================================================
+       DETAIL MODAL
+       ============================================================ */
+    let activeEvent = null;
+
+    function openDetail(idx) {
+      const e = allEvents[idx];
+      if (!e) return;
+      activeEvent = e;
+
+      document.getElementById('detailSubtitle').textContent =
+        `${e.table_name} · ${e.action} · ${fmtDateTime(e.created_at)}`;
+
+      const oldData = e.old_data || {};
+      const newData = e.new_data || {};
+      const allKeys = [...new Set([...Object.keys(oldData), ...Object.keys(newData)])];
+
+      const diffRows = allKeys.map(k => {
+        const oldVal = oldData[k];
+        const newVal = newData[k];
+        const changed = JSON.stringify(oldVal) !== JSON.stringify(newVal);
+        return `
+          <tr>
+            <td class="field-name">${escapeHtml(k)}</td>
+            <td class="${changed ? 'old-val' : ''}" style="${!changed ? 'color:var(--text-muted);' : ''}">
+              ${oldVal !== undefined ? escapeHtml(JSON.stringify(oldVal)) : '—'}
+            </td>
+            <td class="${changed ? 'new-val' : ''}" style="${!changed ? 'color:var(--text-muted);' : ''}">
+              ${newVal !== undefined ? escapeHtml(JSON.stringify(newVal)) : '—'}
+            </td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('detailBody').innerHTML = `
+        <div class="detail-grid" style="margin-bottom:18px;">
+          <div><div style="font-size:0.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Actor</div>
+               <div style="font-weight:700;color:var(--navy);">${escapeHtml(e.actor_name || 'System')}</div></div>
+          <div><div style="font-size:0.7rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Record ID</div>
+               <div style="font-family:'Courier New',monospace;font-size:0.8rem;color:var(--navy);word-break:break-all;">${escapeHtml(e.record_id || '—')}</div></div>
+        </div>
+
+        <div class="diff-section">
+          <div class="diff-title">Field Changes</div>
+          <table class="diff-table">
+            <thead>
+              <tr><th>Field</th><th>Old</th><th>New</th></tr>
+            </thead>
+            <tbody>
+              ${diffRows || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px;">No field-level diff available for this event.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+
+        ${oldData && Object.keys(oldData).length ? `
+          <div class="diff-section">
+            <div class="diff-title">Old Data (raw)</div>
+            <div class="diff-raw">${escapeHtml(JSON.stringify(oldData, null, 2))}</div>
+          </div>` : ''}
+
+        ${newData && Object.keys(newData).length ? `
+          <div class="diff-section">
+            <div class="diff-title">New Data (raw)</div>
+            <div class="diff-raw">${escapeHtml(JSON.stringify(newData, null, 2))}</div>
+          </div>` : ''}
+      `;
+
+      document.getElementById('detailModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+      document.getElementById('detailModal').classList.remove('open');
+      document.body.style.overflow = '';
+      activeEvent = null;
+    }
+
+    document.getElementById('detailModal').addEventListener('click', e => {
+      if (e.target.id === 'detailModal') closeDetail();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeDetail();
+        if (window.adminCloseSidebar) window.adminCloseSidebar();
+      }
+    });
+
+    /* ============================================================
+       FILTERS + PAGINATION
+       ============================================================ */
+    let filterTimer = null;
+    function applyFilters() {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(() => loadAudit(false, false), 200);
+    }
+
+    function loadMore() {
+      loadAudit(false, true);
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    (async function init() {
+      const ok = await checkAdminAccess();
+      if (!ok) return;
+      document.getElementById('adminMain').style.display = 'block';
+
+      await loadActorsForFilter();
+      await loadAudit();
+    })();
+  </script>
+
+</body>
+</html>
