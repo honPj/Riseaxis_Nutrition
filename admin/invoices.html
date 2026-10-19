@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-title" content="Rise Axis Admin">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
-    <link rel="stylesheet" href="splash.css">
+  <link rel="stylesheet" href="splash.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="admin-sidebar.js"></script>
   <style>
@@ -68,6 +68,29 @@
       color: #fff;
       box-shadow: 0 6px 16px rgba(30,83,180,0.25);
     }
+
+    /* Custom Date Inputs */
+    .custom-date-wrap {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-light);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .custom-date-wrap.show { display: flex; }
+    .custom-date-wrap input {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      color: var(--navy);
+      outline: none;
+    }
+    .custom-date-wrap input:focus { border-color: var(--navy); }
+    .custom-date-wrap span { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
 
     .period-bar .pb-range {
       margin-left: auto;
@@ -300,7 +323,7 @@
     }
 
     /* ============================================================
-       MOBILE DROPDOWN STYLES (New Addition)
+       MOBILE DROPDOWN STYLES
        ============================================================ */
     .mobile-dropdown-wrap {
       display: none; /* Hidden on desktop */
@@ -401,6 +424,24 @@
       color: #fff;
     }
 
+    /* Custom date inputs for mobile dropdown */
+    .mobile-custom-dates {
+      display: none;
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      margin-top: 6px;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mobile-custom-dates.show { display: flex; }
+    .mobile-custom-dates input {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
       .summary-grid { grid-template-columns: repeat(2, 1fr); }
@@ -411,8 +452,9 @@
       
       /* Hide desktop period bar and chip row on mobile */
       .period-bar .period-btn,
-      .period-bar .pb-label {
-        display: none;
+      .period-bar .pb-label,
+      .custom-date-wrap {
+        display: none !important;
       }
       .period-bar {
         padding: 0;
@@ -456,7 +498,6 @@
       el.classList.add('fade-out');
       setTimeout(() => el.remove(), 500);
     }
-    // Hide on DOMContentLoaded; fall back to load + 2s
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       setTimeout(hide, 300);
     } else {
@@ -507,6 +548,16 @@
           <button class="period-btn active" data-period="month">This Month</button>
           <button class="period-btn" data-period="year">This Year</button>
           <button class="period-btn" data-period="all">All Time</button>
+          <button class="period-btn" data-period="custom">Custom</button>
+          
+          <!-- Custom Date Inputs -->
+          <div class="custom-date-wrap" id="customDateWrap">
+            <span>From</span>
+            <input type="date" id="customStartDate" onchange="applyCustomDate()">
+            <span>To</span>
+            <input type="date" id="customEndDate" onchange="applyCustomDate()">
+          </div>
+
           <div class="pb-range">
             Showing: <strong id="periodRangeLabel">—</strong>
           </div>
@@ -524,6 +575,13 @@
             <button data-period="month" class="active" onclick="selectMobilePeriod('month')">This Month <i class="fas fa-check"></i></button>
             <button data-period="year" onclick="selectMobilePeriod('year')">This Year <i class="fas fa-check" style="opacity:0;"></i></button>
             <button data-period="all" onclick="selectMobilePeriod('all')">All Time <i class="fas fa-check" style="opacity:0;"></i></button>
+            <button data-period="custom" onclick="selectMobilePeriod('custom')">Custom Range <i class="fas fa-check" style="opacity:0;"></i></button>
+            
+            <div class="mobile-custom-dates" id="mobileCustomDates">
+              <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);">Select Range:</span>
+              <input type="date" id="mobileCustomStart" onchange="applyMobileCustomDate()">
+              <input type="date" id="mobileCustomEnd" onchange="applyMobileCustomDate()">
+            </div>
           </div>
         </div>
 
@@ -684,6 +742,10 @@
     let activePeriod = 'month';
     let voidingId = null;
 
+    // Custom Date State
+    let customStart = null;
+    let customEnd = null;
+
     /* ============================================================
        HELPERS
        ============================================================ */
@@ -744,18 +806,22 @@
           start.setHours(0, 0, 0, 0);
           return { start, end, label: String(now.getFullYear()) };
 
+        case 'custom':
+          if (!customStart || !customEnd) {
+            return { start: null, end: null, label: 'Select Dates' };
+          }
+          const cs = new Date(customStart + 'T00:00:00');
+          const ce = new Date(customEnd + 'T23:59:59');
+          return { 
+            start: cs, 
+            end: ce, 
+            label: `${cs.toLocaleDateString('en-KE',{day:'2-digit',month:'short'})} – ${ce.toLocaleDateString('en-KE',{day:'2-digit',month:'short',year:'numeric'})}` 
+          };
+
         case 'all':
         default:
           return { start: null, end: null, label: 'All time' };
       }
-    }
-
-    function toISODate(d) {
-      if (!d) return null;
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
     }
 
     function isDateInPeriod(dateStr, start, end) {
@@ -778,6 +844,7 @@
         week: 'Paid this week',
         month: 'Paid this month',
         year: 'Paid this year',
+        custom: 'Paid in range',
         all: 'Paid all time'
       }[period] || 'Paid';
     }
@@ -797,10 +864,8 @@
       toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-  
-
     /* ============================================================
-       MOBILE DROPDOWNS (New Addition)
+       MOBILE DROPDOWNS
        ============================================================ */
     function toggleMobileDropdown(id) {
       const el = document.getElementById(id);
@@ -822,29 +887,47 @@
 
     function selectMobilePeriod(period) {
       // Update active state in dropdown
-      document.querySelectorAll('#mobilePeriodDropdown .mobile-dropdown-menu button').forEach(btn => {
+      document.querySelectorAll('#mobilePeriodDropdown .mobile-dropdown-menu > button').forEach(btn => {
         const isActive = btn.dataset.period === period;
         btn.classList.toggle('active', isActive);
         const checkIcon = btn.querySelector('.fa-check');
         if (checkIcon) checkIcon.style.opacity = isActive ? '1' : '0';
       });
 
-      // Update label
-      const labels = { today: 'Today', week: 'This Week', month: 'This Month', year: 'This Year', all: 'All Time' };
-      document.getElementById('mobilePeriodLabel').textContent = labels[period] || period;
+      const customDates = document.getElementById('mobileCustomDates');
+      if (period === 'custom') {
+        customDates.classList.add('show');
+      } else {
+        customDates.classList.remove('show');
+        // Close dropdown if not custom
+        document.getElementById('mobilePeriodDropdown').classList.remove('open');
+      }
 
-      // Close dropdown
-      document.getElementById('mobilePeriodDropdown').classList.remove('open');
+      // Update label
+      const labels = { today: 'Today', week: 'This Week', month: 'This Month', year: 'This Year', all: 'All Time', custom: 'Custom Range' };
+      document.getElementById('mobilePeriodLabel').textContent = labels[period] || period;
 
       // Trigger the same logic as desktop
       activePeriod = period;
-      updateSummary();
-      applyFilters();
+      
+      // If switching to custom and dates are already set, apply them
+      if (period === 'custom') {
+        document.getElementById('customStartDate').value = customStart || '';
+        document.getElementById('customEndDate').value = customEnd || '';
+        if (customStart && customEnd) {
+          updateSummary();
+          applyFilters();
+        }
+      } else {
+        updateSummary();
+        applyFilters();
+      }
 
       // Also update the desktop period buttons so state stays in sync
       document.querySelectorAll('.period-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.period === period);
       });
+      document.getElementById('customDateWrap').classList.toggle('show', period === 'custom');
     }
 
     function selectMobileCategory(filter) {
@@ -870,7 +953,7 @@
       });
     }
 
-       /* ============================================================
+    /* ============================================================
        AUTH — delegated to shared admin-sidebar.js
        ============================================================ */
     async function checkAdminAccess() {
@@ -940,14 +1023,58 @@
         btn.classList.add('active');
         activePeriod = btn.dataset.period;
         
-        // Sync mobile label
-        const labels = { today: 'Today', week: 'This Week', month: 'This Month', year: 'This Year', all: 'All Time' };
+        // Handle Custom Date Input Visibility
+        const customWrap = document.getElementById('customDateWrap');
+        if (activePeriod === 'custom') {
+          customWrap.classList.add('show');
+          if (!customStart) {
+            // Don't update summary/filters until dates are picked
+            return; 
+          }
+        } else {
+          customWrap.classList.remove('show');
+        }
+        
+        // Sync mobile label & dropdown
+        const labels = { today: 'Today', week: 'This Week', month: 'This Month', year: 'This Year', all: 'All Time', custom: 'Custom Range' };
         document.getElementById('mobilePeriodLabel').textContent = labels[activePeriod] || activePeriod;
+        document.querySelectorAll('#mobilePeriodDropdown .mobile-dropdown-menu > button').forEach(b => {
+          b.classList.toggle('active', b.dataset.period === activePeriod);
+        });
         
         updateSummary();
         applyFilters();
       });
     });
+
+    function applyCustomDate() {
+      customStart = document.getElementById('customStartDate').value;
+      customEnd = document.getElementById('customEndDate').value;
+      
+      if (customStart && customEnd) {
+        // Sync mobile dates
+        document.getElementById('mobileCustomStart').value = customStart;
+        document.getElementById('mobileCustomEnd').value = customEnd;
+        
+        updateSummary();
+        applyFilters();
+      }
+    }
+
+    function applyMobileCustomDate() {
+      customStart = document.getElementById('mobileCustomStart').value;
+      customEnd = document.getElementById('mobileCustomEnd').value;
+      
+      if (customStart && customEnd) {
+        // Sync desktop dates
+        document.getElementById('customStartDate').value = customStart;
+        document.getElementById('customEndDate').value = customEnd;
+        
+        document.getElementById('mobilePeriodDropdown').classList.remove('open');
+        updateSummary();
+        applyFilters();
+      }
+    }
 
     /* ============================================================
        SUMMARY CARDS (period-aware)
@@ -974,7 +1101,7 @@
       const outstanding = outstandingList.reduce((s, i) => s + Number(i.balance || 0), 0);
 
       // ---- OVERDUE: overdue invoices that are within the period (by issue date).
-      const overdueList = allInvoices.filter(i => i.is_overdue);
+      const overdueList = allInvoices.filter(i => i.is_overdue && isDateInPeriod(i.issue_date, start, end));
       const overdue = overdueList.reduce((s, i) => s + Number(i.balance || 0), 0);
 
       // ---- PAID in the period: sum of *actual payments* whose paid_at is within the period.
@@ -1009,8 +1136,6 @@
     }
 
     function updateChipCounts() {
-      // Chips reflect the *period* too — so when you pick "Today", "Paid 1" means
-      // 1 invoice issued today whose status is paid.
       const { start, end } = getPeriodRange(activePeriod);
       const inPeriod = allInvoices.filter(inv => isDateInPeriod(inv.issue_date, start, end));
 
