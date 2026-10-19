@@ -7,12 +7,9 @@
   <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="admin-sidebar.js"></script>
+  <!-- html2pdf for PDF Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    /* ============================================================
-       PRINT LAYOUT — invoice-print.html
-       ============================================================ */
-
     :root {
       --navy:      #0f2557;
       --navy-deep: #0f2557;
@@ -235,7 +232,7 @@
     .pay-status-box .psb-row .k { color: var(--text-muted); font-weight: 600; }
     .pay-status-box .psb-row .v { color: var(--navy); font-weight: 700; font-variant-numeric: tabular-nums; }
 
-    /* ---------- Line items table (WITH BORDERS) ---------- */
+    /* ---------- Line items table ---------- */
     .items-table {
       width: 100%;
       border-collapse: collapse;
@@ -408,7 +405,7 @@
     }
     .notes-block h4:first-child { margin-top: 0; }
 
-    /* ---------- Payment history (WITH BORDERS) ---------- */
+    /* ---------- Payment history ---------- */
     .pay-history-block {
       margin-top: 22px;
       padding-top: 16px;
@@ -481,41 +478,6 @@
       user-select: none;
     }
 
-    /* ============================================================
-       PRINT RULES
-       ============================================================ */
-    @page {
-      size: A4;
-      margin: 0;
-    }
-    @media print {
-      html, body {
-        background: #fff !important;
-        font-size: 12px;
-      }
-      .print-toolbar { display: none !important; }
-      .page-wrap {
-        padding: 0;
-        display: block;
-      }
-      .page {
-        width: auto;
-        min-height: auto;
-        box-shadow: none;
-        padding: 12mm 12mm;
-        page-break-after: always;
-      }
-      .page:last-child { page-break-after: auto; }
-
-      .items-table thead { display: table-header-group; }
-      .items-table tr { page-break-inside: avoid; }
-      .pay-history-block tr { page-break-inside: avoid; }
-      .notes-block { page-break-inside: avoid; }
-      .inv-footer { page-break-inside: avoid; }
-
-      .page.void::after { color: rgba(29,59,115,0.12); }
-    }
-
     /* ---------- Loading / error ---------- */
     .state {
       min-height: 100vh;
@@ -560,7 +522,7 @@
 <body>
 
   <!-- ============================================================
-       TOOLBAR (hidden when printing)
+       TOOLBAR
        ============================================================ -->
   <div class="print-toolbar" id="printToolbar" style="display: none;">
     <div class="pt-title">
@@ -568,8 +530,8 @@
       <span id="toolbarTitle">Invoice</span>
     </div>
     <div class="pt-actions">
-      <button class="primary" onclick="window.print()">
-        <i class="fas fa-print"></i> Print / Save PDF
+      <button class="primary" id="downloadBtn" onclick="downloadPDF()">
+        <i class="fas fa-download"></i> Download PDF
       </button>
       <button onclick="window.close()">
         <i class="fas fa-times"></i> Close
@@ -632,7 +594,6 @@
     (async function init() {
       const params = new URLSearchParams(window.location.search);
       const invoiceId = params.get('id');
-      const autoprint = params.get('autoprint') === '1';
 
       if (!invoiceId) return showError('No invoice specified', 'Open an invoice from the admin panel.');
 
@@ -660,9 +621,6 @@
         renderPage({ invoice, items, payments, settings });
 
         document.getElementById('printToolbar').style.display = 'flex';
-        if (autoprint) {
-          setTimeout(() => window.print(), 400);
-        }
       } catch (err) {
         console.error('Print load failed:', err);
         showError('Could not load invoice', err.message || 'Please try again.');
@@ -794,7 +752,8 @@
       // ------- Full page
       const html = `
         <div class="page-wrap">
-          <div class="page ${isVoid ? 'void' : ''}">
+          <!-- The ID 'invoice-page' is used for the PDF download -->
+          <div class="page ${isVoid ? 'void' : ''}" id="invoice-page">
 
             <div class="inv-header">
               <div class="biz-block">
@@ -872,6 +831,43 @@
         </div>`;
 
       document.getElementById('root').innerHTML = html;
+    }
+
+    /* ============================================================
+       DOWNLOAD PDF LOGIC
+       ============================================================ */
+    function downloadPDF() {
+      const element = document.getElementById('invoice-page');
+      if (!element) return;
+
+      const btn = document.getElementById('downloadBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating PDF...';
+
+      // Get invoice number for the filename
+      const invNum = document.querySelector('.inv-num').innerText.trim();
+      const fileName = `Invoice_${invNum}.pdf`;
+
+      // html2pdf options to preserve A4 layout exactly as it looks on screen
+      const opt = {
+        margin:       0,
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 3, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      // Execute download
+      html2pdf().set(opt).from(element).save().then(() => {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }).catch(err => {
+        console.error('PDF generation failed:', err);
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        alert('Failed to generate PDF. Please try again.');
+      });
     }
 
     /* ============================================================

@@ -1,15 +1,5 @@
 /* ============================================================
    RISE AXIS SOLUTIONS — SHARED ADMIN SIDEBAR + AUTH HELPERS
-   Used by: orders.html, invoices.html, invoice-edit.html,
-            invoice-view.html, invoice-print.html,
-            products.html, reports.html, analytics.html,
-            settings.html, posts.html
-   ============================================================
-   Provides:
-     - window.adminSidebarReady  : Promise resolving to {user, profile, role}
-     - window.adminAuthCheck(roles) : Promise<bool>, redirects on failure
-     - window.adminGetProfile() : { user, profile, role } (cached)
-     - auto-renders sidebar + mobile bar + overlay + logout wiring
    ============================================================ */
 
 (function () {
@@ -23,39 +13,83 @@
   let sb = window.supabaseClient;
   if (!sb) {
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      console.error('[admin-sidebar] Supabase SDK not loaded. Add <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> before this file.');
+      console.error('[admin-sidebar] Supabase SDK not loaded.');
       return;
     }
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     window.supabaseClient = sb;
   }
 
+  // ---------- Inject Top Loading Progress Bar
+  function injectLoadingBar() {
+    if (document.getElementById('admin-loading-bar')) return;
+    
+    const style = document.createElement('style');
+    style.innerHTML = `
+      #admin-loading-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--navy, #1D3B73), var(--orange, #E85D26), var(--green, #17B052));
+        width: 0%;
+        z-index: 9999;
+        transition: width 0.3s ease, opacity 0.4s ease;
+        box-shadow: 0 0 10px rgba(232,93,38,0.5);
+      }
+    `;
+    document.head.appendChild(style);
+
+    const bar = document.createElement('div');
+    bar.id = 'admin-loading-bar';
+    document.body.appendChild(bar);
+
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width >= 80) clearInterval(interval);
+      width += Math.random() * 10;
+      bar.style.width = Math.min(width, 80) + '%';
+    }, 150);
+
+    window.__finishAdminLoading = function() {
+      clearInterval(interval);
+      bar.style.width = '100%';
+      setTimeout(() => {
+        bar.style.opacity = '0';
+        setTimeout(() => bar.remove(), 400);
+      }, 200);
+    };
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectLoadingBar);
+  } else {
+    injectLoadingBar();
+  }
+
   // ---------- Sidebar nav definition
-  // Each item: { section, label, icon, href, roles }
-   const NAV_ITEMS = [
+  const NAV_ITEMS = [
     { section: 'Operations', label: 'Orders',   icon: 'fa-boxes-packing', href: 'orders.html',   roles: ['admin','sales'] },
     { section: 'Operations', label: 'Invoices', icon: 'fa-file-invoice',  href: 'invoices.html', roles: ['admin','sales'] },
     { section: 'Operations', label: 'Products', icon: 'fa-box',           href: 'products.html', roles: ['admin','sales'] },
     { section: 'Content',    label: 'Blog',     icon: 'fa-newspaper',     href: 'posts.html',    roles: ['admin'] },
     { section: 'Insights',   label: 'Reports',  icon: 'fa-chart-line',    href: 'reports.html',  roles: ['admin','sales'] },
-    { section: 'Insights',   label: 'Manage Users',icon: 'fa-users-cog',     href: 'users.html',    roles: ['admin'] },
+    { section: 'Insights',   label: 'Manage Users',icon: 'fa-users-cog',  href: 'users.html',    roles: ['admin'] },
     { section: 'Insights',   label: 'Analytics',icon: 'fa-bolt',          href: 'analytics.html',roles: ['admin'] },
     { section: 'Insights',   label: 'Audit',    icon: 'fa-history',       href: 'audit.html',    roles: ['admin'] },
     { section: 'System',     label: 'Settings', icon: 'fa-cog',           href: 'settings.html', roles: ['admin'] }
   ];
 
-  // ---------- Which page am I on?
   function currentPage() {
     const path = window.location.pathname || '';
     const file = path.substring(path.lastIndexOf('/') + 1) || 'orders.html';
     return file.toLowerCase();
   }
 
-  // ---------- Build the sidebar HTML
   function buildSidebarHTML(role) {
     const page = currentPage();
     const allowed = NAV_ITEMS.filter(i => i.roles.includes(role));
-    // Group by section, preserving order
+    
     const sections = [];
     const seenSections = {};
     allowed.forEach(item => {
@@ -88,7 +122,9 @@
       </nav>
       <div class="admin-sidebar-footer">
         <div class="user-chip">
-          <i id="userInitials">··</i>
+          <i id="userInitials">
+            <i class="fas fa-circle-notch fa-spin"></i>
+          </i>
           <span id="userEmail">Loading...</span>
         </div>
         <button class="btn-logout" onclick="adminLogout()">
@@ -105,7 +141,6 @@
       </button>`;
   }
 
-  // ---------- Inject the shell into the DOM
   function injectShell(role) {
     const body = document.body;
 
@@ -128,13 +163,11 @@
       sidebar.id = 'adminSidebar';
       sidebar.className = 'admin-sidebar';
       
-      // Inject scrollbar styles dynamically
       sidebar.style.display = 'flex';
       sidebar.style.flexDirection = 'column';
       sidebar.style.height = '100vh';
       sidebar.style.overflowY = 'auto';
 
-      // Custom scrollbar styling
       const style = document.createElement('style');
       style.innerHTML = `
         #adminSidebar::-webkit-scrollbar { width: 6px; }
@@ -158,7 +191,7 @@
       sidebar.parentNode.insertBefore(overlay, sidebar.nextSibling);
     }
 
-    // Wrap existing main in .admin-shell if not already wrapped
+    // Wrap existing main in .admin-shell
     const existingMain = document.getElementById('adminMain');
     if (existingMain && !existingMain.closest('.admin-shell')) {
       const shell = document.createElement('div');
@@ -180,7 +213,6 @@
     }
   }
 
-  // ---------- Sidebar toggle (mobile)
   window.adminToggleSidebar = function () {
     const sidebar = document.getElementById('adminSidebar');
     const overlay = document.getElementById('sidebarOverlay');
@@ -195,25 +227,19 @@
     if (overlay) overlay.classList.remove('open');
   };
 
-    // ---------- Logout
   window.adminLogout = async function () {
     try { await sb.auth.signOut(); } catch (e) { /* ignore */ }
 
-    // Detect if we're running as an installed PWA (standalone)
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       window.matchMedia('(display-mode: fullscreen)').matches ||
       window.matchMedia('(display-mode: minimal-ui)').matches ||
       window.navigator.standalone === true;
 
-    // If running as an installed app, stay inside the app — go to login card.
-    // If running in a regular browser, go to the shop homepage.
     window.location.replace(isStandalone ? 'login.html' : '../index.html');
   };
 
-  // ---------- Toast (shared, used by redirects)
   function showToast(msg, type) {
-    // Reuse the page's toast if it exists
     const toastEl = document.getElementById('toastMessage');
     if (!toastEl) return;
     const iconEl = document.getElementById('toastIcon');
@@ -231,10 +257,8 @@
   }
   window.adminShowToast = showToast;
 
-  // ---------- Cache for profile
   let currentProfile = null;
 
-  // ---------- Core: load user + profile
   async function loadProfile() {
     try {
       const { data: { user } } = await sb.auth.getUser();
@@ -254,13 +278,9 @@
     }
   }
 
-  // ---------- Auth check + redirect
-  // Usage: const ok = await adminAuthCheck(['admin','sales']); if (!ok) return;
   window.adminAuthCheck = async function (allowedRoles) {
     if (!currentProfile) currentProfile = await loadProfile();
     const { user, profile, role } = currentProfile;
-
-    const page = currentPage();
 
     if (!user) {
       showToast('Please sign in to continue.', 'error');
@@ -279,7 +299,6 @@
     }
 
     if (allowedRoles && !allowedRoles.includes(role)) {
-      // Silent redirect to orders (or appropriate fallback)
       showToast('You do not have access to that page.', 'error');
       const fallback = ['admin','sales'].includes(role) ? 'orders.html' : '../index.html';
       setTimeout(() => {
@@ -291,64 +310,50 @@
     return true;
   };
 
-  // ---------- Expose cached profile
   window.adminGetProfile = function () {
     return currentProfile || { user: null, profile: null, role: null };
   };
 
-  // ---------- Auto-inject as soon as the DOM is ready
   function boot() {
-    // Wait for DOM
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', boot);
       return;
     }
 
-    // Ensure we have a main element — every admin page has <main id="adminMain">
     const mainEl = document.getElementById('adminMain');
     if (!mainEl) {
-      console.warn('[admin-sidebar] No #adminMain element found — pages should wrap their content in <main id="adminMain">.');
+      console.warn('[admin-sidebar] No #adminMain element found.');
     }
 
-    // Load profile then inject sidebar once we know the role
     loadProfile().then(profileInfo => {
       currentProfile = profileInfo;
-      // Only inject if we have a role. If not authenticated, skip — the page's
-      // own auth guard will redirect.
       const role = profileInfo.role;
       if (role && ['admin','sales'].includes(role)) {
         injectShell(role);
       } else {
-        // Still inject an empty sidebar so styling is consistent
         injectShell(role || 'admin');
       }
-      // Resolve the ready promise
+      
+      if (window.__finishAdminLoading) window.__finishAdminLoading();
+      
       window.adminSidebarReady = Promise.resolve(profileInfo);
     });
 
-    // Escape key closes mobile sidebar
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         window.adminCloseSidebar();
       }
     });
-
-    // Redraw sidebar when navigating? Not needed — full page loads.
   }
 
-  // Promise that resolves when sidebar is ready
   window.adminSidebarReady = new Promise(resolve => {
     window.__adminSidebarResolve = resolve;
   });
 
-  // Patch loadProfile to resolve the ready promise
-  const originalBoot = boot;
-
   boot();
-    // ---------- Session expiry detection
+
   sb.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_OUT') {
-      // Only redirect if we were on an admin page (avoid double redirect from login.html)
       const path = window.location.pathname;
       if (path.includes('/admin/') && !path.endsWith('/login.html')) {
         const isStandalone =

@@ -1509,7 +1509,7 @@
       }
     }
 
-    async function finalizeInvoice() {
+      async function finalizeInvoice() {
       if (locked) return;
       const btn = document.getElementById('finalizeBtn');
       const orig = btn.innerHTML;
@@ -1519,11 +1519,7 @@
       try {
         // 1. Save the current state first (returns ID or null)
         const id = await persistInvoice();
-        if (!id) {
-          // If persistInvoice failed validation, it returns null. 
-          // The finally block will unlock the button.
-          return; 
-        }
+        if (!id) return; 
 
         // 2. Flip to issued
         console.log("Attempting to finalize invoice ID:", id);
@@ -1540,7 +1536,7 @@
 
         showToast('Invoice finalized');
         
-        // Small delay to let the toast show, then navigate
+        // Navigate to the view page (or print page depending on your preference)
         setTimeout(() => {
           window.location.href = 'invoice-view.html?id=' + encodeURIComponent(id);
         }, 500);
@@ -1549,13 +1545,10 @@
         console.error('Finalize failed:', err);
         showToast('Could not finalize: ' + (err.message || 'Unknown error'), 'error');
       } finally {
-        // THIS IS CRITICAL: It ensures the button ALWAYS unlocks, 
-        // even if validation fails, the DB throws, or network times out.
         btn.disabled = false;
         btn.innerHTML = orig;
       }
     }
-
     function cancelEditor() {
       if (editingId && !locked) {
         // Optional: warn about unsaved changes. For v1, just confirm.

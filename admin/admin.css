@@ -1,10 +1,6 @@
 /* ============================================================
    RISE AXIS SOLUTIONS — ADMIN SHARED STYLESHEET
-   Strict palette: navy / red / green only. No orange, yellow,
-   blue, gold, purple, or bronze.
-   Used by: orders.html, products.html, posts.html,
-            invoices.html, invoice-edit.html,
-            invoice-view.html, invoice-print.html, settings.html
+   Strict palette: navy / red / green only.
    ============================================================ */
 
 /* ---------- Design tokens ---------- */
@@ -36,6 +32,7 @@ body {
   color: var(--text-dark);
   line-height: 1.5;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
@@ -428,10 +425,11 @@ button, input, select, textarea { font-family: inherit; }
 .btn-del:hover { background: var(--red); color: #fff; }
 .btn-view { background: rgba(29,59,115,0.1); color: var(--navy); }
 .btn-view:hover { background: var(--navy); color: #fff; }
-    .btn-stock { background: rgba(29,59,115,0.1); color: var(--navy); }
-    .btn-stock:hover { background: var(--navy); color: #fff; }
-    .btn-receive { background: rgba(23,176,82,0.12); color: var(--green-deep); }
-    .btn-receive:hover { background: var(--green); color: #fff; }
+.btn-stock { background: rgba(29,59,115,0.1); color: var(--navy); }
+.btn-stock:hover { background: var(--navy); color: #fff; }
+.btn-receive { background: rgba(23,176,82,0.12); color: var(--green-deep); }
+.btn-receive:hover { background: var(--green); color: #fff; }
+
 /* ============================================================
    STATS CARDS
    ============================================================ */
@@ -553,8 +551,7 @@ button, input, select, textarea { font-family: inherit; }
 }
 
 /* ============================================================
-   BADGES (status pills)
-   All statuses use navy-soft / red-soft / green-soft only.
+   BADGES
    ============================================================ */
 .badge {
   display: inline-flex;
@@ -570,66 +567,14 @@ button, input, select, textarea { font-family: inherit; }
 }
 .badge i { font-size: 0.6rem; }
 
-/* Positive / success */
-.badge-active,
-.badge-ok,
-.badge-paid,
-.badge-delivered,
-.badge-pub {
-  background: var(--green-soft);
-  color: var(--green-deep);
-}
-
-/* Warning / attention — now uses navy-soft as a neutral */
-.badge-low,
-.badge-pending,
-.badge-draft,
-.badge-partial {
-  background: var(--navy-soft);
-  color: var(--navy-deep);
-}
-
-/* Negative / danger */
-.badge-inactive,
-.badge-out,
-.badge-cancelled,
-.badge-failed,
-.badge-overdue {
-  background: var(--red-soft);
-  color: var(--red-deep);
-}
-
-/* In-progress / informational */
-.badge-processing,
-.badge-shipped,
-.badge-issued,
-.badge-cat,
-.badge-l2 {
-  background: var(--navy-soft);
-  color: var(--navy);
-}
-
-/* Level badges — differentiated by intensity of navy */
-.badge-root {
-  background: var(--navy);
-  color: #fff;
-}
-.badge-l3 {
-  background: var(--navy-soft);
-  color: var(--navy-deep);
-  border: 1px solid rgba(29,59,115,0.2);
-}
-
-.badge-refunded {
-  background: var(--navy-soft);
-  color: var(--navy-deep);
-}
-
-.badge-void {
-  background: #e5e7eb;
-  color: #374151;
-  text-decoration: line-through;
-}
+.badge-active, .badge-ok, .badge-paid, .badge-delivered, .badge-pub { background: var(--green-soft); color: var(--green-deep); }
+.badge-low, .badge-pending, .badge-draft, .badge-partial { background: var(--navy-soft); color: var(--navy-deep); }
+.badge-inactive, .badge-out, .badge-cancelled, .badge-failed, .badge-overdue { background: var(--red-soft); color: var(--red-deep); }
+.badge-processing, .badge-shipped, .badge-issued, .badge-cat, .badge-l2 { background: var(--navy-soft); color: var(--navy); }
+.badge-root { background: var(--navy); color: #fff; }
+.badge-l3 { background: var(--navy-soft); color: var(--navy-deep); border: 1px solid rgba(29,59,115,0.2); }
+.badge-refunded { background: var(--navy-soft); color: var(--navy-deep); }
+.badge-void { background: #e5e7eb; color: #374151; text-decoration: line-through; }
 
 /* ============================================================
    MODALS
@@ -732,11 +677,7 @@ button, input, select, textarea { font-family: inherit; }
   padding-bottom: 26px;
   border-bottom: 1px dashed var(--border);
 }
-.form-section:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
+.form-section:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
 .form-section-title {
   font-size: 0.78rem;
   font-weight: 800;
@@ -785,17 +726,8 @@ button, input, select, textarea { font-family: inherit; }
   border-color: var(--navy);
   box-shadow: 0 0 0 3px rgba(29,59,115,0.1);
 }
-.form-field textarea {
-  resize: vertical;
-  min-height: 80px;
-  line-height: 1.6;
-}
-.form-field small {
-  display: block;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  margin-top: 5px;
-}
+.form-field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.form-field small { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; }
 
 /* ============================================================
    IMAGE UPLOAD
@@ -838,7 +770,7 @@ button, input, select, textarea { font-family: inherit; }
 .btn-remove-img:hover { background: var(--red); color: #fff; }
 
 /* ============================================================
-   TABLE CONTAINERS
+   TABLE CONTAINERS (MOBILE SCROLL FIX)
    ============================================================ */
 .data-card {
   background: #fff;
@@ -847,12 +779,15 @@ button, input, select, textarea { font-family: inherit; }
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(29,59,115,0.05);
 }
-.data-table-wrap { overflow-x: auto; }
+.data-table-wrap { 
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
 table.data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88rem;
-  min-width: 1000px;
+  min-width: 900px; /* Forced width to prevent squishing */
 }
 .data-table thead th {
   text-align: left;
@@ -890,28 +825,11 @@ table.data-table {
   font-size: 2.2rem;
   color: var(--navy);
 }
-.empty-state h3 {
-  color: var(--navy);
-  font-weight: 800;
-  font-size: 1.2rem;
-  margin-bottom: 6px;
-}
-.empty-state p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-}
+.empty-state h3 { color: var(--navy); font-weight: 800; font-size: 1.2rem; margin-bottom: 6px; }
+.empty-state p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
 
-.loading-skeleton {
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--text-muted);
-}
-.loading-skeleton i {
-  font-size: 2rem;
-  color: var(--navy);
-  margin-bottom: 14px;
-}
+.loading-skeleton { padding: 60px 20px; text-align: center; color: var(--text-muted); }
+.loading-skeleton i { font-size: 2rem; color: var(--navy); margin-bottom: 14px; }
 .loading-skeleton p { font-size: 0.9rem; }
 
 /* ============================================================
@@ -952,17 +870,8 @@ table.data-table {
   font-size: 2rem;
   margin: 0 auto 18px;
 }
-.confirm-modal h3 {
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: var(--navy);
-  margin-bottom: 8px;
-}
-.confirm-modal p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 22px;
-}
+.confirm-modal h3 { font-size: 1.2rem; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+.confirm-modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 22px; }
 .confirm-modal p strong { color: var(--navy); }
 .confirm-actions { display: flex; gap: 10px; flex-direction: column; }
 
@@ -1034,21 +943,9 @@ table.data-table {
   font-size: 2.2rem;
   margin: 0 auto 22px;
 }
-.access-denied-card h2 {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: var(--navy);
-  margin-bottom: 10px;
-}
-.access-denied-card p {
-  color: var(--text-muted);
-  margin-bottom: 24px;
-  font-size: 0.95rem;
-}
-.access-denied-card .btn-primary {
-  width: 100%;
-  justify-content: center;
-}
+.access-denied-card h2 { font-size: 1.5rem; font-weight: 900; color: var(--navy); margin-bottom: 10px; }
+.access-denied-card p { color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem; }
+.access-denied-card .btn-primary { width: 100%; justify-content: center; }
 
 /* ============================================================
    UTILITY
@@ -1063,16 +960,20 @@ table.data-table {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1024px) {
+  /* Sidebar Slide-out */
   .admin-sidebar { transform: translateX(-100%); }
   .admin-sidebar.open { transform: translateX(0); }
   .admin-shell { margin-left: 0; }
   .admin-mobile-bar { display: flex; }
+  
+  /* Grid adjustments */
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .form-grid  { grid-template-columns: 1fr; }
   .form-field.full { grid-column: 1; }
 }
 
 @media (max-width: 768px) {
+  .container { padding: 0 16px; }
   .page-title-row h1 { font-size: 1.3rem; }
   .stats-grid { grid-template-columns: 1fr; }
   .filter-bar { flex-direction: column; align-items: stretch; }
@@ -1081,6 +982,7 @@ table.data-table {
   .title-actions { width: 100%; }
   .title-actions button { flex: 1; justify-content: center; }
 
+  /* Modals */
   .modal { border-radius: 16px; max-height: 96vh; }
   .modal-body { padding: 20px; }
   .modal-header { padding: 20px; }
@@ -1097,6 +999,11 @@ table.data-table {
     right: 16px;
     left: 16px;
     max-width: none;
+  }
+  
+  /* Hide less important table columns on mobile to save space */
+  .hide-mobile {
+    display: none !important;
   }
 }
 

@@ -8,6 +8,8 @@
   <link rel="icon" type="image/x-icon" href="../image/rise axis.jpg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- html2pdf for PDF Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
@@ -518,30 +520,6 @@
       line-height: 1.6;
     }
 
-    /* ---------- Print rules ---------- */
-    @page {
-      size: A4;
-      margin: 0;
-    }
-    @media print {
-      html, body {
-        background: #fff !important;
-        font-size: 12px;
-      }
-      .pub-topbar { display: none !important; }
-      .page-wrap { padding: 0; display: block; }
-      .page {
-        width: auto;
-        min-height: auto;
-        box-shadow: none;
-        padding: 12mm 12mm;
-      }
-      .items-table thead { display: table-header-group; }
-      .items-table tr { page-break-inside: avoid; }
-      .pay-history-block tr { page-break-inside: avoid; }
-      .notes-block, .inv-footer { page-break-inside: avoid; }
-    }
-
     /* ---------- Mobile ---------- */
     @media (max-width: 900px) {
       .page { width: 100%; padding: 20px 16px; min-height: auto; }
@@ -569,7 +547,6 @@
       el.classList.add('fade-out');
       setTimeout(() => el.remove(), 500);
     }
-    // Hide on DOMContentLoaded; fall back to load + 2s
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       setTimeout(hide, 300);
     } else {
@@ -578,6 +555,7 @@
     }
   })();
 </script>
+
   <!-- ============================================================
        TOP BAR (screen only)
        ============================================================ -->
@@ -587,8 +565,9 @@
       <span style="color:var(--text-muted); font-weight:600;">· Invoice</span>
     </div>
     <div class="pub-actions">
-      <button class="primary" onclick="window.print()">
-        <i class="fas fa-print"></i> Print / Save PDF
+      <!-- CHANGED BUTTON TO DOWNLOAD -->
+      <button class="primary" id="downloadBtn" onclick="downloadPDF()">
+        <i class="fas fa-download"></i> Download PDF
       </button>
     </div>
   </div>
@@ -809,7 +788,8 @@
       // ---- Full page
       document.getElementById('root').innerHTML = `
         <div class="page-wrap">
-          <div class="page ${isVoid ? 'void' : ''}">
+          <!-- ID added here for the PDF generator to target -->
+          <div class="page ${isVoid ? 'void' : ''}" id="invoice-page">
 
             <div class="inv-header">
               <div class="biz-block">
@@ -886,6 +866,42 @@
 
           </div>
         </div>`;
+    }
+
+    /* ============================================================
+       DOWNLOAD PDF
+       ============================================================ */
+    function downloadPDF() {
+      const element = document.getElementById('invoice-page');
+      if (!element) return;
+
+      const btn = document.getElementById('downloadBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating...';
+
+      // Get invoice number for filename
+      const invNum = document.querySelector('.inv-num').innerText.trim() || 'DRAFT';
+      const fileName = `Invoice_${invNum}.pdf`;
+
+      const opt = {
+        margin:       0,
+        filename:     fileName,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 3, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      // Execute
+      html2pdf().set(opt).from(element).save().then(() => {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }).catch(err => {
+        console.error('PDF generation failed:', err);
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        alert('Failed to generate PDF. Please try again.');
+      });
     }
 
     /* ============================================================
