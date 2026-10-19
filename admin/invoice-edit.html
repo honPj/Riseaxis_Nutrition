@@ -1690,7 +1690,6 @@
     function closeNewProductModal() {
       document.getElementById('newProductModal').classList.remove('open');
     }
-
     async function saveNewProduct() {
       const btn = document.getElementById('npSaveBtn');
       const orig = btn.innerHTML;
@@ -1703,36 +1702,60 @@
         const salesPrice = Number(document.getElementById('npSalesPrice').value) || 0;
         const costPrice = Number(document.getElementById('npCostPrice').value) || 0;
         const qty = Number(document.getElementById('npQty').value) || 1;
+        const stockQty = Number(document.getElementById('npStock').value) || 1;
         const packLabel = document.getElementById('npPackLabel').value.trim();
         const packPriceValue = document.getElementById('npPackPrice').value;
         const categoryId = document.getElementById('npCategory').value || null;
 
         if (!name) throw new Error('Product name is required');
 
+        // Generate a unique slug
+        const generatedSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') 
+                            + '-' + Math.floor(Math.random() * 10000);
+
         const packs = packLabel ? [{
+          id: 'pack-' + Date.now(),
           label: packLabel,
           price: packPriceValue === '' ? salesPrice : Number(packPriceValue) || 0
-        }] : [];
-        const { data: newProd, error } = await supabaseClient
+        }] : null;
+
+        // 1. Insert Product
+        const { data: newProd, error: insErr } = await supabaseClient
           .from('products')
           .insert({
             name,
+            slug: generatedSlug, // <-- CRITICAL FIX: Database requires this
+            description: desc || null,
             price: salesPrice,
             cost_price: costPrice,
             category_id: categoryId,
-            packs,
-            is_active: true
+            packs: packs,
+            vat_applicable: false,
+            is_active: false // Keep hidden from website
           })
           .select('id, name, price, cost_price, image_url, vat_applicable, packs, category_id, is_active')
           .single();
-        if (error) throw error;
+          
+        if (insErr) throw insErr;
+
+        // 2. Insert into Stock Ledger so finalizing the invoice doesn't fail
+        const { error: ledgerErr } = await supabaseClient.from('stock_ledger').insert([{
+          product_id: newProd.id,
+          change_qty: stockQty,
+          reason: 'Initial Quick Add Stock'
+        }]);
+        
+        // Log ledger error but don't stop invoice creation
+        if (ledgerErr) {
+          console.warn('Could not add initial stock to ledger:', ledgerErr);
+        }
 
         // 3. Add to local cache and invoice UI
         products.push(newProd);
 
         const row = addBlankLine();
         row.dataset.productId = newProd.id;
-        row.dataset.custom = '1'; // <-- Treat this row as a custom line (no stock deduction)
+        row.dataset.custom = '1'; // Treat as custom line (no stock deduction on finalize)
         row.querySelector('.product-search-input').value = newProd.name;
         row.querySelector('.line-description').value = desc || newProd.name;
         row.querySelector('.line-qty').value = qty;
@@ -1751,8 +1774,7 @@
         btn.disabled = false;
         btn.innerHTML = orig;
       }
-      }
-    
+    }
   </script>
 <script src="pwa.js"></script>
 </body>
