@@ -181,6 +181,183 @@
       color: var(--text-dark);
     }
     .statement-table tbody tr:hover { background: #f8fafc; }
+
+        /* ============================================================
+       STATEMENT DOCUMENT — mirrors invoice-view design language
+       ============================================================ */
+
+    #printableStatement .stmt-biz-name {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #1D3B73;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+    #printableStatement .stmt-biz-line {
+      color: #64748b;
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+    #printableStatement .stmt-biz-line strong { color: #1D3B73; font-weight: 700; }
+    #printableStatement .stmt-logo {
+      max-height: 60px; max-width: 200px;
+      object-fit: contain; margin-bottom: 12px; display: block;
+    }
+
+    #printableStatement .stmt-meta { text-align: right; }
+    #printableStatement .stmt-meta .stmt-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #1D3B73;
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+    #printableStatement .stmt-meta .stmt-num {
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #1D3B73;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    #printableStatement .stmt-meta .meta-row {
+      display: flex; justify-content: flex-end; gap: 12px;
+      font-size: 0.85rem; padding: 3px 0;
+    }
+    #printableStatement .stmt-meta .meta-row .k { color: #64748b; font-weight: 600; }
+    #printableStatement .stmt-meta .meta-row .v { color: #1D3B73; font-weight: 700; }
+
+    #printableStatement .stmt-divider {
+      border: none;
+      border-top: 1px dashed #e2e8f0;
+      margin: 22px 0;
+    }
+
+    #printableStatement .stmt-section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #1D3B73;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #printableStatement .stmt-section-title i { color: #E85D26; }
+
+    #printableStatement .stmt-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      font-variant-numeric: tabular-nums;
+    }
+    #printableStatement .stmt-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #fafbff;
+      color: #1D3B73;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    #printableStatement .stmt-table thead th.num { text-align: right; }
+    #printableStatement .stmt-table tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #0f172a;
+      vertical-align: top;
+    }
+    #printableStatement .stmt-table tbody tr:last-child td { border-bottom: none; }
+    #printableStatement .stmt-table td.num {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    #printableStatement .stmt-table td.mono {
+      font-family: 'Courier New', monospace;
+      font-weight: 800;
+      color: #1D3B73;
+      letter-spacing: 0.4px;
+      font-size: 0.8rem;
+    }
+    #printableStatement .stmt-table td.pos { color: #0e7a3c; font-weight: 700; }
+    #printableStatement .stmt-table td.neg { color: #c8102e; font-weight: 700; }
+
+    #printableStatement .stmt-table tfoot td {
+      padding: 12px;
+      border-top: 2px solid #1D3B73;
+      font-weight: 900;
+      color: #1D3B73;
+      font-size: 0.88rem;
+      background: #fafbff;
+    }
+    #printableStatement .stmt-table tfoot td.num { text-align: right; }
+
+    /* Payment history — invoice-style rows */
+    #printableStatement .stmt-pay-list { display: flex; flex-direction: column; }
+    #printableStatement .stmt-pay-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    #printableStatement .stmt-pay-row:last-child { border-bottom: none; }
+    #printableStatement .stmt-pay-icon {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; color: #fff; flex-shrink: 0;
+    }
+    #printableStatement .stmt-pay-icon.mpesa { background: linear-gradient(135deg, #10b981, #047857); }
+    #printableStatement .stmt-pay-icon.bank  { background: linear-gradient(135deg, #1D3B73, #142a52); }
+    #printableStatement .stmt-pay-icon.cash  { background: linear-gradient(135deg, #f59e0b, #D97706); }
+    #printableStatement .stmt-pay-icon.cheque{ background: linear-gradient(135deg, #a16207, #5a421f); }
+    #printableStatement .stmt-pay-icon.card  { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+    #printableStatement .stmt-pay-icon.other { background: linear-gradient(135deg, #6b7280, #374151); }
+
+    #printableStatement .stmt-pay-info { flex: 1; min-width: 0; }
+    #printableStatement .stmt-pay-info strong {
+      display: block;
+      color: #1D3B73;
+      font-weight: 800;
+      font-size: 0.86rem;
+      margin-bottom: 2px;
+    }
+    #printableStatement .stmt-pay-info small {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+    #printableStatement .stmt-pay-amount {
+      font-size: 0.95rem;
+      font-weight: 900;
+      color: #0e7a3c;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #printableStatement .stmt-empty {
+      text-align: center;
+      padding: 26px 12px;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    #printableStatement .stmt-footer {
+      margin-top: 26px;
+      padding-top: 16px;
+      border-top: 1px dashed #e2e8f0;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -228,7 +405,7 @@
             <p>View registered accounts and manage system roles.</p>
           </div>
           <div class="title-actions">
-            <button class="btn-refresh" id="refreshBtn" onclick="loadUsers(true)">
+                       <button class="btn-refresh" id="refreshBtn" onclick="loadCustomers(true)">
               <i class="fas fa-sync-alt"></i> Refresh
             </button>
             <button class="btn-register" onclick="openRegisterModal()">
@@ -242,11 +419,12 @@
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Search by name or email...">
           </div>
-          <select class="filter-select" id="filterRole">
-            <option value="">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="sales">Sales</option>
-            <option value="customer">Customer</option>
+                    <select class="filter-select" id="filterRole">
+            <option value="">All Customers</option>
+            <option value="customer">Registered · Customer</option>
+            <option value="sales">Registered · Sales</option>
+            <option value="admin">Registered · Admin</option>
+            <option value="guest">Guests (no account)</option>
           </select>
         </div>
 
@@ -399,7 +577,10 @@
       return true;
     }
 
-    async function loadUsers(showSpinner = false) {
+      /* ============================================================
+       LOAD CUSTOMERS — merges profiles + orders + invoices
+       ============================================================ */
+    async function loadCustomers(showSpinner = false) {
       const refreshBtn = document.getElementById('refreshBtn');
       if (showSpinner) {
         refreshBtn.classList.add('spinning');
@@ -407,24 +588,174 @@
       }
 
       try {
-        // Added phone to the select so we can display it if needed
-        const { data, error } = await supabaseClient
-          .from('profiles')
-          .select('id, first_name, last_name, email, phone, role, created_at')
-          .order('created_at', { ascending: false });
+        // 1. Fetch all three sources in parallel
+        const [profilesRes, ordersRes, invoicesRes] = await Promise.all([
+          supabaseClient
+            .from('profiles')
+            .select('id, first_name, last_name, email, phone, role, created_at'),
+          supabaseClient
+            .from('orders')
+            .select('id, order_number, customer_name, customer_phone, customer_email, total, payment_status, created_at'),
+          supabaseClient
+            .from('invoices')
+            .select('id, invoice_number, customer_user_id, customer_name, customer_phone, customer_email, total, amount_paid, status, issue_date')
+        ]);
 
-        if (error) throw error;
-        allUsers = data || [];
+        if (profilesRes.error) throw profilesRes.error;
+        if (ordersRes.error) throw ordersRes.error;
+        if (invoicesRes.error) throw invoicesRes.error;
+
+        const profiles = profilesRes.data || [];
+        const orders   = ordersRes.data || [];
+        const invoices = invoicesRes.data || [];
+
+        // 2. Normalise helpers
+        const normEmail = s => (s || '').trim().toLowerCase();
+        const normPhone = s => (s || '').replace(/\D/g, '');
+
+        // 3. Build lookup maps from profiles (by email and phone)
+        const profileByEmail = {};
+        const profileByPhone = {};
+        const profileById = {};
+        profiles.forEach(p => {
+          profileById[p.id] = p;
+          const e = normEmail(p.email);
+          const t = normPhone(p.phone);
+          if (e) profileByEmail[e] = p;
+          if (t) profileByPhone[t] = p;
+        });
+
+        // 4. Merge bucket — keyed by a stable synthetic customerKey
+        const bucket = {};
+
+        function getOrCreate(key) {
+          if (!bucket[key]) {
+            bucket[key] = {
+              customerKey: key,
+              profileId: null,
+              name: '',
+              email: '',
+              phone: '',
+              role: 'guest',
+              isRegistered: false,
+              firstSaleAt: null,
+              lastSaleAt: null,
+              orderCount: 0,
+              invoiceCount: 0,
+              totalBilled: 0,
+              totalPaid: 0,
+              sources: []
+            };
+          }
+          return bucket[key];
+        }
+
+        function touchDate(cust, iso) {
+          if (!iso) return;
+          const d = new Date(iso);
+          if (isNaN(d.getTime())) return;
+          if (!cust.firstSaleAt || d < cust.firstSaleAt) cust.firstSaleAt = d;
+          if (!cust.lastSaleAt || d > cust.lastSaleAt) cust.lastSaleAt = d;
+        }
+
+        // 5. Seed from profiles (registered users always appear)
+        profiles.forEach(p => {
+          const key = 'p:' + p.id;
+          const c = getOrCreate(key);
+          c.profileId = p.id;
+          c.isRegistered = true;
+          c.role = p.role || 'customer';
+          c.name = [p.first_name, p.last_name].filter(Boolean).join(' ') || '—';
+          c.email = p.email || '';
+          c.phone = p.phone || '';
+          c.sources.push('profile');
+          touchDate(c, p.created_at);
+        });
+
+        // 6. Merge invoices — link to profile if email/phone matches, else guest
+        invoices.forEach(inv => {
+          let key = null;
+
+          // a) Direct profile link
+          if (inv.customer_user_id && profileById[inv.customer_user_id]) {
+            key = 'p:' + inv.customer_user_id;
+          }
+          // b) Match by email
+          if (!key) {
+            const e = normEmail(inv.customer_email);
+            if (e && profileByEmail[e]) key = 'p:' + profileByEmail[e].id;
+          }
+          // c) Match by phone
+          if (!key) {
+            const t = normPhone(inv.customer_phone);
+            if (t && profileByPhone[t]) key = 'p:' + profileByPhone[t].id;
+          }
+          // d) Guest — use email as key, else phone, else unique
+          if (!key) {
+            const e = normEmail(inv.customer_email);
+            const t = normPhone(inv.customer_phone);
+            if (e) key = 'e:' + e;
+            else if (t) key = 't:' + t;
+            else key = 'inv:' + inv.id;
+          }
+
+          const c = getOrCreate(key);
+          if (!c.sources.includes('invoices')) c.sources.push('invoices');
+          if (!c.name || c.name === '—') c.name = inv.customer_name || c.name;
+          if (!c.email) c.email = inv.customer_email || '';
+          if (!c.phone) c.phone = inv.customer_phone || '';
+          c.invoiceCount += 1;
+          if (inv.status !== 'void') {
+            c.totalBilled += Number(inv.total) || 0;
+            c.totalPaid   += Number(inv.amount_paid) || 0;
+          }
+          touchDate(c, inv.issue_date);
+        });
+
+        // 7. Merge orders — same match strategy
+        orders.forEach(o => {
+          let key = null;
+
+          const e = normEmail(o.customer_email);
+          const t = normPhone(o.customer_phone);
+          if (e && profileByEmail[e]) key = 'p:' + profileByEmail[e].id;
+          else if (t && profileByPhone[t]) key = 'p:' + profileByPhone[t].id;
+          else if (e) key = 'e:' + e;
+          else if (t) key = 't:' + t;
+          else key = 'ord:' + o.id;
+
+          const c = getOrCreate(key);
+          if (!c.sources.includes('orders')) c.sources.push('orders');
+          if (!c.name || c.name === '—') c.name = o.customer_name || c.name;
+          if (!c.email) c.email = o.customer_email || '';
+          if (!c.phone) c.phone = o.customer_phone || '';
+          c.orderCount += 1;
+          // Orders that have no linked invoice: count order total as billed/paid if payment_status = paid
+          // (avoid double-counting when an invoice already exists — we only add if invoiceCount === 0)
+          if (o.payment_status === 'paid') {
+            c.totalPaid += Number(o.total) || 0;
+          }
+          touchDate(c, o.created_at);
+        });
+
+        // 8. Flatten and sort (registered first, then most recent sale)
+        allUsers = Object.values(bucket).sort((a, b) => {
+          if (a.isRegistered !== b.isRegistered) return a.isRegistered ? -1 : 1;
+          const da = a.lastSaleAt ? a.lastSaleAt.getTime() : 0;
+          const db = b.lastSaleAt ? b.lastSaleAt.getTime() : 0;
+          return db - da;
+        });
+
         applyFilters();
       } catch (err) {
-        console.error('Failed to load users:', err);
+        console.error('Failed to load customers:', err);
         document.getElementById('usersContent').innerHTML = `
           <div class="empty-orders" style="padding:60px;">
             <div class="icon" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i></div>
-            <h3>Could not load users</h3>
+            <h3>Could not load customers</h3>
             <p>${escapeHtml(err.message)}</p>
           </div>`;
-        showToast('Failed to load users', 'error');
+        showToast('Failed to load customers', 'error');
       } finally {
         if (showSpinner) {
           setTimeout(() => {
@@ -434,17 +765,20 @@
         }
       }
     }
-
     function applyFilters() {
       const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
       const roleFilter = document.getElementById('filterRole').value;
 
       const filtered = allUsers.filter(u => {
-        if (roleFilter && u.role !== roleFilter) return false;
+        // Role filter: 'guest' → show only guests; else match role
+        if (roleFilter === 'guest') {
+          if (u.isRegistered) return false;
+        } else if (roleFilter) {
+          if (!u.isRegistered || u.role !== roleFilter) return false;
+        }
         if (q) {
-          const name = [u.first_name, u.last_name].filter(Boolean).join(' ').toLowerCase();
-          const email = (u.email || '').toLowerCase();
-          if (!name.includes(q) && !email.includes(q)) return false;
+          const haystack = [u.name, u.email, u.phone].filter(Boolean).join(' ').toLowerCase();
+          if (!haystack.includes(q)) return false;
         }
         return true;
       });
@@ -462,49 +796,68 @@
         wrap.innerHTML = `
           <div class="empty-orders" style="padding:60px;">
             <div class="icon"><i class="fas fa-users"></i></div>
-            <h3>No users found</h3>
+            <h3>No customers found</h3>
             <p>Try adjusting your search or filters.</p>
           </div>`;
         return;
       }
 
       const rows = users.map(u => {
-        const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || '—';
-        const isMe = u.id === currentUserId;
+        const isMe = u.profileId && u.profileId === currentUserId;
         const role = u.role || 'customer';
-        
-        const roles = ['admin', 'sales', 'customer'];
-        const roleOptions = roles.map(r => 
-          `<option value="${r}" ${role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`
-        ).join('');
+
+        // Type badge
+        const typeBadge = u.isRegistered
+          ? `<span class="role-badge ${role}" title="Registered account">${role}</span>`
+          : `<span class="role-badge" style="background:#FEF3C7;color:#92400E;" title="Guest — no account">GUEST</span>`;
+
+        // Role dropdown or Register button
+        let roleCell;
+        if (u.isRegistered) {
+          const roleOptions = ['admin', 'sales', 'customer'].map(r =>
+            `<option value="${r}" ${role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`
+          ).join('');
+          roleCell = `
+            <select class="role-select"
+                    onchange="updateUserRole('${u.profileId}', this.value)"
+                    ${isMe ? 'disabled title="You cannot change your own role"' : ''}>
+              ${roleOptions}
+            </select>`;
+        } else {
+          roleCell = `
+            <button type="button"
+                    onclick='openRegisterPrefilled(${JSON.stringify({ name: u.name, email: u.email, phone: u.phone })})'
+                    style="background:linear-gradient(135deg,#086815,#0a7d1a);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;"
+                    title="Register this guest as a full account">
+              <i class="fas fa-user-plus"></i> Register
+            </button>`;
+        }
+
+        // Statement always available
+        const statementBtn = `
+          <button class="btn-statement" onclick="showUserStatement('${escapeHtml(u.customerKey)}')">
+            <i class="fas fa-file-invoice"></i> Statement
+          </button>`;
+
+        // Date display
+        const dateSrc = u.lastSaleAt || u.firstSaleAt;
+        const dateStr = dateSrc
+          ? dateSrc.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+          : '—';
 
         return `
           <tr>
             <td>
               <div class="customer-cell">
-                <strong>${escapeHtml(name)} ${isMe ? '<span style="color:var(--orange);font-size:0.7rem;">(You)</span>' : ''}</strong>
+                <strong>${escapeHtml(u.name || '—')} ${isMe ? '<span style="color:var(--orange);font-size:0.7rem;">(You)</span>' : ''}</strong>
                 <small>${escapeHtml(u.email || 'No email')}</small>
                 ${u.phone ? `<small style="color:var(--navy); font-weight:600;"><i class="fas fa-phone" style="font-size:0.6rem;"></i> ${escapeHtml(u.phone)}</small>` : ''}
               </div>
             </td>
-            <td>
-              <select class="role-select" 
-                      onchange="updateUserRole('${u.id}', this.value)"
-                      ${isMe ? 'disabled title="You cannot change your own role"' : ''}>
-                ${roleOptions}
-              </select>
-            </td>
-            <td>
-              <span class="role-badge ${role}">${role}</span>
-            </td>
-            <td style="white-space:nowrap;">
-              <button class="btn-statement" onclick="showUserStatement('${u.id}')">
-                <i class="fas fa-file-invoice"></i> Statement
-              </button>
-            </td>
-            <td class="date-cell">
-              ${u.created_at ? new Date(u.created_at).toLocaleDateString('en-KE', {day:'2-digit', month:'short', year:'numeric'}) : '—'}
-            </td>
+            <td>${typeBadge}</td>
+            <td>${roleCell}</td>
+            <td style="white-space:nowrap;">${statementBtn}</td>
+            <td class="date-cell">${dateStr}</td>
           </tr>
         `;
       }).join('');
@@ -514,18 +867,17 @@
           <table class="users-table">
             <thead>
               <tr>
-                <th>User</th>
+                <th>Customer</th>
+                <th>Type</th>
                 <th>Change Role</th>
-                <th>Current Role</th>
                 <th>Actions</th>
-                <th>Joined</th>
+                <th>Last Activity</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
     }
-
     async function updateUserRole(userId, newRole) {
       try {
         const { error } = await supabaseClient
@@ -546,18 +898,97 @@
         loadUsers(); 
       }
     }
+        /* ============================================================
+       STATEMENT HELPERS — mirrors invoice-view.html
+       ============================================================ */
+    const fmtDateTime = iso => {
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
+             + ' · ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
+      } catch { return iso; }
+    };
+
+    const paymentMethodLabel = m => ({
+      cash: 'Cash', mpesa: 'M-Pesa', bank: 'Bank Transfer',
+      cheque: 'Cheque', card: 'Card', other: 'Other'
+    }[m] || m || '—');
+
+    const paymentMethodIcon = m => ({
+      cash: 'fa-money-bill-wave', mpesa: 'fa-mobile-alt', bank: 'fa-university',
+      cheque: 'fa-money-check', card: 'fa-credit-card', other: 'fa-circle'
+    }[m] || 'fa-circle');
+
+        /* ==========================================
+       CUSTOMER RESOLVER — key → customer context
+       ========================================== */
+    async function resolveCustomer(customerKey) {
+      // Find in already-loaded allUsers
+      const c = allUsers.find(u => u.customerKey === customerKey);
+      if (!c) return null;
+
+      // Registered — we have profileId
+      if (c.isRegistered) {
+        return {
+          profileId: c.profileId,
+          guestName: c.name,
+          guestEmail: c.email,
+          guestPhone: c.phone,
+          displayName: c.name || 'Customer'
+        };
+      }
+
+      // Guest — profileId is null, use email/phone
+      return {
+        profileId: null,
+        guestName: c.name,
+        guestEmail: c.email,
+        guestPhone: c.phone,
+        displayName: c.name || 'Guest Customer'
+      };
+    }
+
+    /* ==========================================
+       PRE-FILL REGISTRATION FOR GUEST
+       ========================================== */
+    function openRegisterPrefilled(data) {
+      // Pre-fill the registration modal
+      const parts = (data.name || '').trim().split(/\s+/);
+      const firstName = parts.shift() || '';
+      const lastName = parts.join(' ') || '';
+
+      document.getElementById('regFirstName').value = firstName;
+      document.getElementById('regLastName').value  = lastName;
+      document.getElementById('regEmail').value     = data.email || '';
+      document.getElementById('regPhone').value     = data.phone || '';
+      document.getElementById('regCity').value      = '';
+      document.getElementById('regCountry').value   = 'Kenya';
+      document.getElementById('regAddress').value   = '';
+      document.getElementById('regPassword').value  = 'RiseAxis2026!';
+      document.getElementById('regRole').value      = 'customer';
+
+      document.getElementById('registerModal').classList.add('open');
+      document.getElementById('regFirstName').focus();
+    }
 
     /* ==========================================
        USER STATEMENT LOGIC
        ========================================== */
-    async function showUserStatement(userId) {
-      const user = allUsers.find(u => u.id === userId);
-      if (!user) return;
+        async function showUserStatement(customerKey) {
+      // 1. Resolve customerKey → { user (for header), profileId, invoiceIds, guestName/email/phone }
+      const resolved = await resolveCustomer(customerKey);
+      if (!resolved) {
+        showToast('Customer not found', 'error');
+        return;
+      }
 
-      const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Customer';
-      document.getElementById('stmtModalSubtitle').textContent = name + ' · ' + (user.email || 'No email');
+      const { profileId, guestName, guestEmail, guestPhone, displayName } = resolved;
+
+      document.getElementById('stmtModalSubtitle').textContent =
+        displayName + (guestEmail ? ' · ' + guestEmail : '');
       document.getElementById('statementModal').classList.add('open');
-      
+
       const body = document.getElementById('statementBody');
       body.innerHTML = `
         <div class="loading-skeleton" style="padding:40px 20px;">
@@ -566,60 +997,178 @@
         </div>`;
 
       try {
-        // Fetch all invoices for this user
-        const { data: invoices, error } = await supabaseClient
+        // 2. Load settings + invoices in parallel
+        let invoiceQuery = supabaseClient
           .from('invoices')
-          .select('id, invoice_number, issue_date, due_date, total, amount_paid, status')
-          .eq('customer_user_id', user.id)
-          .order('issue_date', { ascending: false });
+          .select('id, invoice_number, issue_date, due_date, total, amount_paid, status, reference')
+          .order('issue_date', { ascending: true });
 
-        if (error) throw error;
+        // Filter: by profile_id if registered, else by email OR phone
+        if (profileId) {
+          invoiceQuery = invoiceQuery.eq('customer_user_id', profileId);
+        } else {
+          const orFilters = [];
+          if (guestEmail) orFilters.push(`customer_email.ilike.${guestEmail}`);
+          if (guestPhone) orFilters.push(`customer_phone.eq.${guestPhone}`);
+          if (orFilters.length) invoiceQuery = invoiceQuery.or(orFilters.join(','));
+          else invoiceQuery = invoiceQuery.eq('customer_user_id', '00000000-0000-0000-0000-000000000000'); // force empty
+        }
 
-        // Calculate stats
-        let totalBilled = 0;
-        let totalPaid = 0;
-        let totalBalance = 0;
+        const [settingsRes, invoicesRes] = await Promise.all([
+          supabaseClient.from('settings').select('*').eq('id', 1).maybeSingle(),
+          invoiceQuery
+        ]);
 
-        const invoiceRows = (invoices || []).map(inv => {
-          const amt = Number(inv.total) || 0;
-          const paid = Number(inv.amount_paid) || 0;
-          const bal = amt - paid;
+        if (invoicesRes.error) throw invoicesRes.error;
+        const settings = settingsRes.data || {};
+        const invoices = invoicesRes.data || [];
 
-          totalBilled += amt;
-          totalPaid += paid;
-          totalBalance += bal;
+        // 3. Payments for those invoices
+        const invoiceIds = invoices.map(i => i.id);
+        let payments = [];
+        if (invoiceIds.length > 0) {
+          const { data: pays, error: payErr } = await supabaseClient
+            .from('payments')
+            .select('id, invoice_id, amount, method, reference, notes, paid_at')
+            .in('invoice_id', invoiceIds)
+            .order('paid_at', { ascending: true });
+          if (payErr) throw payErr;
+          payments = pays || [];
+        }
 
-          let statusBadge = 'badge-draft';
-          if (inv.status === 'paid') statusBadge = 'badge-paid';
-          else if (inv.status === 'partial') statusBadge = 'badge-partial';
-          else if (inv.status === 'void') statusBadge = 'badge-void';
+        // 4. Map invoice_id → invoice_number
+        const invNumById = {};
+        invoices.forEach(i => { invNumById[i.id] = i.invoice_number || 'DRAFT'; });
 
-          return `
-            <tr>
-              <td><strong>${escapeHtml(inv.invoice_number || 'DRAFT')}</strong></td>
-              <td>${inv.issue_date || '—'}</td>
-              <td>${inv.due_date || '—'}</td>
-              <td><span class="badge ${statusBadge}">${escapeHtml(inv.status)}</span></td>
-              <td>KES ${amt.toLocaleString('en-KE')}</td>
-              <td>KES ${paid.toLocaleString('en-KE')}</td>
-              <td style="font-weight:700;color:${bal > 0 ? 'var(--red)' : 'var(--green)'}">
-                KES ${bal.toLocaleString('en-KE')}
-              </td>
-            </tr>
-          `;
-        }).join('');
+        // 5. Compute summary
+        let totalBilled = 0, totalPaid = 0;
+        invoices.forEach(inv => {
+          if (inv.status === 'void') return;
+          totalBilled += Number(inv.total) || 0;
+          totalPaid   += Number(inv.amount_paid) || 0;
+        });
+        const balanceDue = totalBilled - totalPaid;
 
+        // 6. Build ledger
+        const ledger = [];
+        invoices.forEach(inv => {
+          if (inv.status === 'void') return;
+          ledger.push({
+            date: inv.issue_date,
+            sortKey: inv.issue_date + 'T00:00:00',
+            desc: `Invoice ${inv.invoice_number || 'DRAFT'} raised`,
+            debit: Number(inv.total) || 0,
+            credit: 0
+          });
+        });
+        payments.forEach(p => {
+          ledger.push({
+            date: (p.paid_at || '').slice(0, 10),
+            sortKey: p.paid_at,
+            desc: `Payment — ${paymentMethodLabel(p.method)}${p.reference ? ' (' + p.reference + ')' : ''} · ${invNumById[p.invoice_id] || ''}`,
+            debit: 0,
+            credit: Number(p.amount) || 0
+          });
+        });
+        ledger.sort((a, b) => (a.sortKey || '').localeCompare(b.sortKey || ''));
+
+        // 7. Running balance
+        let runningBal = 0;
+        const ledgerRows = ledger.map(row => {
+          runningBal += row.debit - row.credit;
+          return { ...row, balance: runningBal };
+        }).map(row => `
+          <tr>
+            <td style="font-weight:600;">${escapeHtml(row.date || '—')}</td>
+            <td>${escapeHtml(row.desc)}</td>
+            <td class="num ${row.debit ? 'neg' : ''}">${row.debit ? 'KES ' + row.debit.toLocaleString('en-KE') : '—'}</td>
+            <td class="num ${row.credit ? 'pos' : ''}">${row.credit ? 'KES ' + row.credit.toLocaleString('en-KE') : '—'}</td>
+            <td class="num" style="font-weight:800;color:${row.balance > 0.01 ? '#c8102e' : '#0e7a3c'};">
+              KES ${row.balance.toLocaleString('en-KE')}
+            </td>
+          </tr>
+        `).join('');
+
+        // 8. Invoice table
+        const invoiceRows = invoices.length === 0
+          ? `<tr><td colspan="7" class="stmt-empty">No invoices found for this customer.</td></tr>`
+          : invoices.map(inv => {
+              const amt = Number(inv.total) || 0;
+              const paid = Number(inv.amount_paid) || 0;
+              const bal = amt - paid;
+              const isVoid = inv.status === 'void';
+              let statusBadge = 'badge-draft';
+              if (inv.status === 'paid') statusBadge = 'badge-paid';
+              else if (inv.status === 'partial') statusBadge = 'badge-partial';
+              else if (inv.status === 'void') statusBadge = 'badge-void';
+              else if (inv.status === 'issued') statusBadge = 'badge-issued';
+              return `
+                <tr style="${isVoid ? 'opacity:0.55;text-decoration:line-through;' : ''}">
+                  <td class="mono">${escapeHtml(inv.invoice_number || 'DRAFT')}</td>
+                  <td>${escapeHtml(inv.issue_date || '—')}</td>
+                  <td>${escapeHtml(inv.due_date || '—')}</td>
+                  <td><span class="badge ${statusBadge}">${escapeHtml(inv.status)}</span></td>
+                  <td class="num">KES ${amt.toLocaleString('en-KE')}</td>
+                  <td class="num pos">KES ${paid.toLocaleString('en-KE')}</td>
+                  <td class="num ${bal > 0.01 ? 'neg' : 'pos'}">KES ${bal.toLocaleString('en-KE')}</td>
+                </tr>`;
+            }).join('');
+
+        // 9. Payment history
+        const payHistoryHtml = payments.length === 0
+          ? `<div class="stmt-empty"><i class="fas fa-info-circle"></i> No payments recorded yet.</div>`
+          : `<div class="stmt-pay-list">${payments.slice().reverse().map(p => `
+              <div class="stmt-pay-row">
+                <div class="stmt-pay-icon ${escapeHtml(p.method || 'other')}">
+                  <i class="fas ${paymentMethodIcon(p.method)}"></i>
+                </div>
+                <div class="stmt-pay-info">
+                  <strong>${escapeHtml(paymentMethodLabel(p.method))}${p.reference ? ' · ' + escapeHtml(p.reference) : ''}</strong>
+                  <small>${escapeHtml(fmtDateTime(p.paid_at))} · Invoice ${escapeHtml(invNumById[p.invoice_id] || '—')}${p.notes ? ' · ' + escapeHtml(p.notes) : ''}</small>
+                </div>
+                <div class="stmt-pay-amount">KES ${(Number(p.amount) || 0).toLocaleString('en-KE')}</div>
+              </div>
+            `).join('')}</div>`;
+
+        // 10. Business header info
+        const bizName  = settings.business_name || 'Rise Axis Solutions Ltd';
+        const bizPin   = settings.business_pin;
+        const bizAddr  = settings.business_address;
+        const bizPoBox = settings.business_po_box;
+        const bizEmail = settings.business_email;
+        const bizPhone = settings.business_phone;
+        const bizLogo  = settings.business_logo_url;
+
+        const stmtNumber = 'STMT-' + (profileId ? profileId.slice(0, 8) : (customerKey || '').replace(/[^a-z0-9]/gi, '').slice(0, 8)).toUpperCase();
+        const stmtDate = new Date().toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        // 11. Render — SAME statement document as before
         body.innerHTML = `
-          <div id="printableStatement" style="background:#fff; color:#000; padding: 20px; font-family: Arial, sans-serif;">
-            <div class="statement-header">
+          <div id="printableStatement" style="background:#fff; color:#0f172a; padding: 28px 32px; font-family: 'Inter', Arial, sans-serif; font-size: 0.88rem;">
+
+            <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:40px;padding-bottom:24px;border-bottom:1px dashed #e2e8f0;">
               <div>
-                <h2 style="margin:0; color:#1D3B73;">${escapeHtml(name)}</h2>
-                <p style="margin:4px 0; color:#666;">${escapeHtml(user.email || '')} | Statement Date: ${new Date().toLocaleDateString('en-KE')}</p>
-                <p style="margin:0; color:#666; font-size:0.8rem;">Rise Axis Solutions Ltd</p>
+                ${bizLogo ? `<img class="stmt-logo" src="${escapeHtml(bizLogo)}" alt="">` : ''}
+                <div class="stmt-biz-name">${escapeHtml(bizName)}</div>
+                <div class="stmt-biz-line">
+                  ${bizPin   ? `<strong>KRA PIN:</strong> ${escapeHtml(bizPin)}<br>` : ''}
+                  ${bizAddr  ? `${escapeHtml(bizAddr)}<br>` : ''}
+                  ${bizPoBox ? `P.O. Box ${escapeHtml(bizPoBox)}<br>` : ''}
+                  ${bizEmail ? `${escapeHtml(bizEmail)}<br>` : ''}
+                  ${bizPhone ? `${escapeHtml(bizPhone)}` : ''}
+                </div>
+              </div>
+              <div class="stmt-meta">
+                <div class="stmt-title">Statement of Account</div>
+                <div class="stmt-num">${escapeHtml(stmtNumber)}</div>
+                <div class="meta-row"><span class="k">Statement Date:</span><span class="v">${escapeHtml(stmtDate)}</span></div>
+                <div class="meta-row"><span class="k">Customer:</span><span class="v">${escapeHtml(displayName)}</span></div>
+                ${guestPhone ? `<div class="meta-row"><span class="k">Phone:</span><span class="v">${escapeHtml(guestPhone)}</span></div>` : ''}
+                ${guestEmail ? `<div class="meta-row"><span class="k">Email:</span><span class="v">${escapeHtml(guestEmail)}</span></div>` : ''}
               </div>
             </div>
 
-            <div class="statement-stats">
+            <div class="statement-stats" style="margin-top:24px;">
               <div class="stat-box">
                 <div class="label">Total Billed</div>
                 <div class="value">KES ${totalBilled.toLocaleString('en-KE')}</div>
@@ -629,44 +1178,85 @@
                 <div class="value text-green">KES ${totalPaid.toLocaleString('en-KE')}</div>
               </div>
               <div class="stat-box">
-                <div class="label">Outstanding Balance</div>
-                <div class="value text-red">KES ${totalBalance.toLocaleString('en-KE')}</div>
+                <div class="label">Balance Due</div>
+                <div class="value ${balanceDue > 0.01 ? 'text-red' : 'text-green'}">KES ${balanceDue.toLocaleString('en-KE')}</div>
               </div>
             </div>
 
-            <table class="statement-table" style="width:100%; border-collapse:collapse;">
+            <div class="stmt-section-title" style="margin-top:8px;"><i class="fas fa-file-invoice"></i> Invoices</div>
+            <table class="stmt-table">
               <thead>
                 <tr>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Invoice #</th>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Issued</th>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Due Date</th>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Status</th>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Total</th>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Paid</th>
-                  <th style="border-bottom:1px solid #ddd; padding:8px; text-align:left;">Balance</th>
+                  <th>Invoice #</th>
+                  <th>Issued</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th class="num">Total</th>
+                  <th class="num">Paid</th>
+                  <th class="num">Balance</th>
+                </tr>
+              </thead>
+              <tbody>${invoiceRows}</tbody>
+            </table>
+
+            <hr class="stmt-divider">
+            <div class="stmt-section-title"><i class="fas fa-list-ol"></i> Transaction Ledger — Debits &amp; Credits</div>
+            <table class="stmt-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th class="num">Debit (KES)</th>
+                  <th class="num">Credit (KES)</th>
+                  <th class="num">Running Balance</th>
                 </tr>
               </thead>
               <tbody>
-                ${invoiceRows || '<tr><td colspan="7" style="text-align:center;padding:30px;">No invoices found for this customer.</td></tr>'}
+                ${ledgerRows || `<tr><td colspan="5" class="stmt-empty">No transactions recorded.</td></tr>`}
               </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2">Totals</td>
+                  <td class="num">KES ${totalBilled.toLocaleString('en-KE')}</td>
+                  <td class="num">KES ${totalPaid.toLocaleString('en-KE')}</td>
+                  <td class="num" style="color:${balanceDue > 0.01 ? '#c8102e' : '#0e7a3c'};">
+                    KES ${balanceDue.toLocaleString('en-KE')}
+                  </td>
+                </tr>
+              </tfoot>
             </table>
+
+            <hr class="stmt-divider">
+            <div class="stmt-section-title"><i class="fas fa-history"></i> Payment History</div>
+            ${payHistoryHtml}
+
+            <div class="stmt-footer">
+              This is a computer-generated statement of account from ${escapeHtml(bizName)}.<br>
+              For fiscal tax compliance, please refer to the official KRA eTIMS invoice where applicable.<br>
+              Generated on ${escapeHtml(new Date().toLocaleString('en-KE'))}.
+            </div>
+
           </div>
         `;
 
       } catch (err) {
         console.error('Failed to load statement:', err);
-        body.innerHTML = `<div class="empty-orders"><p>Error loading statement: ${escapeHtml(err.message)}</p></div>`;
+        body.innerHTML = `
+          <div class="empty-orders" style="padding:60px;">
+            <div class="icon" style="color:var(--red);"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3>Could not load statement</h3>
+            <p>${escapeHtml(err.message || 'Unknown error')}</p>
+          </div>`;
+        showToast('Failed to load statement', 'error');
       }
     }
-
     function closeStatementModal() {
       document.getElementById('statementModal').classList.remove('open');
     }
-
     /* ==========================================
        DOWNLOAD PDF LOGIC
        ========================================== */
-    function downloadStatement() {
+      function downloadStatement() {
       const element = document.getElementById('printableStatement');
       if (!element) {
         showToast('Statement data is not loaded yet', 'error');
@@ -678,20 +1268,19 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating PDF...';
 
-      // Generate a filename using the user's name from the header
-      const userName = document.querySelector('#printableStatement h2').innerText.replace(/[^a-z0-9]/gi, '_');
+      const userName = (document.querySelector('#printableStatement .stmt-meta .meta-row .v')?.innerText || 'Customer')
+        .replace(/[^a-z0-9]/gi, '_');
       const fileName = `Statement_${userName}_${new Date().toISOString().slice(0,10)}.pdf`;
 
-      // html2pdf options for a clean A4 document
       const opt = {
-        margin:       10,
+        margin:       [10, 10, 10, 10],
         filename:     fileName,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
       };
 
-      // Execute download
       html2pdf().set(opt).from(element).save().then(() => {
         btn.disabled = false;
         btn.innerHTML = orig;
@@ -703,7 +1292,6 @@
         showToast('Failed to generate PDF', 'error');
       });
     }
-
     /* ==========================================
        REGISTRATION LOGIC (NATIVE SUPABASE)
        ========================================== */
@@ -808,17 +1396,17 @@
           });
         }
         
-        btn.disabled = false;
+            btn.disabled = false;
         btn.innerHTML = orig;
-        await loadUsers(); 
+        await loadCustomers();
       }
     }
 
-    (async function init() {
+       (async function init() {
       const ok = await checkAdminAccess();
       if (!ok) return;
       document.getElementById('adminMain').style.display = 'block';
-      await loadUsers();
+      await loadCustomers();
     })();
   </script>
   <script src="pwa.js"></script>

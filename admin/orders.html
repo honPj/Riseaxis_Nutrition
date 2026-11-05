@@ -398,6 +398,117 @@
       .detail-grid { grid-template-columns: 1fr; }
       .status-controls { grid-template-columns: 1fr; }
     }
+        /* --- DATE SORT CONTROLS --- */
+    .date-sort-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 12px 16px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(31,58,110,0.04);
+    }
+    .date-sort-bar .ds-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .date-sort-bar .ds-label i { color: var(--orange); }
+    .date-sort-bar .ds-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .date-sort-bar .ds-pill {
+      padding: 7px 16px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .date-sort-bar .ds-pill:hover {
+      border-color: var(--navy);
+      color: var(--navy);
+      background: #f4f7fc;
+    }
+    .date-sort-bar .ds-pill.active {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(29,59,115,0.25);
+    }
+    .date-sort-bar .ds-custom {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-left: 4px;
+    }
+    .date-sort-bar .ds-custom.show { display: flex; }
+    .date-sort-bar .ds-custom input[type="date"] {
+      padding: 7px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      color: var(--navy);
+      font-weight: 600;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .date-sort-bar .ds-custom input[type="date"]:focus {
+      border-color: var(--navy);
+    }
+    .date-sort-bar .ds-custom span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .date-sort-bar .ds-custom button {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: none;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .date-sort-bar .ds-custom button:hover { background: var(--navy-deep); }
+    .date-sort-bar .ds-clear {
+      margin-left: auto;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #fecaca;
+      background: #FEF2F2;
+      color: #991B1B;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-family: inherit;
+    }
+    .date-sort-bar .ds-clear.show { display: inline-flex; }
+    .date-sort-bar .ds-clear:hover { background: #FEE2E2; }
   </style>
 </head>
 <body>
@@ -478,7 +589,25 @@
             <div class="stat-label">Total Revenue</div>
           </div>
         </div>
-
+        <!-- DATE SORT BAR -->
+        <div class="date-sort-bar" id="dateSortBar">
+          <div class="ds-label"><i class="fas fa-calendar-alt"></i> Date Range:</div>
+          <div class="ds-pills" id="datePills">
+            <button class="ds-pill active" data-range="all">All Time</button>
+            <button class="ds-pill" data-range="today">Today</button>
+            <button class="ds-pill" data-range="week">This Week</button>
+            <button class="ds-pill" data-range="month">This Month</button>
+            <button class="ds-pill" data-range="year">This Year</button>
+            <button class="ds-pill" data-range="custom">Custom</button>
+          </div>
+          <div class="ds-custom" id="customDateWrap">
+            <input type="date" id="customFrom" title="From date">
+            <span>to</span>
+            <input type="date" id="customTo" title="To date">
+            <button type="button" id="applyCustomBtn">Apply</button>
+          </div>
+          <button class="ds-clear" id="clearDateBtn"><i class="fas fa-times"></i> Clear</button>
+        </div>
         <div class="filter-bar">
           <div class="search-box">
             <i class="fas fa-search"></i>
@@ -577,6 +706,10 @@
     let currentOrder = null;
     let currentOrderItems = [];
     let currentInvoice = null;      // invoice linked to current order (or null)
+        /* --- DATE SORT STATE --- */
+    let activeDateRange = 'all';    // 'all' | 'today' | 'week' | 'month' | 'year' | 'custom'
+    let customFromDate = null;      // Date object or null
+    let customToDate = null;        // Date object or null
 
     const PAYMENT_BADGES = {
       'pending':  { class: 'badge-pending',  label: 'Pending',  icon: 'fa-hourglass-half' },
@@ -610,7 +743,79 @@
       return d.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' })
         + ' · ' + d.toLocaleTimeString('en-KE', { hour: '2-digit', minute: '2-digit' });
     };
+    /* --- DATE RANGE HELPERS --- */
+    function startOfDay(d) {
+      const x = new Date(d);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    }
+    function endOfDay(d) {
+      const x = new Date(d);
+      x.setHours(23, 59, 59, 999);
+      return x;
+    }
+    function startOfWeek(d) {
+      // Week starts Monday
+      const x = startOfDay(d);
+      const day = x.getDay(); // 0 = Sunday, 1 = Monday...
+      const diff = day === 0 ? 6 : day - 1;
+      x.setDate(x.getDate() - diff);
+      return x;
+    }
+    function startOfMonth(d) {
+      const x = startOfDay(d);
+      x.setDate(1);
+      return x;
+    }
+    function startOfYear(d) {
+      const x = startOfDay(d);
+      x.setMonth(0, 1);
+      return x;
+    }
 
+    /**
+     * Returns true if the order's created_at falls within the active date range.
+     */
+    function orderMatchesDateRange(order) {
+      if (activeDateRange === 'all') return true;
+      if (!order.created_at) return false;
+
+      const created = new Date(order.created_at);
+      if (isNaN(created.getTime())) return false;
+
+      const now = new Date();
+
+      if (activeDateRange === 'today') {
+        return created >= startOfDay(now) && created <= endOfDay(now);
+      }
+      if (activeDateRange === 'week') {
+        const weekStart = startOfWeek(now);
+        const weekEnd = endOfDay(now);
+        return created >= weekStart && created <= weekEnd;
+      }
+      if (activeDateRange === 'month') {
+        const monthStart = startOfMonth(now);
+        const monthEnd = endOfDay(now);
+        return created >= monthStart && created <= monthEnd;
+      }
+      if (activeDateRange === 'year') {
+        const yearStart = startOfYear(now);
+        const yearEnd = endOfDay(now);
+        return created >= yearStart && created <= yearEnd;
+      }
+      if (activeDateRange === 'custom') {
+        if (!customFromDate && !customToDate) return true;
+        let ok = true;
+        if (customFromDate) {
+          ok = ok && created >= startOfDay(customFromDate);
+        }
+        if (customToDate) {
+          ok = ok && created <= endOfDay(customToDate);
+        }
+        return ok;
+      }
+      return true;
+    }
     function invoiceChipForInvoice(inv) {
       if (!inv) return `<span class="invoice-empty">—</span>`;
       // Determine visual class
@@ -733,6 +938,7 @@
       const method = document.getElementById('filterMethod').value;
 
       filteredOrders = allOrders.filter(o => {
+                if (!orderMatchesDateRange(o)) return false;
         if (payment && o.payment_status !== payment) return false;
         if (status && o.order_status !== status) return false;
         if (method && o.payment_method !== method) return false;
@@ -759,6 +965,69 @@
     document.getElementById('filterPayment').addEventListener('change', applyFilters);
     document.getElementById('filterStatus').addEventListener('change', applyFilters);
     document.getElementById('filterMethod').addEventListener('change', applyFilters);
+        /* --- DATE SORT EVENT LISTENERS --- */
+    (function wireDateSort() {
+      const pills = document.querySelectorAll('#datePills .ds-pill');
+      const customWrap = document.getElementById('customDateWrap');
+      const customFrom = document.getElementById('customFrom');
+      const customTo = document.getElementById('customTo');
+      const applyCustomBtn = document.getElementById('applyCustomBtn');
+      const clearBtn = document.getElementById('clearDateBtn');
+
+      function setActivePill(range) {
+        pills.forEach(p => p.classList.toggle('active', p.dataset.range === range));
+      }
+
+      function updateClearVisibility() {
+        clearBtn.classList.toggle('show', activeDateRange !== 'all');
+      }
+
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const range = pill.dataset.range;
+          activeDateRange = range;
+
+          if (range === 'custom') {
+            customWrap.classList.add('show');
+          } else {
+            customWrap.classList.remove('show');
+          }
+
+          setActivePill(range);
+          updateClearVisibility();
+          applyFilters();
+        });
+      });
+
+      applyCustomBtn.addEventListener('click', () => {
+        const fromVal = customFrom.value ? new Date(customFrom.value) : null;
+        const toVal = customTo.value ? new Date(customTo.value) : null;
+
+        if (fromVal && toVal && fromVal > toVal) {
+          showToast('From date cannot be after To date', 'error');
+          return;
+        }
+
+        customFromDate = fromVal;
+        customToDate = toVal;
+        activeDateRange = 'custom';
+        setActivePill('custom');
+        updateClearVisibility();
+        applyFilters();
+      });
+
+      clearBtn.addEventListener('click', () => {
+        activeDateRange = 'all';
+        customFromDate = null;
+        customToDate = null;
+        customFrom.value = '';
+        customTo.value = '';
+        customWrap.classList.remove('show');
+        setActivePill('all');
+        updateClearVisibility();
+        applyFilters();
+      });
+    })();
 
     /* ============================================================
        RENDER TABLE

@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="splash.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="admin-sidebar.js"></script>
   <style>
     /* ============================================================
@@ -797,6 +799,210 @@
       .ytd-item { padding: 14px; }
       .ytd-item .yi-value { font-size: 1.05rem; }
     }
+        /* ============================================================
+       PRINTABLE ANALYTICS REPORT
+       Colors match brand palette: navy #1D3B73, red #C81E27,
+       green #17B052, bg-light #f7f8fa, text-dark #0f1729,
+       text-muted #4a5568, border #e2e8f0
+       (Hex literals used so html2canvas renders correctly)
+       ============================================================ */
+    #printableReport {
+      background: #ffffff;
+      color: #0f1729;
+      padding: 28px 32px;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 0.88rem;
+      width: 100%;
+    }
+    #printableReport .rp-header {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px dashed #e2e8f0;
+      margin-bottom: 24px;
+    }
+    #printableReport .rp-biz-name {
+      font-size: 1.35rem; font-weight: 900;
+      color: #1D3B73; letter-spacing: -0.3px; margin-bottom: 8px;
+    }
+    #printableReport .rp-biz-line {
+      color: #4a5568; font-size: 0.85rem; line-height: 1.7;
+    }
+    #printableReport .rp-biz-line strong { color: #1D3B73; font-weight: 700; }
+    #printableReport .rp-logo {
+      max-height: 60px; max-width: 200px;
+      object-fit: contain; margin-bottom: 12px; display: block;
+    }
+    #printableReport .rp-meta { text-align: right; }
+    #printableReport .rp-meta .rp-title {
+      font-size: 1.5rem; font-weight: 900; color: #1D3B73;
+      letter-spacing: -0.5px; margin-bottom: 2px; text-transform: uppercase;
+    }
+    #printableReport .rp-meta .rp-ref {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem; font-weight: 800; color: #1D3B73;
+      letter-spacing: 1px; margin-bottom: 10px;
+    }
+    #printableReport .rp-meta .meta-row {
+      display: flex; justify-content: flex-end; gap: 12px;
+      font-size: 0.82rem; padding: 3px 0;
+    }
+    #printableReport .rp-meta .meta-row .k { color: #4a5568; font-weight: 600; }
+    #printableReport .rp-meta .meta-row .v { color: #1D3B73; font-weight: 700; }
+
+    #printableReport .rp-section-title {
+      font-size: 0.78rem; font-weight: 800; color: #1D3B73;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      margin: 0 0 12px; display: flex; align-items: center; gap: 8px;
+      padding-bottom: 6px; border-bottom: 1px solid #e2e8f0;
+    }
+    #printableReport .rp-section-title i { color: #C81E27; }
+
+    #printableReport .rp-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; margin-bottom: 22px;
+    }
+    #printableReport .rp-stat {
+      background: #f7f8fa; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 14px;
+    }
+    #printableReport .rp-stat .label {
+      font-size: 0.65rem; font-weight: 800; color: #4a5568;
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+    }
+    #printableReport .rp-stat .value {
+      font-size: 1.15rem; font-weight: 900; color: #1D3B73;
+      line-height: 1.1; font-variant-numeric: tabular-nums;
+    }
+    #printableReport .rp-stat .value.red { color: #C81E27; }
+    #printableReport .rp-stat .value.green { color: #17B052; }
+    #printableReport .rp-stat .sub {
+      font-size: 0.7rem; color: #4a5568; font-weight: 600; margin-top: 4px;
+    }
+
+    #printableReport .rp-ytd {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 22px;
+    }
+    #printableReport .rp-ytd-item {
+      background: linear-gradient(135deg, #f7f8fa, #eef4fb);
+      border: 1px solid rgba(29,59,115,0.1);
+      border-radius: 10px; padding: 14px;
+    }
+    #printableReport .rp-ytd-item .lbl {
+      font-size: 0.65rem; font-weight: 800; color: #4a5568;
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;
+    }
+    #printableReport .rp-ytd-item .val {
+      font-size: 1.05rem; font-weight: 900; color: #1D3B73;
+      font-variant-numeric: tabular-nums;
+    }
+    #printableReport .rp-ytd-item .sub {
+      font-size: 0.7rem; color: #4a5568; font-weight: 600; margin-top: 2px;
+    }
+
+    #printableReport table.rp-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.82rem; margin-bottom: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+    #printableReport table.rp-table thead th {
+      text-align: left; padding: 8px 10px;
+      background: #f7f8fa; color: #1D3B73;
+      font-size: 0.65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.7px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    #printableReport table.rp-table thead th.num { text-align: right; }
+    #printableReport table.rp-table tbody td {
+      padding: 8px 10px; border-bottom: 1px solid #e2e8f0;
+      color: #0f1729; vertical-align: top;
+    }
+    #printableReport table.rp-table tbody tr:last-child td { border-bottom: none; }
+    #printableReport table.rp-table td.num {
+      text-align: right; white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    #printableReport table.rp-table td.mono {
+      font-family: 'Courier New', monospace;
+      font-weight: 800; color: #1D3B73; letter-spacing: 0.3px;
+      font-size: 0.78rem;
+    }
+    #printableReport table.rp-table td.pos { color: #17B052; font-weight: 700; }
+    #printableReport table.rp-table td.neg { color: #C81E27; font-weight: 700; }
+
+    #printableReport .rp-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px;
+      font-size: 0.65rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    #printableReport .rp-badge.paid      { background: #e6f7ee; color: #0d7a38; }
+    #printableReport .rp-badge.partial   { background: #fef3c7; color: #92400e; }
+    #printableReport .rp-badge.issued    { background: #e8eef8; color: #1D3B73; }
+    #printableReport .rp-badge.overdue   { background: #fdecee; color: #a30d25; }
+    #printableReport .rp-badge.void      { background: #e5e7eb; color: #4b5563; text-decoration: line-through; }
+    #printableReport .rp-badge.new       { background: #e6f7ee; color: #0d7a38; }
+    #printableReport .rp-badge.returning { background: #e8eef8; color: #1D3B73; }
+    #printableReport .rp-badge.out       { background: #fdecee; color: #a30d25; }
+    #printableReport .rp-badge.low       { background: #e8eef8; color: #1D3B73; }
+    #printableReport .rp-badge.soon      { background: #fef3c7; color: #92400e; }
+
+    #printableReport .rp-empty {
+      text-align: center; padding: 18px;
+      color: #4a5568; font-size: 0.82rem; font-style: italic;
+    }
+
+    #printableReport .rp-action-list {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 10px; margin-bottom: 22px;
+    }
+    #printableReport .rp-action-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: #f7f8fa;
+      border: 1px solid #e2e8f0; border-radius: 8px;
+    }
+    #printableReport .rp-action-row .lbl {
+      font-size: 0.82rem; color: #4a5568; font-weight: 600;
+    }
+    #printableReport .rp-action-row .cnt {
+      font-size: 0.95rem; color: #C81E27; font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+    #printableReport .rp-action-row .cnt.ok { color: #17B052; }
+
+    #printableReport .rp-method-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0;
+    }
+    #printableReport .rp-method-bar .lbl {
+      width: 100px; font-size: 0.8rem; font-weight: 700; color: #1D3B73;
+    }
+    #printableReport .rp-method-bar .track {
+      flex: 1; height: 8px; background: #f7f8fa;
+      border-radius: 20px; overflow: hidden;
+    }
+    #printableReport .rp-method-bar .fill {
+      height: 100%; border-radius: 20px;
+      background: linear-gradient(90deg, #17B052, #0d7a38);
+    }
+    #printableReport .rp-method-bar .val {
+      font-size: 0.78rem; font-weight: 800; color: #1D3B73;
+      min-width: 80px; text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #printableReport .rp-footer {
+      margin-top: 28px; padding-top: 16px;
+      border-top: 1px dashed #e2e8f0;
+      font-size: 0.72rem; color: #4a5568;
+      text-align: center; line-height: 1.6;
+    }
+
+    #printableReport .rp-keep {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
   </style>
 </head>
 <body>
@@ -842,10 +1048,15 @@
     <main class="admin-main" id="adminMain" style="display: none;">
       <div class="container">
 
-        <div class="page-title-row">
+                <div class="page-title-row">
           <div>
             <h1><i class="fas fa-bolt"></i> Live Analytics</h1>
             <p>What's happening right now</p>
+          </div>
+          <div class="title-actions">
+            <button class="btn-refresh" id="downloadReportBtn" onclick="downloadReport()">
+              <i class="fas fa-download"></i> Download Report
+            </button>
           </div>
         </div>
 
@@ -1089,6 +1300,7 @@
     let seenPaymentIds = new Set();
     let firstLoad = true;
     let hourlyChart = null;
+        let lastData = null;   
 
     /* ============================================================
        HELPERS
@@ -1952,9 +2164,10 @@
     /* ============================================================
        POLLING
        ============================================================ */
-    async function refresh() {
+        async function refresh() {
       try {
         const data = await loadAllData();
+        lastData = data;             // ← save snapshot for the report
         renderAll(data);
         // Reset countdown
         secondsLeft = Math.floor(REFRESH_MS / 1000);
@@ -2010,7 +2223,454 @@
         stopPolling();
       }
     }
+    /* ============================================================
+       ANALYTICS REPORT — download as PDF
+       ============================================================ */
+    function buildAnalyticsReport(data) {
+      const today = todayISO();
+      const now = new Date();
 
+      // -------- Compute totals (same logic as renderAll) --------
+      const todayInvoicedTotal = data.todayInvoices.reduce((s, i) => s + Number(i.total || 0), 0);
+      const todayInvoicedCount = data.todayInvoices.length;
+      const todayCollectedTotal = data.todayPayments.reduce((s, p) => s + Number(p.amount || 0), 0);
+      const todayCollectedCount = data.todayPayments.length;
+      const outstandingTotal = data.outstanding.reduce((s, i) =>
+        s + Math.max(0, Number(i.total || 0) - Number(i.amount_paid || 0)), 0);
+      const outstandingCount = data.outstanding.length;
+      const overdueAmount = data.overdue.reduce((s, i) =>
+        s + Math.max(0, Number(i.total || 0) - Number(i.amount_paid || 0)), 0);
+      const overdueCount = data.overdue.length;
+
+      const yesterdayInvoiced = data.yesterdayInvoices.reduce((s, i) => s + Number(i.total || 0), 0);
+      const yesterdayCollected = data.yesterdayPayments.reduce((s, p) => s + Number(p.amount || 0), 0);
+
+      // -------- YTD --------
+      const weekTotal = data.weekInvoices.reduce((s, i) => s + Number(i.total || 0), 0);
+      const monthTotal = data.monthInvoices.reduce((s, i) => s + Number(i.total || 0), 0);
+      const yearTotal = data.yearInvoices.reduce((s, i) => s + Number(i.total || 0), 0);
+
+      // -------- Awaiting action --------
+      const awaitingStaleDrafts = data.staleDrafts.length;
+      const awaitingOutOfStock = data.lowStock.filter(p => Number(p.stock) === 0).length;
+      const awaitingOrdersNotInvoiced = data.todayOrders.filter(o => o.payment_status !== 'paid').length;
+
+      // -------- Settings --------
+      const s = (window.__raxSettings || {});
+      const bizName   = s.business_name || 'Rise Axis Solutions Ltd';
+      const bizPin    = s.business_pin;
+      const bizAddr   = s.business_address;
+      const bizPoBox  = s.business_po_box;
+      const bizEmail  = s.business_email;
+      const bizPhone  = s.business_phone;
+      const bizLogo   = s.business_logo_url;
+
+      // -------- Report reference --------
+      const reportRef = 'RPT-' + now.toISOString().slice(0, 10).replace(/-/g, '') + '-' +
+                        String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+      const generatedAt = now.toLocaleString('en-KE', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      // -------- Helper: delta text --------
+      function deltaText(current, previous) {
+        if (previous === 0 && current === 0) return '—';
+        if (previous === 0) return '↑ new';
+        const pct = ((current - previous) / previous) * 100;
+        if (Math.abs(pct) < 1) return 'flat';
+        return (pct > 0 ? '↑ ' : '↓ ') + Math.abs(pct).toFixed(0) + '%';
+      }
+
+      // -------- Section builders --------
+      function emptyRow(cols, msg) {
+        return `<tr><td colspan="${cols}" class="rp-empty">${msg}</td></tr>`;
+      }
+
+      const invoiceRows = data.todayInvoices.length === 0
+        ? emptyRow(5, 'No invoices issued today.')
+        : data.todayInvoices.slice(0, 10).map(inv => `
+            <tr>
+              <td class="mono">${escapeHtml(inv.invoice_number || 'DRAFT')}</td>
+              <td>${escapeHtml(inv.customer_name || '—')}</td>
+              <td>${escapeHtml(fmtTime(inv.created_at))}</td>
+              <td class="num pos">${fmtKES(inv.total)}</td>
+              <td><span class="rp-badge ${inv.status}">${escapeHtml(inv.status)}</span></td>
+            </tr>`).join('');
+
+      const paymentRows = data.todayPayments.length === 0
+        ? emptyRow(4, 'No payments received today.')
+        : data.todayPayments.slice(0, 10).map(p => `
+            <tr>
+              <td>${escapeHtml(paymentMethodLabel(p.method))}${p.reference ? ' · ' + escapeHtml(p.reference) : ''}</td>
+              <td>${escapeHtml(fmtTime(p.paid_at))}</td>
+              <td class="num pos">${fmtKES(p.amount)}</td>
+              <td>${p.notes ? escapeHtml(p.notes) : '—'}</td>
+            </tr>`).join('');
+
+      const lowStockRows = data.lowStock.length === 0
+        ? emptyRow(2, 'All products are well stocked.')
+        : data.lowStock.slice(0, 10).map(p => {
+            const stock = Number(p.stock) || 0;
+            return `<tr>
+              <td>${escapeHtml(p.name)}</td>
+              <td class="num"><span class="rp-badge ${stock === 0 ? 'out' : 'low'}">${stock === 0 ? 'OUT' : stock + ' left'}</span></td>
+            </tr>`;
+          }).join('');
+
+      const overdueRows = data.overdue.length === 0
+        ? emptyRow(4, 'No overdue invoices.')
+        : data.overdue.slice(0, 10).map(inv => {
+            const balance = Math.max(0, Number(inv.total) - Number(inv.amount_paid));
+            const dueDate = new Date(String(inv.due_date).slice(0, 10) + 'T00:00:00');
+            const daysLate = Math.max(0, Math.floor((new Date(today + 'T00:00:00') - dueDate) / 86400000));
+            return `<tr>
+              <td class="mono">${escapeHtml(inv.invoice_number)}</td>
+              <td>${escapeHtml(inv.customer_name || '—')}</td>
+              <td>${escapeHtml(fmtDate(inv.due_date))} · <span class="rp-badge overdue">${daysLate}d late</span></td>
+              <td class="num neg">${fmtKES(balance)}</td>
+            </tr>`;
+          }).join('');
+
+      // Top products
+      const byProduct = {};
+      data.todayItems.forEach(it => {
+        if (it.is_custom) return;
+        const pid = it.product_id || `custom:${it.description}`;
+        if (!byProduct[pid]) byProduct[pid] = {
+          name: it.product_id ? (data.productsMap[it.product_id] || 'Unknown') : (it.description || 'Custom'),
+          qty: 0, revenue: 0
+        };
+        byProduct[pid].qty += Number(it.quantity) || 0;
+        byProduct[pid].revenue += (Number(it.quantity) || 0) * (Number(it.unit_price) || 0);
+      });
+      const topProducts = Object.values(byProduct).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+
+      const topProductRows = topProducts.length === 0
+        ? emptyRow(3, 'No sales today yet.')
+        : topProducts.map((p, i) => `
+            <tr>
+              <td class="num">${i + 1}</td>
+              <td>${escapeHtml(p.name)}</td>
+              <td class="num pos">${fmtKES(p.revenue)}</td>
+            </tr>`).join('');
+
+      // Methods
+      const byMethod = {};
+      data.todayPayments.forEach(p => {
+        const m = p.method || 'other';
+        if (!byMethod[m]) byMethod[m] = { total: 0 };
+        byMethod[m].total += Number(p.amount) || 0;
+      });
+      const methodEntries = Object.entries(byMethod).sort((a, b) => b[1].total - a[1].total);
+      const methodGrand = methodEntries.reduce((s, [, v]) => s + v.total, 0);
+      const methodBars = methodEntries.length === 0
+        ? `<div class="rp-empty">No payments today.</div>`
+        : methodEntries.map(([m, v]) => {
+            const pct = methodGrand > 0 ? (v.total / methodGrand) * 100 : 0;
+            return `<div class="rp-method-bar">
+              <div class="lbl">${escapeHtml(paymentMethodLabel(m))}</div>
+              <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+              <div class="val">${fmtKES(v.total)}</div>
+            </div>`;
+          }).join('');
+
+      // Customer activity
+      const byCustomer = {};
+      data.todayInvoices.forEach(inv => {
+        const key = inv.customer_user_id || `walkin:${inv.customer_name}`;
+        if (!byCustomer[key]) byCustomer[key] = {
+          name: inv.customer_user_id
+            ? (data.profilesMap[inv.customer_user_id]?.name || inv.customer_name || 'Customer')
+            : (inv.customer_name || 'Walk-in'),
+          invoices: 0, total: 0
+        };
+        byCustomer[key].invoices += 1;
+        byCustomer[key].total += Number(inv.total) || 0;
+      });
+      const customerRows = Object.values(byCustomer)
+        .sort((a, b) => b.total - a.total)
+        .map(c => {
+          const isNew = c.invoices === 1;
+          return `<tr>
+            <td>${escapeHtml(c.name)}</td>
+            <td class="num">${c.invoices}</td>
+            <td class="num pos">${fmtKES(c.total)}</td>
+            <td><span class="rp-badge ${isNew ? 'new' : 'returning'}">${isNew ? 'New' : 'Returning'}</span></td>
+          </tr>`;
+        }).join('');
+      const customerSection = customerRows
+        ? `<table class="rp-table"><thead><tr>
+             <th>Customer</th><th class="num">Invoices</th><th class="num">Total</th><th>Type</th>
+           </tr></thead><tbody>${customerRows}</tbody></table>`
+        : `<div class="rp-empty">No customer activity today.</div>`;
+
+      // Follow-up
+      const followupRows = data.overdue
+        .filter(inv => inv.customer_user_id && data.historyMap[inv.customer_user_id]?.count > 0)
+        .map(inv => {
+          const balance = Math.max(0, Number(inv.total) - Number(inv.amount_paid));
+          const hist = data.historyMap[inv.customer_user_id];
+          const dueDate = new Date(String(inv.due_date).slice(0, 10) + 'T00:00:00');
+          const daysLate = Math.max(0, Math.floor((new Date(today + 'T00:00:00') - dueDate) / 86400000));
+          return `<tr>
+            <td>${escapeHtml(inv.customer_name || 'Customer')}</td>
+            <td class="mono">${escapeHtml(inv.invoice_number)}</td>
+            <td>${hist.count} past paid · ${fmtKES(hist.total)}</td>
+            <td class="num neg">${fmtKES(balance)}</td>
+            <td class="num">${daysLate}d</td>
+          </tr>`;
+        }).join('');
+      const followupSection = followupRows
+        ? `<table class="rp-table"><thead><tr>
+             <th>Customer</th><th>Invoice</th><th>History</th><th class="num">Balance</th><th class="num">Late</th>
+           </tr></thead><tbody>${followupRows}</tbody></table>`
+        : `<div class="rp-empty">No overdue customers with payment history.</div>`;
+
+      // Stale drafts
+      const staleRows = data.staleDrafts.length === 0
+        ? emptyRow(4, 'No stale drafts.')
+        : data.staleDrafts.map(d => {
+            const ageHours = Math.floor((Date.now() - new Date(d.created_at).getTime()) / 3600000);
+            const ageLabel = ageHours >= 24 ? Math.floor(ageHours / 24) + 'd old' : ageHours + 'h old';
+            return `<tr>
+              <td class="mono">${escapeHtml(d.invoice_number || 'DRAFT')}</td>
+              <td>${escapeHtml(d.customer_name || '—')}</td>
+              <td class="num">${fmtKES(d.total)}</td>
+              <td class="num"><span class="rp-badge soon">${ageLabel}</span></td>
+            </tr>`;
+          }).join('');
+
+      // Hourly table
+      const hourlyRows = Array.from({ length: 24 }, (_, h) => {
+        const inv = data.todayInvoices.filter(i => new Date(i.created_at).getHours() === h)
+          .reduce((s, i) => s + Number(i.total || 0), 0);
+        const col = data.todayPayments.filter(p => new Date(p.paid_at).getHours() === h)
+          .reduce((s, p) => s + Number(p.amount || 0), 0);
+        if (inv === 0 && col === 0) return '';
+        return `<tr>
+          <td class="mono">${String(h).padStart(2, '0')}:00</td>
+          <td class="num ${inv > 0 ? 'pos' : ''}">${inv > 0 ? fmtKES(inv) : '—'}</td>
+          <td class="num ${col > 0 ? 'pos' : ''}">${col > 0 ? fmtKES(col) : '—'}</td>
+        </tr>`;
+      }).filter(Boolean).join('');
+      const hourlySection = hourlyRows
+        ? `<table class="rp-table"><thead><tr>
+             <th>Hour</th><th class="num">Invoiced</th><th class="num">Collected</th>
+           </tr></thead><tbody>${hourlyRows}</tbody></table>`
+        : `<div class="rp-empty">No activity today yet.</div>`;
+
+      // -------- Compose HTML --------
+      return `
+        <div id="printableReport">
+          <!-- HEADER -->
+          <div class="rp-header">
+            <div>
+              ${bizLogo ? `<img class="rp-logo" src="${escapeHtml(bizLogo)}" alt="">` : ''}
+              <div class="rp-biz-name">${escapeHtml(bizName)}</div>
+              <div class="rp-biz-line">
+                ${bizPin   ? `<strong>KRA PIN:</strong> ${escapeHtml(bizPin)}<br>` : ''}
+                ${bizAddr  ? `${escapeHtml(bizAddr)}<br>` : ''}
+                ${bizPoBox ? `P.O. Box ${escapeHtml(bizPoBox)}<br>` : ''}
+                ${bizEmail ? `${escapeHtml(bizEmail)}<br>` : ''}
+                ${bizPhone ? `${escapeHtml(bizPhone)}` : ''}
+              </div>
+            </div>
+            <div class="rp-meta">
+              <div class="rp-title">Live Analytics Report</div>
+              <div class="rp-ref">${escapeHtml(reportRef)}</div>
+              <div class="meta-row"><span class="k">Generated:</span><span class="v">${escapeHtml(generatedAt)}</span></div>
+              <div class="meta-row"><span class="k">Business Date:</span><span class="v">${escapeHtml(fmtDate(today))}</span></div>
+            </div>
+          </div>
+
+          <!-- SUMMARY STATS -->
+          <div class="rp-section-title"><i class="fas fa-chart-line"></i> Executive Summary</div>
+          <div class="rp-stats">
+            <div class="rp-stat">
+              <div class="label">Invoiced Today</div>
+              <div class="value">${fmtKES(todayInvoicedTotal)}</div>
+              <div class="sub">${todayInvoicedCount} invoice${todayInvoicedCount !== 1 ? 's' : ''} · ${deltaText(todayInvoicedTotal, yesterdayInvoiced)}</div>
+            </div>
+            <div class="rp-stat">
+              <div class="label">Collected Today</div>
+              <div class="value green">${fmtKES(todayCollectedTotal)}</div>
+              <div class="sub">${todayCollectedCount} payment${todayCollectedCount !== 1 ? 's' : ''} · ${deltaText(todayCollectedTotal, yesterdayCollected)}</div>
+            </div>
+            <div class="rp-stat">
+              <div class="label">Outstanding</div>
+              <div class="value red">${fmtKES(outstandingTotal)}</div>
+              <div class="sub">${outstandingCount} invoice${outstandingCount !== 1 ? 's' : ''} unpaid</div>
+            </div>
+            <div class="rp-stat">
+              <div class="label">Overdue</div>
+              <div class="value red">${fmtKES(overdueAmount)}</div>
+              <div class="sub">${overdueCount} invoice${overdueCount !== 1 ? 's' : ''} past due</div>
+            </div>
+          </div>
+
+          <!-- AWAITING ACTION -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-bolt"></i> Awaiting Action</div>
+          <div class="rp-action-list rp-keep">
+            <div class="rp-action-row">
+              <span class="lbl">Overdue invoices to chase</span>
+              <span class="cnt ${overdueCount === 0 ? 'ok' : ''}">${overdueCount}</span>
+            </div>
+            <div class="rp-action-row">
+              <span class="lbl">Invoices awaiting payment</span>
+              <span class="cnt ${outstandingCount === 0 ? 'ok' : ''}">${outstandingCount}</span>
+            </div>
+            <div class="rp-action-row">
+              <span class="lbl">Orders not yet paid</span>
+              <span class="cnt ${awaitingOrdersNotInvoiced === 0 ? 'ok' : ''}">${awaitingOrdersNotInvoiced}</span>
+            </div>
+            <div class="rp-action-row">
+              <span class="lbl">Stale drafts</span>
+              <span class="cnt ${awaitingStaleDrafts === 0 ? 'ok' : ''}">${awaitingStaleDrafts}</span>
+            </div>
+            <div class="rp-action-row">
+              <span class="lbl">Products out of stock</span>
+              <span class="cnt ${awaitingOutOfStock === 0 ? 'ok' : ''}">${awaitingOutOfStock}</span>
+            </div>
+          </div>
+
+          <!-- PERIOD TOTALS -->
+          <div class="rp-section-title"><i class="fas fa-calendar-alt"></i> Period Totals</div>
+          <div class="rp-ytd">
+            <div class="rp-ytd-item">
+              <div class="lbl">This Week</div>
+              <div class="val">${fmtKES(weekTotal)}</div>
+              <div class="sub">${data.weekInvoices.length} invoices</div>
+            </div>
+            <div class="rp-ytd-item">
+              <div class="lbl">This Month</div>
+              <div class="val">${fmtKES(monthTotal)}</div>
+              <div class="sub">${data.monthInvoices.length} invoices</div>
+            </div>
+            <div class="rp-ytd-item">
+              <div class="lbl">This Year</div>
+              <div class="val">${fmtKES(yearTotal)}</div>
+              <div class="sub">${data.yearInvoices.length} invoices</div>
+            </div>
+          </div>
+
+          <!-- HOURLY ACTIVITY -->
+          <div class="rp-section-title"><i class="fas fa-clock"></i> Today's Activity by Hour</div>
+          ${hourlySection}
+
+          <!-- RECENT INVOICES -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-file-invoice"></i> Recent Invoices (${data.todayInvoices.length})</div>
+          <table class="rp-table rp-keep">
+            <thead><tr><th>Invoice #</th><th>Customer</th><th>Time</th><th class="num">Total</th><th>Status</th></tr></thead>
+            <tbody>${invoiceRows}</tbody>
+          </table>
+
+          <!-- RECENT PAYMENTS -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-money-bill-wave"></i> Recent Payments (${data.todayPayments.length})</div>
+          <table class="rp-table rp-keep">
+            <thead><tr><th>Method · Reference</th><th>Time</th><th class="num">Amount</th><th>Notes</th></tr></thead>
+            <tbody>${paymentRows}</tbody>
+          </table>
+
+          <!-- LOW STOCK -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-exclamation-triangle"></i> Low Stock Alerts (${data.lowStock.length})</div>
+          <table class="rp-table rp-keep">
+            <thead><tr><th>Product</th><th class="num">Stock</th></tr></thead>
+            <tbody>${lowStockRows}</tbody>
+          </table>
+
+          <!-- OVERDUE -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-hourglass-end"></i> Overdue Invoices (${data.overdue.length})</div>
+          <table class="rp-table rp-keep">
+            <thead><tr><th>Invoice #</th><th>Customer</th><th>Due / Age</th><th class="num">Balance</th></tr></thead>
+            <tbody>${overdueRows}</tbody>
+          </table>
+
+          <!-- TOP PRODUCTS -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-trophy"></i> Top Products Today</div>
+          <table class="rp-table rp-keep">
+            <thead><tr><th class="num">Rank</th><th>Product</th><th class="num">Revenue</th></tr></thead>
+            <tbody>${topProductRows}</tbody>
+          </table>
+
+          <!-- PAYMENTS BY METHOD -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-credit-card"></i> Payments Today by Method</div>
+          <div class="rp-keep">${methodBars}</div>
+
+          <!-- CUSTOMER ACTIVITY -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-users"></i> Customer Activity Today</div>
+          <div class="rp-keep">${customerSection}</div>
+
+          <!-- FOLLOW UP -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-phone-volume"></i> Follow Up — Overdue with History</div>
+          <div class="rp-keep">${followupSection}</div>
+
+          <!-- STALE DRAFTS -->
+          <div class="rp-section-title rp-keep"><i class="fas fa-file-alt"></i> Stale Drafts (${data.staleDrafts.length})</div>
+          <table class="rp-table rp-keep">
+            <thead><tr><th>Invoice #</th><th>Customer</th><th class="num">Total</th><th class="num">Age</th></tr></thead>
+            <tbody>${staleRows}</tbody>
+          </table>
+
+          <!-- FOOTER -->
+          <div class="rp-footer">
+            This is a computer-generated analytics report from ${escapeHtml(bizName)}.<br>
+            Generated on ${escapeHtml(generatedAt)} · Reference ${escapeHtml(reportRef)}<br>
+            For fiscal tax compliance, refer to the official KRA eTIMS invoice where applicable.
+          </div>
+        </div>
+      `;
+    }
+
+    async function downloadReport() {
+      if (!lastData) {
+        showToast('Data not loaded yet — please wait a moment', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('downloadReportBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating...';
+
+      try {
+        // Load business settings if not already cached
+        if (!window.__raxSettings) {
+          const { data: s } = await supabaseClient.from('settings').select('*').eq('id', 1).maybeSingle();
+          window.__raxSettings = s || {};
+        }
+
+        // Build offscreen container
+        const holder = document.createElement('div');
+        holder.style.position = 'fixed';
+        holder.style.left = '-99999px';
+        holder.style.top = '0';
+        holder.style.width = '210mm';         // A4 width
+        holder.style.background = '#ffffff';
+        holder.innerHTML = buildAnalyticsReport(lastData);
+        document.body.appendChild(holder);
+
+        const fileName = `Analytics_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+        const opt = {
+          margin:       [10, 10, 10, 10],
+          filename:     fileName,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak:    { mode: ['css', 'legacy'] }
+        };
+
+        await html2pdf().set(opt).from(holder.firstElementChild).save();
+        holder.remove();
+        showToast('Report downloaded successfully');
+      } catch (err) {
+        console.error('Report download failed:', err);
+        showToast('Failed to generate report: ' + (err.message || 'Unknown error'), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
     /* ============================================================
        INIT
        ============================================================ */
