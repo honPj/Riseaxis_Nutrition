@@ -1004,15 +1004,31 @@
           .order('issue_date', { ascending: true });
 
         // Filter: by profile_id if registered, else by email OR phone
-        if (profileId) {
-          invoiceQuery = invoiceQuery.eq('customer_user_id', profileId);
-        } else {
-          const orFilters = [];
-          if (guestEmail) orFilters.push(`customer_email.ilike.${guestEmail}`);
-          if (guestPhone) orFilters.push(`customer_phone.eq.${guestPhone}`);
-          if (orFilters.length) invoiceQuery = invoiceQuery.or(orFilters.join(','));
-          else invoiceQuery = invoiceQuery.eq('customer_user_id', '00000000-0000-0000-0000-000000000000'); // force empty
-        }
+        // Filter: registered → by user_id; guest → by email (fuzzy) OR phone tail (fuzzy)
+if (profileId) {
+  invoiceQuery = invoiceQuery.eq('customer_user_id', profileId);
+} else {
+  const orFilters = [];
+
+  // Email match (case-insensitive, tolerates whitespace)
+  if (guestEmail) {
+    orFilters.push(`customer_email.ilike.%${guestEmail.trim()}%`);
+  }
+
+  // Phone match — compare last 9 digits so +254… / 0… / 254… all match
+  if (guestPhone) {
+    const digits = String(guestPhone).replace(/\D/g, '');
+    const tail = digits.slice(-9);
+    if (tail) orFilters.push(`customer_phone.ilike.%${tail}%`);
+  }
+
+  if (orFilters.length) {
+    invoiceQuery = invoiceQuery.or(orFilters.join(','));
+  } else {
+    // force empty result
+    invoiceQuery = invoiceQuery.eq('customer_user_id', '00000000-0000-0000-0000-000000000000');
+  }
+}
 
         const [settingsRes, invoicesRes] = await Promise.all([
           supabaseClient.from('settings').select('*').eq('id', 1).maybeSingle(),
@@ -1021,7 +1037,8 @@
 
         if (invoicesRes.error) throw invoicesRes.error;
         const settings = settingsRes.data || {};
-        const invoices = invoicesRes.data || [];
+        const invoices = invoicesRes.data || [];console.log('[Statement] profileId:', profileId, '| guestEmail:', guestEmail, '| guestPhone:', guestPhone, '| invoices found:', invoices.length, invoices);
+
 
         // 3. Payments for those invoices
         const invoiceIds = invoices.map(i => i.id);
