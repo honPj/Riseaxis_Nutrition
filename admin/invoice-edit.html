@@ -1457,7 +1457,11 @@
             created_by: user?.id || null,
             // Only set order_id on brand-new invoices created from an order.
             // The UPDATE branch above must never touch order_id.
-            order_id: fromOrderId || null
+            order_id: fromOrderId || null,
+             customer_user_id: header.customer_user_id || null,
+            customer_email:   (header.customer_email || '').trim() || null,
+            customer_phone:   (header.customer_phone || '').trim() || null
+            
           })
           .select('id')
           .single();
@@ -1617,12 +1621,25 @@
         const { data: items } = await supabaseClient
           .from('order_items').select('*').eq('order_id', orderId);
 
-        // Fill customer (walk-in if no user_id link — we just fill name/phone/email)
-        customerTab = 'walkin';
-        applyCustomerTab();
-        document.getElementById('walkinName').value = order.customer_name || '';
-        document.getElementById('walkinPhone').value = order.customer_phone || '';
-        document.getElementById('walkinEmail').value = order.customer_email || '';
+             // If the order belongs to a registered user, link the invoice to them
+        // so statements / account history work. Otherwise fall back to walk-in.
+        if (order.user_id) {
+          customerTab = 'existing';
+          selectedCustomer = {
+            user_id: order.user_id,
+            name: order.customer_name || '',
+            phone: order.customer_phone || '',
+            email: order.customer_email || ''
+          };
+          applyCustomerTab();
+          renderSelectedCustomer();
+        } else {
+          customerTab = 'walkin';
+          applyCustomerTab();
+          document.getElementById('walkinName').value = order.customer_name || '';
+          document.getElementById('walkinPhone').value = order.customer_phone || '';
+          document.getElementById('walkinEmail').value = order.customer_email || '';
+        }
         document.getElementById('reference').value = 'From order ' + (order.order_number || '');
 
         // Order totals already include VAT (if any) in price_per_unit.

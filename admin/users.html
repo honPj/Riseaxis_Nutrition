@@ -996,39 +996,35 @@
           <p>Fetching customer records...</p>
         </div>`;
 
-      try {
+            try {
         // 2. Load settings + invoices in parallel
         let invoiceQuery = supabaseClient
           .from('invoices')
           .select('id, invoice_number, issue_date, due_date, total, amount_paid, status, reference')
           .order('issue_date', { ascending: true });
 
-        // Filter: by profile_id if registered, else by email OR phone
-        // Filter: registered → by user_id; guest → by email (fuzzy) OR phone tail (fuzzy)
-if (profileId) {
-  invoiceQuery = invoiceQuery.eq('customer_user_id', profileId);
-} else {
-  const orFilters = [];
+        // Filter: match on ANY available identifier — user_id, email, or phone-tail
+        const orFilters = [];
 
-  // Email match (case-insensitive, tolerates whitespace)
-  if (guestEmail) {
-    orFilters.push(`customer_email.ilike.%${guestEmail.trim()}%`);
-  }
+        if (profileId) {
+          orFilters.push(`customer_user_id.eq.${profileId}`);
+        }
 
-  // Phone match — compare last 9 digits so +254… / 0… / 254… all match
-  if (guestPhone) {
-    const digits = String(guestPhone).replace(/\D/g, '');
-    const tail = digits.slice(-9);
-    if (tail) orFilters.push(`customer_phone.ilike.%${tail}%`);
-  }
+        if (guestEmail && guestEmail.trim()) {
+          orFilters.push(`customer_email.ilike.%${guestEmail.trim()}%`);
+        }
 
-  if (orFilters.length) {
-    invoiceQuery = invoiceQuery.or(orFilters.join(','));
-  } else {
-    // force empty result
-    invoiceQuery = invoiceQuery.eq('customer_user_id', '00000000-0000-0000-0000-000000000000');
-  }
-}
+        if (guestPhone) {
+          const digits = String(guestPhone).replace(/\D/g, '');
+          const tail = digits.slice(-9);
+          if (tail) orFilters.push(`customer_phone.ilike.%${tail}%`);
+        }
+
+        if (orFilters.length) {
+          invoiceQuery = invoiceQuery.or(orFilters.join(','));
+        } else {
+          invoiceQuery = invoiceQuery.eq('customer_user_id', '00000000-0000-0000-0000-000000000000');
+        }
 
         const [settingsRes, invoicesRes] = await Promise.all([
           supabaseClient.from('settings').select('*').eq('id', 1).maybeSingle(),
