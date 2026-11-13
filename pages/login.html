@@ -1784,7 +1784,13 @@
        AUTO-REDIRECT IF ALREADY LOGGED IN
        ============================================================ */
     (async function init() {
-          try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('confirmed') === 'true') {
+        showToast('Email confirmed successfully! Please sign in.', 'success');
+      }
+      // ----------------------
+
+      try {
         const { data: { user } } = await supabaseClient.auth.getUser();
         if (user) {
           let redirect = 'account.html';
